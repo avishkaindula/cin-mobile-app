@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView, Alert, AppState } from "react-native";
+import { SafeAreaView, Alert, InteractionManager } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -49,9 +49,11 @@ export default function SignUp() {
       if (error) {
         Alert.alert("Sign Up Error", error.message || "An unexpected error occurred");
       } else {
-        // Redirect directly to verification page
-        router.push("/verify-email" as any);
-        setTimeout(() => router.setParams({ email }), 100);
+        // Use InteractionManager to ensure smooth navigation
+        InteractionManager.runAfterInteractions(() => {
+          router.push("/verify-email" as any);
+          setTimeout(() => router.setParams({ email }), 100);
+        });
       }
     } catch (error) {
       Alert.alert("Sign Up Error", "An unexpected error occurred. Please try again.");

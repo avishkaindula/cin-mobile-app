@@ -1,6 +1,6 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useState, useRef } from "react";
-import { SafeAreaView, Alert, TextInput } from "react-native";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { SafeAreaView, Alert, TextInput, Keyboard, InteractionManager } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -18,11 +18,33 @@ export default function VerifyEmail() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const { verifyOtp, resendVerification } = useSession();
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
+  // Wait for the screen to fully load before showing interactive elements
+  useFocusEffect(
+    useCallback(() => {
+      const task = InteractionManager.runAfterInteractions(() => {
+        setIsReady(true);
+      });
+      return () => task.cancel();
+    }, [])
+  );
+
+  // Clean up keyboard and input refs on unmount
+  useEffect(() => {
+    return () => {
+      // Dismiss keyboard when component unmounts
+      Keyboard.dismiss();
+      // Clear input refs
+      inputRefs.current = [];
+    };
+  }, []);
+
   const handleCodeChange = (value: string, index: number) => {
+    if (!isReady) return; // Don't handle input until screen is ready
     if (value.length > 1) return; // Prevent multiple characters
 
     const newCode = [...code];
@@ -31,14 +53,25 @@ export default function VerifyEmail() {
 
     // Auto-focus next input
     if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
+      // Use setTimeout to avoid focus issues during state updates
+      setTimeout(() => {
+        if (inputRefs.current[index + 1]) {
+          inputRefs.current[index + 1]?.focus();
+        }
+      }, 50);
     }
   };
 
   const handleKeyPress = (e: any, index: number) => {
+    if (!isReady) return; // Don't handle input until screen is ready
     // Handle backspace to focus previous input
     if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+      // Use setTimeout to avoid focus issues during state updates
+      setTimeout(() => {
+        if (inputRefs.current[index - 1]) {
+          inputRefs.current[index - 1]?.focus();
+        }
+      }, 50);
     }
   };
 
@@ -65,8 +98,8 @@ export default function VerifyEmail() {
 
       if (error) {
         Alert.alert(
-          "Verification Error",
-          error.message || "Invalid verification code"
+          "Verification Failed",
+          "The verification code is invalid or has expired. Please check your code or request a new one."
         );
       } else {
         Alert.alert(
@@ -206,7 +239,9 @@ export default function VerifyEmail() {
                       >
                         <TextInput
                           ref={(ref) => {
-                            inputRefs.current[index] = ref;
+                            if (isReady) {
+                              inputRefs.current[index] = ref;
+                            }
                           }}
                           value={digit}
                           onChangeText={(value) =>
@@ -216,6 +251,10 @@ export default function VerifyEmail() {
                           keyboardType="numeric"
                           maxLength={1}
                           textAlign="center"
+                          autoCorrect={false}
+                          autoComplete="off"
+                          textContentType="none"
+                          editable={isReady}
                           style={{
                             flex: 1,
                             fontSize: 18,
@@ -235,7 +274,7 @@ export default function VerifyEmail() {
                     size="lg"
                     className="w-full"
                     disabled={
-                      loading || resendLoading || code.some((digit) => !digit)
+                      !isReady || loading || resendLoading || code.some((digit) => !digit)
                     }
                     onPress={handleVerify}
                   >
