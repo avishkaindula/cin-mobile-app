@@ -11,17 +11,24 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { UserPlus, Mail, Lock, ArrowLeft } from "lucide-react-native";
+import { UserPlus, Mail, Lock, ArrowLeft, User, Github } from "lucide-react-native";
 import { useSession } from "@/context/ctx";
 
 export default function SignUp() {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signUp } = useSession();
+  const [githubLoading, setGithubLoading] = useState(false);
+  const { signUp, signInWithGitHub } = useSession();
 
   async function handleSignUp() {
+    if (!fullName.trim()) {
+      Alert.alert("Name Required", "Please enter your full name");
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert("Password Error", "Passwords do not match");
       return;
@@ -36,24 +43,44 @@ export default function SignUp() {
     }
 
     setLoading(true);
-    const { error, session } = await signUp(email, password);
+    try {
+      const { error, session } = await signUp(email, password, fullName);
 
-    if (error) {
-      Alert.alert("Sign Up Error", error.message);
-    } else {
-      // Always show email verification message since session won't be created until confirmed
-      Alert.alert(
-        "Check Your Email",
-        "We've sent you a confirmation email. Please click the link in your email to activate your account.",
-        [
-          {
-            text: "OK",
-            onPress: () => router.push("/sign-in"),
-          },
-        ]
-      );
+      if (error) {
+        Alert.alert("Sign Up Error", error.message || "An unexpected error occurred");
+      } else {
+        // Always show email verification message since session won't be created until confirmed
+        Alert.alert(
+          "Check Your Email",
+          "We've sent you a confirmation email. Please click the link in your email to activate your account.",
+          [
+            {
+              text: "OK",
+              onPress: () => router.push("/sign-in"),
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      Alert.alert("Sign Up Error", "An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  }
+
+  async function handleGitHubSignUp() {
+    setGithubLoading(true);
+    try {
+      const { error } = await signInWithGitHub();
+
+      if (error) {
+        Alert.alert("GitHub Sign Up Error", error.message || "Failed to sign up with GitHub");
+      }
+    } catch (error) {
+      Alert.alert("GitHub Sign Up Error", "An unexpected error occurred with GitHub sign up");
+    } finally {
+      setGithubLoading(false);
+    }
   }
 
   return (
@@ -123,6 +150,28 @@ export default function SignUp() {
                     </Text>
                   </VStack>
 
+                  {/* Full Name Input */}
+                  <VStack space="xs" className="w-full">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
+                      Full Name
+                    </Text>
+                    <Input className="w-full" key="fullname-input">
+                      <InputIcon as={User} className="ml-3" />
+                      <InputField
+                        testID="fullname-field"
+                        placeholder="Your full name"
+                        value={fullName}
+                        onChangeText={setFullName}
+                        autoCapitalize="words"
+                        textContentType="name"
+                        autoComplete="name"
+                      />
+                    </Input>
+                  </VStack>
+
                   {/* Email Input */}
                   <VStack space="xs" className="w-full">
                     <Text
@@ -131,14 +180,17 @@ export default function SignUp() {
                     >
                       Email
                     </Text>
-                    <Input className="w-full">
+                    <Input className="w-full" key="email-input">
                       <InputIcon as={Mail} className="ml-3" />
                       <InputField
+                        testID="email-field"
                         placeholder="email@address.com"
                         value={email}
                         onChangeText={setEmail}
                         autoCapitalize="none"
                         keyboardType="email-address"
+                        textContentType="emailAddress"
+                        autoComplete="email"
                       />
                     </Input>
                   </VStack>
@@ -151,14 +203,17 @@ export default function SignUp() {
                     >
                       Password
                     </Text>
-                    <Input className="w-full">
+                    <Input className="w-full" key="password-input">
                       <InputIcon as={Lock} className="ml-3" />
                       <InputField
+                        testID="password-field"
                         placeholder="Password (min. 6 characters)"
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry={true}
                         autoCapitalize="none"
+                        textContentType="newPassword"
+                        autoComplete="new-password"
                       />
                     </Input>
                   </VStack>
@@ -171,14 +226,17 @@ export default function SignUp() {
                     >
                       Confirm Password
                     </Text>
-                    <Input className="w-full">
+                    <Input className="w-full" key="confirm-password-input">
                       <InputIcon as={Lock} className="ml-3" />
                       <InputField
+                        testID="confirm-password-field"
                         placeholder="Confirm your password"
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         secureTextEntry={true}
                         autoCapitalize="none"
+                        textContentType="newPassword"
+                        autoComplete="new-password"
                       />
                     </Input>
                   </VStack>
@@ -189,13 +247,48 @@ export default function SignUp() {
                     action="primary"
                     size="lg"
                     className="w-full"
-                    disabled={loading}
+                    disabled={loading || githubLoading}
                     onPress={handleSignUp}
                   >
                     <HStack space="md" className="items-center">
                       <Icon as={UserPlus} size="md" className="text-white" />
                       <Text size="lg" className="text-white font-semibold">
                         {loading ? "Creating Account..." : "Create Account"}
+                      </Text>
+                    </HStack>
+                  </Button>
+
+                  {/* Divider */}
+                  <HStack className="items-center w-full">
+                    <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
+                    <Text
+                      size="sm"
+                      className="px-4 text-typography-500 dark:text-typography-400"
+                    >
+                      or
+                    </Text>
+                    <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
+                  </HStack>
+
+                  {/* GitHub OAuth Button */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    disabled={loading || githubLoading}
+                    onPress={handleGitHubSignUp}
+                  >
+                    <HStack space="md" className="items-center">
+                      <Icon
+                        as={Github}
+                        size="md"
+                        className="text-typography-600 dark:text-typography-400"
+                      />
+                      <Text
+                        size="lg"
+                        className="text-typography-600 dark:text-typography-400 font-semibold"
+                      >
+                        {githubLoading ? "Connecting..." : "Continue with GitHub"}
                       </Text>
                     </HStack>
                   </Button>

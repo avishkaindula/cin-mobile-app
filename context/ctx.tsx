@@ -1,5 +1,11 @@
-import { use, createContext, type PropsWithChildren, useEffect, useState } from "react";
-import { Session } from '@supabase/supabase-js';
+import {
+  use,
+  createContext,
+  type PropsWithChildren,
+  useEffect,
+  useState,
+} from "react";
+import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
@@ -13,12 +19,16 @@ WebBrowser.maybeCompleteAuthSession();
 const AuthContext = createContext<{
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<{ error?: any; session?: Session | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName?: string
+  ) => Promise<{ error?: any; session?: Session | null }>;
   signInWithGitHub: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
   session: Session | null;
-  user: Session['user'] | null;
+  user: Session["user"] | null;
   isLoading: boolean;
 }>({
   signIn: async () => ({ error: null }),
@@ -52,23 +62,23 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const createSessionFromUrl = async (url: string) => {
     try {
       const { params, errorCode } = QueryParams.getQueryParams(url);
-      
+
       if (errorCode) throw new Error(errorCode);
-      
+
       const { access_token, refresh_token } = params;
-      
+
       if (!access_token) return;
-      
+
       const { data, error } = await supabase.auth.setSession({
         access_token,
         refresh_token,
       });
-      
+
       if (error) throw error;
-      
+
       return data.session;
     } catch (error) {
-      console.error('Error creating session from URL:', error);
+      console.error("Error creating session from URL:", error);
       throw error;
     }
   };
@@ -81,7 +91,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setIsLoading(false);
     });
@@ -92,7 +104,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   // Handle linking into app from email/OAuth
   const url = Linking.useURL();
   useEffect(() => {
-    if (url && Platform.OS !== 'web') {
+    if (url && Platform.OS !== "web") {
       createSessionFromUrl(url).catch(console.error);
     }
   }, [url]);
@@ -109,12 +121,18 @@ export function SessionProvider({ children }: PropsWithChildren) {
     await supabase.auth.signOut();
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { data: { session }, error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, fullName?: string) => {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectTo,
+        data: {
+          full_name: fullName || "",
+        },
       },
     });
     return { error, session };
@@ -122,7 +140,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const signInWithGitHub = async () => {
     try {
-      if (Platform.OS === 'web') {
+      if (Platform.OS === "web") {
         // For web, use standard OAuth flow
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: "github",
@@ -140,20 +158,20 @@ export function SessionProvider({ children }: PropsWithChildren) {
             skipBrowserRedirect: true,
           },
         });
-        
+
         if (error) throw error;
-        
+
         const res = await WebBrowser.openAuthSessionAsync(
           data?.url ?? "",
           redirectTo
         );
-        
+
         if (res.type === "success") {
           const { url } = res;
           await createSessionFromUrl(url);
           return { error: null };
         }
-        
+
         return { error: new Error("OAuth cancelled") };
       }
     } catch (error) {
@@ -173,7 +191,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'com.climateintelligencedemo://reset-password',
+      redirectTo: "com.climateintelligencedemo://reset-password",
     });
     return { error };
   };
