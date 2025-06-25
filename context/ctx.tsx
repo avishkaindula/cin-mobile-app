@@ -27,7 +27,11 @@ const AuthContext = createContext<{
   signInWithGitHub: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
-  verifyOtp: (email: string, token: string, type: 'signup' | 'recovery' | 'email_change') => Promise<{ error?: any; session?: Session | null }>;
+  verifyOtp: (
+    email: string,
+    token: string,
+    type: "signup" | "recovery" | "email_change"
+  ) => Promise<{ error?: any; session?: Session | null }>;
   resendVerification: (email: string) => Promise<{ error?: any }>;
   session: Session | null;
   user: Session["user"] | null;
@@ -65,9 +69,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   // Create session from URL for both web and mobile
   const createSessionFromUrl = async (url: string) => {
     try {
-      console.log('createSessionFromUrl called with:', url);
-      
-      if (Platform.OS === 'web') {
+      if (Platform.OS === "web") {
         // Parse both query parameters and hash fragments
         const urlObj = new URL(url);
         const searchParams = urlObj.searchParams;
@@ -75,48 +77,47 @@ export function SessionProvider({ children }: PropsWithChildren) {
         const hashParams = new URLSearchParams(hashFragment);
 
         // Check for authorization code (PKCE flow)
-        const code = searchParams.get('code');
-        const error_description = searchParams.get('error_description') || hashParams.get('error_description');
-
-        console.log('Parsed parameters:', { code, error_description });
+        const code = searchParams.get("code");
+        const error_description =
+          searchParams.get("error_description") ||
+          hashParams.get("error_description");
 
         if (error_description) throw new Error(error_description);
 
         if (code) {
-          console.log('Exchanging code for session...');
           // Exchange authorization code for session (PKCE flow)
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-          
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            code
+          );
+
           if (error) {
-            console.error('Error exchanging code:', error);
+            console.error("Error exchanging code:", error);
             throw error;
           }
 
-          console.log('Successfully exchanged code for session:', data.session);
-
           // Clean the URL after processing
-          if (typeof window !== 'undefined') {
-            window.history.replaceState({}, '', window.location.pathname);
+          if (typeof window !== "undefined") {
+            window.history.replaceState({}, "", window.location.pathname);
           }
 
           return data.session;
         }
 
         // Fallback: Check for direct access token (implicit flow)
-        const access_token = hashParams.get('access_token');
-        const refresh_token = hashParams.get('refresh_token');
+        const access_token = hashParams.get("access_token");
+        const refresh_token = hashParams.get("refresh_token");
 
         if (access_token) {
           const { data, error } = await supabase.auth.setSession({
             access_token,
-            refresh_token: refresh_token || '',
+            refresh_token: refresh_token || "",
           });
 
           if (error) throw error;
 
           // Clean the URL after processing
-          if (typeof window !== 'undefined') {
-            window.history.replaceState({}, '', window.location.pathname);
+          if (typeof window !== "undefined") {
+            window.history.replaceState({}, "", window.location.pathname);
           }
 
           return data.session;
@@ -133,7 +134,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
         if (code) {
           // Exchange authorization code for session (PKCE flow)
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            code
+          );
           if (error) throw error;
           return data.session;
         }
@@ -160,15 +163,17 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const initializeAuth = async () => {
       try {
         // Check for auth tokens/codes in URL first (for email verification, OAuth, etc.)
-        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        if (Platform.OS === "web" && typeof window !== "undefined") {
           const currentUrl = window.location.href;
-          console.log('Current URL:', currentUrl);
-          
-          if (currentUrl.includes('?code=') || currentUrl.includes('#access_token=') || currentUrl.includes('#error=') || currentUrl.includes('?error=')) {
-            console.log('Processing auth URL...');
+
+          if (
+            currentUrl.includes("?code=") ||
+            currentUrl.includes("#access_token=") ||
+            currentUrl.includes("#error=") ||
+            currentUrl.includes("?error=")
+          ) {
             const session = await createSessionFromUrl(currentUrl);
             if (session) {
-              console.log('Session created from URL:', session);
               setSession(session);
               setIsLoading(false);
               return; // Early return if we successfully created a session
@@ -177,13 +182,15 @@ export function SessionProvider({ children }: PropsWithChildren) {
         }
 
         // Get initial session
-        console.log('Getting initial session...');
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session:', session);
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         setSession(session);
         setIsLoading(false);
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error("Auth initialization error:", error);
         setIsLoading(false);
       }
     };
@@ -221,11 +228,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
     try {
       // Use scope: 'local' for web to avoid the 403 error
       const { error } = await supabase.auth.signOut({
-        scope: Platform.OS === 'web' ? 'local' : 'global'
+        scope: Platform.OS === "web" ? "local" : "global",
       });
-      
+
       if (error) {
-        console.error('Sign out error:', error);
+        console.error("Sign out error:", error);
         // If there's an error, still clear the local session
         setSession(null);
         return;
@@ -235,28 +242,28 @@ export function SessionProvider({ children }: PropsWithChildren) {
       setSession(null);
 
       // Web-specific cleanup
-      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      if (Platform.OS === "web" && typeof window !== "undefined") {
         // Clear any remaining localStorage items
         try {
           const keys = Object.keys(localStorage);
-          keys.forEach(key => {
-            if (key.includes('supabase') || key.includes('auth')) {
+          keys.forEach((key) => {
+            if (key.includes("supabase") || key.includes("auth")) {
               localStorage.removeItem(key);
             }
           });
         } catch (storageError) {
-          console.warn('Error clearing localStorage:', storageError);
+          console.warn("Error clearing localStorage:", storageError);
         }
 
         // Force a page refresh to ensure clean state
         window.location.reload();
       }
     } catch (error) {
-      console.error('Sign out failed:', error);
+      console.error("Sign out failed:", error);
       // Even if sign out fails, clear local state
       setSession(null);
-      
-      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+
+      if (Platform.OS === "web" && typeof window !== "undefined") {
         window.location.reload();
       }
     }
@@ -270,9 +277,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
       email,
       password,
       options: {
-        emailRedirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
-          ? window.location.origin 
-          : redirectTo,
+        emailRedirectTo:
+          Platform.OS === "web" && typeof window !== "undefined"
+            ? window.location.origin
+            : redirectTo,
         data: {
           full_name: fullName || "",
         },
@@ -288,7 +296,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: "github",
           options: {
-            redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+            redirectTo:
+              typeof window !== "undefined"
+                ? window.location.origin
+                : undefined,
           },
         });
         return { error };
@@ -326,9 +337,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
-          ? window.location.origin 
-          : redirectTo,
+        emailRedirectTo:
+          Platform.OS === "web" && typeof window !== "undefined"
+            ? window.location.origin
+            : redirectTo,
       },
     });
     return { error };
@@ -336,14 +348,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
-        ? `${window.location.origin}/reset-password`
-        : "com.climateintelligencedemo://reset-password",
+      redirectTo:
+        Platform.OS === "web" && typeof window !== "undefined"
+          ? `${window.location.origin}/reset-password`
+          : "com.climateintelligencedemo://reset-password",
     });
     return { error };
   };
 
-  const verifyOtp = async (email: string, token: string, type: 'signup' | 'recovery' | 'email_change') => {
+  const verifyOtp = async (
+    email: string,
+    token: string,
+    type: "signup" | "recovery" | "email_change"
+  ) => {
     const { data, error } = await supabase.auth.verifyOtp({
       email,
       token,
@@ -354,12 +371,13 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const resendVerification = async (email: string) => {
     const { error } = await supabase.auth.resend({
-      type: 'signup',
+      type: "signup",
       email,
       options: {
-        emailRedirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
-          ? window.location.origin 
-          : redirectTo,
+        emailRedirectTo:
+          Platform.OS === "web" && typeof window !== "undefined"
+            ? window.location.origin
+            : redirectTo,
       },
     });
     return { error };
