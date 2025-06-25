@@ -62,25 +62,94 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const redirectTo = makeRedirectUri();
 
-  // Create session from URL for deep linking
+  // Create session from URL for both web and mobile
   const createSessionFromUrl = async (url: string) => {
     try {
-      const { params, errorCode } = QueryParams.getQueryParams(url);
+      console.log('createSessionFromUrl called with:', url);
+      
+      if (Platform.OS === 'web') {
+        // Parse both query parameters and hash fragments
+        const urlObj = new URL(url);
+        const searchParams = urlObj.searchParams;
+        const hashFragment = urlObj.hash.substring(1); // Remove the #
+        const hashParams = new URLSearchParams(hashFragment);
 
-      if (errorCode) throw new Error(errorCode);
+        // Check for authorization code (PKCE flow)
+        const code = searchParams.get('code');
+        const error_description = searchParams.get('error_description') || hashParams.get('error_description');
 
-      const { access_token, refresh_token } = params;
+        console.log('Parsed parameters:', { code, error_description });
 
-      if (!access_token) return;
+        if (error_description) throw new Error(error_description);
 
-      const { data, error } = await supabase.auth.setSession({
-        access_token,
-        refresh_token,
-      });
+        if (code) {
+          console.log('Exchanging code for session...');
+          // Exchange authorization code for session (PKCE flow)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (error) {
+            console.error('Error exchanging code:', error);
+            throw error;
+          }
 
-      if (error) throw error;
+          console.log('Successfully exchanged code for session:', data.session);
 
-      return data.session;
+          // Clean the URL after processing
+          if (typeof window !== 'undefined') {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+
+          return data.session;
+        }
+
+        // Fallback: Check for direct access token (implicit flow)
+        const access_token = hashParams.get('access_token');
+        const refresh_token = hashParams.get('refresh_token');
+
+        if (access_token) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token: refresh_token || '',
+          });
+
+          if (error) throw error;
+
+          // Clean the URL after processing
+          if (typeof window !== 'undefined') {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+
+          return data.session;
+        }
+
+        return null;
+      } else {
+        // For mobile, use the existing QueryParams approach
+        const { params, errorCode } = QueryParams.getQueryParams(url);
+
+        if (errorCode) throw new Error(errorCode);
+
+        const { access_token, refresh_token, code } = params;
+
+        if (code) {
+          // Exchange authorization code for session (PKCE flow)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          return data.session;
+        }
+
+        if (access_token) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          });
+
+          if (error) throw error;
+          return data.session;
+        }
+
+        return null;
+      }
     } catch (error) {
       console.error("Error creating session from URL:", error);
       throw error;
@@ -88,11 +157,38 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsLoading(false);
-    });
+    const initializeAuth = async () => {
+      try {
+        // Check for auth tokens/codes in URL first (for email verification, OAuth, etc.)
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+          const currentUrl = window.location.href;
+          console.log('Current URL:', currentUrl);
+          
+          if (currentUrl.includes('?code=') || currentUrl.includes('#access_token=') || currentUrl.includes('#error=') || currentUrl.includes('?error=')) {
+            console.log('Processing auth URL...');
+            const session = await createSessionFromUrl(currentUrl);
+            if (session) {
+              console.log('Session created from URL:', session);
+              setSession(session);
+              setIsLoading(false);
+              return; // Early return if we successfully created a session
+            }
+          }
+        }
+
+        // Get initial session
+        console.log('Getting initial session...');
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session:', session);
+        setSession(session);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
 
     // Listen for auth changes
     const {
@@ -105,7 +201,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle linking into app from email/OAuth
+  // Handle linking into app from email/OAuth (mobile only)
   const url = Linking.useURL();
   useEffect(() => {
     if (url && Platform.OS !== "web") {
@@ -122,7 +218,48 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      // Use scope: 'local' for web to avoid the 403 error
+      const { error } = await supabase.auth.signOut({
+        scope: Platform.OS === 'web' ? 'local' : 'global'
+      });
+      
+      if (error) {
+        console.error('Sign out error:', error);
+        // If there's an error, still clear the local session
+        setSession(null);
+        return;
+      }
+
+      // Clear local session state
+      setSession(null);
+
+      // Web-specific cleanup
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        // Clear any remaining localStorage items
+        try {
+          const keys = Object.keys(localStorage);
+          keys.forEach(key => {
+            if (key.includes('supabase') || key.includes('auth')) {
+              localStorage.removeItem(key);
+            }
+          });
+        } catch (storageError) {
+          console.warn('Error clearing localStorage:', storageError);
+        }
+
+        // Force a page refresh to ensure clean state
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Sign out failed:', error);
+      // Even if sign out fails, clear local state
+      setSession(null);
+      
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.location.reload();
+      }
+    }
   };
 
   const signUp = async (email: string, password: string, fullName?: string) => {
@@ -133,7 +270,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
       email,
       password,
       options: {
-        emailRedirectTo: redirectTo,
+        emailRedirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
+          ? window.location.origin 
+          : redirectTo,
         data: {
           full_name: fullName || "",
         },
@@ -149,7 +288,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: "github",
           options: {
-            redirectTo: window.location.origin,
+            redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
           },
         });
         return { error };
@@ -187,7 +326,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: redirectTo,
+        emailRedirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
+          ? window.location.origin 
+          : redirectTo,
       },
     });
     return { error };
@@ -195,7 +336,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "com.climateintelligencedemo://reset-password",
+      redirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
+        ? `${window.location.origin}/reset-password`
+        : "com.climateintelligencedemo://reset-password",
     });
     return { error };
   };
@@ -214,7 +357,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
       type: 'signup',
       email,
       options: {
-        emailRedirectTo: redirectTo,
+        emailRedirectTo: Platform.OS === "web" && typeof window !== 'undefined' 
+          ? window.location.origin 
+          : redirectTo,
       },
     });
     return { error };
