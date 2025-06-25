@@ -27,7 +27,7 @@ const SCOPE = 'TOAST';
 cssInterop(MotionView, { className: 'style' });
 
 const toastStyle = tva({
-  base: 'p-6 mx-4 mt-12 mb-4 rounded-xl gap-3 web:pointer-events-auto shadow-hard-5 border-outline-100 min-w-80 max-w-md',
+  base: 'p-6 mx-4 mt-12 mb-4 rounded-xl web:pointer-events-auto shadow-hard-5 border-outline-100 min-w-80 max-w-md flex-row gap-3',
   variants: {
     action: {
       error: 'bg-error-800 border-error-700',
@@ -72,7 +72,7 @@ const toastStyle = tva({
 });
 
 const toastTitleStyle = tva({
-  base: 'text-typography-0 font-medium font-body tracking-md text-left',
+  base: 'text-typography-0 font-medium font-body tracking-md text-left flex-wrap',
   variants: {
     isTruncated: {
       true: '',
@@ -143,7 +143,7 @@ const toastTitleStyle = tva({
 });
 
 const toastDescriptionStyle = tva({
-  base: 'font-normal font-body tracking-md text-left',
+  base: 'font-normal font-body tracking-md text-left flex-wrap',
   variants: {
     isTruncated: {
       true: '',
@@ -221,16 +221,14 @@ const Toast = React.forwardRef<React.ComponentRef<typeof Root>, IToastProps>(
         context={{ variant, action }}
         {...props}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1, gap: 12 }}>
-          <View style={{ marginTop: 2 }}>
-            <IconComponent 
-              size={20} 
-              color={getIconColor()}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            {children}
-          </View>
+        <View className="mt-0.5">
+          <IconComponent 
+            size={20} 
+            color={getIconColor()}
+          />
+        </View>
+        <View className="flex-1">
+          {children}
         </View>
       </Root>
     );
