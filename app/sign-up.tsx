@@ -235,8 +235,8 @@ export default function SignUp() {
                         onChangeText={setConfirmPassword}
                         secureTextEntry={true}
                         autoCapitalize="none"
-                        textContentType="newPassword"
-                        autoComplete="new-password"
+                        textContentType="none"
+                        autoComplete="off"
                       />
                     </Input>
                   </VStack>
