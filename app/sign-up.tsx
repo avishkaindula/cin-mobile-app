@@ -49,17 +49,9 @@ export default function SignUp() {
       if (error) {
         Alert.alert("Sign Up Error", error.message || "An unexpected error occurred");
       } else {
-        // Always show email verification message since session won't be created until confirmed
-        Alert.alert(
-          "Check Your Email",
-          "We've sent you a confirmation email. Please click the link in your email to activate your account.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.push("/sign-in"),
-            },
-          ]
-        );
+        // Redirect directly to verification page
+        router.push("/verify-email" as any);
+        setTimeout(() => router.setParams({ email }), 100);
       }
     } catch (error) {
       Alert.alert("Sign Up Error", "An unexpected error occurred. Please try again.");

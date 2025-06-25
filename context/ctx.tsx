@@ -27,6 +27,8 @@ const AuthContext = createContext<{
   signInWithGitHub: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
+  verifyOtp: (email: string, token: string, type: 'signup' | 'recovery' | 'email_change') => Promise<{ error?: any; session?: Session | null }>;
+  resendVerification: (email: string) => Promise<{ error?: any }>;
   session: Session | null;
   user: Session["user"] | null;
   isLoading: boolean;
@@ -37,6 +39,8 @@ const AuthContext = createContext<{
   signInWithGitHub: async () => ({ error: null }),
   sendMagicLink: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
+  verifyOtp: async () => ({ error: null }),
+  resendVerification: async () => ({ error: null }),
   session: null,
   user: null,
   isLoading: true,
@@ -196,6 +200,26 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return { error };
   };
 
+  const verifyOtp = async (email: string, token: string, type: 'signup' | 'recovery' | 'email_change') => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type,
+    });
+    return { error, session: data.session };
+  };
+
+  const resendVerification = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: redirectTo,
+      },
+    });
+    return { error };
+  };
+
   return (
     <AuthContext
       value={{
@@ -205,6 +229,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signInWithGitHub,
         sendMagicLink,
         resetPassword,
+        verifyOtp,
+        resendVerification,
         session,
         user: session?.user || null,
         isLoading,
