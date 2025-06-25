@@ -28,7 +28,7 @@ export default function SignIn() {
     const { error } = await signIn(email, password);
 
     if (error) {
-      showError("Sign In Error", error.message);
+      showError("Sign In Error!", error.message);
     } else {
       showSuccess("Welcome Back!", "You have successfully signed in.");
     }
@@ -41,7 +41,7 @@ export default function SignIn() {
     const { error } = await signInWithGitHub();
 
     if (error) {
-      showError("GitHub Sign In Error", error.message);
+      showError("GitHub Sign In Error!", error.message);
     } else {
       showSuccess(
         "GitHub Connected!",
