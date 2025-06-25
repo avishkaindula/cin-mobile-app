@@ -27,10 +27,8 @@ export default function SignIn() {
 
     if (error) {
       Alert.alert("Sign In Error", error.message);
-    } else {
-      // Navigation is handled by the Stack.Protected guard
-      // No need to manually navigate
     }
+
     setLoading(false);
   }
 
