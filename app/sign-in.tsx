@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { useToast, Toast, ToastTitle } from "@/components/ui/toast";
+import { useAppToast } from "@/components/toast-utils";
 import { LogIn, Shield, Mail, Lock, Github } from "lucide-react-native";
 import { useSession } from "@/context/ctx";
 
@@ -21,26 +21,16 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const { signIn, signInWithGitHub } = useSession();
-  const toast = useToast();
-
-  const showErrorToast = (title: string, message: string) => {
-    toast.show({
-      placement: "top",
-      render: ({ id }) => (
-        <Toast nativeID={`toast-${id}`} action="error" variant="outline">
-          <ToastTitle>{title}</ToastTitle>
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
+  const { showError, showSuccess } = useAppToast();
 
   async function handleSignIn() {
     setLoading(true);
     const { error } = await signIn(email, password);
 
     if (error) {
-      showErrorToast("Sign In Error!", error.message);
+      showError("Sign In Error", error.message);
+    } else {
+      showSuccess("Welcome Back!", "You have successfully signed in.");
     }
 
     setLoading(false);
@@ -51,7 +41,12 @@ export default function SignIn() {
     const { error } = await signInWithGitHub();
 
     if (error) {
-      showErrorToast("GitHub Sign In Error!", error.message);
+      showError("GitHub Sign In Error", error.message);
+    } else {
+      showSuccess(
+        "GitHub Connected!",
+        "You have successfully signed in with GitHub."
+      );
     }
     setGithubLoading(false);
   }
