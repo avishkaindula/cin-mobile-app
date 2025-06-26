@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Mail, ArrowLeft } from "lucide-react-native";
-import { useSession } from "@/context/ctx";
+import { useSession } from "@/context/auth";
 import { useAppToast } from "@/components/toast-utils";
 
 export default function VerifyEmail() {

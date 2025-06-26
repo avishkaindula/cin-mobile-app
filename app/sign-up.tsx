@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { UserPlus, Mail, Lock, ArrowLeft, User, Github } from "lucide-react-native";
-import { useSession } from "@/context/ctx";
+import { useSession } from "@/context/auth";
 import { useAppToast } from "@/components/toast-utils";
 
 export default function SignUp() {

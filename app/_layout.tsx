@@ -13,7 +13,7 @@ import {
 import { LanguageProvider } from "@/components/i18n/LanguageContext";
 
 import "../global.css";
-import { SessionProvider, useSession } from "@/context/ctx";
+import { SessionProvider, useSession } from "@/context/auth";
 import { SplashScreenController } from "@/components/SplashController";
 
 export {
