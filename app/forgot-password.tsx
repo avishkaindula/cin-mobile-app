@@ -35,7 +35,10 @@ export default function ForgotPassword() {
       showError("Reset Password Error", error.message);
     } else {
       setEmailSent(true);
-      showSuccess("Email Sent", "Check your email for password reset instructions");
+      showSuccess(
+        "Email Sent",
+        "Check your email for password reset instructions"
+      );
     }
     setLoading(false);
   }
@@ -66,7 +69,7 @@ export default function ForgotPassword() {
                 size="lg"
                 className="text-typography-900 dark:text-typography-950 font-semibold ml-2"
               >
-                Password Reset
+                Go Back
               </Text>
             </HStack>
 
