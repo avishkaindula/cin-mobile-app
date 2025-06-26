@@ -95,8 +95,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
             throw error;
           }
 
-          // Clean the URL after processing
-          if (typeof window !== "undefined") {
+          // Clean the URL after processing (but only if not on reset-password page)
+          if (
+            typeof window !== "undefined" &&
+            !window.location.pathname.includes("/reset-password")
+          ) {
             window.history.replaceState({}, "", window.location.pathname);
           }
 

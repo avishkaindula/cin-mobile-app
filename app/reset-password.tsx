@@ -1,5 +1,5 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect } from "react";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -19,30 +19,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isValidSession, setIsValidSession] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
   const { showError, showSuccess } = useAppToast();
-
-  const params = useLocalSearchParams();
-
-  useEffect(() => {
-    // Check if we have a valid session for password reset
-    const checkSession = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        setIsValidSession(!!session);
-      } catch (error) {
-        console.error("Error checking session:", error);
-        setIsValidSession(false);
-      } finally {
-        setCheckingSession(false);
-      }
-    };
-
-    checkSession();
-  }, []);
 
   async function handlePasswordReset() {
     if (password !== confirmPassword) {
@@ -72,74 +49,14 @@ export default function ResetPassword() {
           "Password Updated",
           "Your password has been successfully updated!"
         );
-        // Navigate after a short delay to let user see the success message
-        setTimeout(() => {
-          router.replace("/");
-        }, 1500);
+
+        router.replace("/");
       }
     } catch (error) {
       showError("Password Reset Error", "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
-  }
-
-  if (checkingSession) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1 }}
-        className="bg-white dark:bg-background-dark"
-      >
-        <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-          <Box className="flex-1 justify-center items-center p-6">
-            <VStack space="lg" className="items-center">
-              <Icon as={KeyRound} size="xl" className="text-primary-500" />
-              <Text className="text-typography-600 dark:text-typography-750">
-                Checking reset link...
-              </Text>
-            </VStack>
-          </Box>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  if (!isValidSession) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1 }}
-        className="bg-white dark:bg-background-dark"
-      >
-        <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-          <Box className="flex-1 justify-center items-center p-6">
-            <VStack space="xl" className="items-center">
-              <Box className="p-4 bg-red-100 dark:bg-red-900/30 rounded-full">
-                <Icon as={AlertCircle} size="xl" className="text-red-500" />
-              </Box>
-              <VStack space="md" className="items-center">
-                <Heading
-                  size="xl"
-                  className="text-typography-900 dark:text-typography-950 text-center"
-                >
-                  Invalid Reset Link
-                </Heading>
-                <Text className="text-typography-600 dark:text-typography-750 text-center">
-                  This password reset link is invalid or has expired. Please
-                  request a new one.
-                </Text>
-              </VStack>
-              <Button
-                variant="solid"
-                action="primary"
-                onPress={() => router.push("/forgot-password")}
-              >
-                <Text className="text-white">Request New Reset Link</Text>
-              </Button>
-            </VStack>
-          </Box>
-        </ScrollView>
-      </SafeAreaView>
-    );
   }
 
   return (
