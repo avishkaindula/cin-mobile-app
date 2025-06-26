@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Alert } from "react-native";
+import { SafeAreaView } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -13,6 +13,7 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { KeyRound, Lock, CheckCircle, AlertCircle } from "lucide-react-native";
 import { supabase } from "@/lib/supabase";
+import { useAppToast } from "@/components/toast-utils";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -20,6 +21,7 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [isValidSession, setIsValidSession] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const { showError, showSuccess } = useAppToast();
 
   const params = useLocalSearchParams();
 
@@ -44,12 +46,12 @@ export default function ResetPassword() {
 
   async function handlePasswordReset() {
     if (password !== confirmPassword) {
-      Alert.alert("Password Error", "Passwords do not match");
+      showError("Password Error", "Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert(
+      showError(
         "Password Error",
         "Password must be at least 6 characters long"
       );
@@ -64,21 +66,19 @@ export default function ResetPassword() {
       });
 
       if (error) {
-        Alert.alert("Password Reset Error", error.message);
+        showError("Password Reset Error", error.message);
       } else {
-        Alert.alert(
+        showSuccess(
           "Password Updated",
-          "Your password has been successfully updated!",
-          [
-            {
-              text: "OK",
-              onPress: () => router.replace("/"),
-            },
-          ]
+          "Your password has been successfully updated!"
         );
+        // Navigate after a short delay to let user see the success message
+        setTimeout(() => {
+          router.replace("/");
+        }, 1500);
       }
     } catch (error) {
-      Alert.alert("Password Reset Error", "An unexpected error occurred");
+      showError("Password Reset Error", "An unexpected error occurred");
     } finally {
       setLoading(false);
     }

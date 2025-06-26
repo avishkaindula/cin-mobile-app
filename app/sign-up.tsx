@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView, Alert, InteractionManager } from "react-native";
+import { SafeAreaView, InteractionManager } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -13,6 +13,7 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { UserPlus, Mail, Lock, ArrowLeft, User, Github } from "lucide-react-native";
 import { useSession } from "@/context/ctx";
+import { useAppToast } from "@/components/toast-utils";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
@@ -22,20 +23,21 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const { signUp, signInWithGitHub } = useSession();
+  const { showError, showSuccess } = useAppToast();
 
   async function handleSignUp() {
     if (!fullName.trim()) {
-      Alert.alert("Name Required", "Please enter your full name");
+      showError("Name Required", "Please enter your full name");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Password Error", "Passwords do not match");
+      showError("Password Error", "Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert(
+      showError(
         "Password Error",
         "Password must be at least 6 characters long"
       );
@@ -47,7 +49,7 @@ export default function SignUp() {
       const { error, session } = await signUp(email, password, fullName);
 
       if (error) {
-        Alert.alert("Sign Up Error", error.message || "An unexpected error occurred");
+        showError("Sign Up Error", error.message || "An unexpected error occurred");
       } else {
         // Use InteractionManager to ensure smooth navigation
         InteractionManager.runAfterInteractions(() => {
@@ -56,7 +58,7 @@ export default function SignUp() {
         });
       }
     } catch (error) {
-      Alert.alert("Sign Up Error", "An unexpected error occurred. Please try again.");
+      showError("Sign Up Error", "An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -68,10 +70,10 @@ export default function SignUp() {
       const { error } = await signInWithGitHub();
 
       if (error) {
-        Alert.alert("GitHub Sign Up Error", error.message || "Failed to sign up with GitHub");
+        showError("GitHub Sign Up Error", error.message || "Failed to sign up with GitHub");
       }
     } catch (error) {
-      Alert.alert("GitHub Sign Up Error", "An unexpected error occurred with GitHub sign up");
+      showError("GitHub Sign Up Error", "An unexpected error occurred with GitHub sign up");
     } finally {
       setGithubLoading(false);
     }

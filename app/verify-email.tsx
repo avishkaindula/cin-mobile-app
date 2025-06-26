@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { SafeAreaView, Alert, TextInput, Keyboard, InteractionManager } from "react-native";
+import { SafeAreaView, TextInput, Keyboard, InteractionManager } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Mail, ArrowLeft } from "lucide-react-native";
 import { useSession } from "@/context/ctx";
+import { useAppToast } from "@/components/toast-utils";
 
 export default function VerifyEmail() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -20,6 +21,7 @@ export default function VerifyEmail() {
   const [resendLoading, setResendLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const { verifyOtp, resendVerification } = useSession();
+  const { showError, showSuccess } = useAppToast();
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -79,12 +81,12 @@ export default function VerifyEmail() {
     const verificationCode = code.join("");
 
     if (verificationCode.length !== 6) {
-      Alert.alert("Invalid Code", "Please enter all 6 digits");
+      showError("Invalid Code", "Please enter all 6 digits");
       return;
     }
 
     if (!email) {
-      Alert.alert("Error", "Email not found. Please go back and try again.");
+      showError("Error", "Email not found. Please go back and try again.");
       return;
     }
 
@@ -97,24 +99,22 @@ export default function VerifyEmail() {
       );
 
       if (error) {
-        Alert.alert(
+        showError(
           "Verification Failed",
           "The verification code is invalid or has expired. Please check your code or request a new one."
         );
       } else {
-        Alert.alert(
+        showSuccess(
           "Email Verified!",
-          "Your email has been successfully verified.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.push("/sign-in"),
-            },
-          ]
+          "Your email has been successfully verified."
         );
+        // Navigate after a short delay to let user see the success message
+        setTimeout(() => {
+          router.push("/sign-in");
+        }, 1500);
       }
     } catch (error) {
-      Alert.alert(
+      showError(
         "Verification Error",
         "An unexpected error occurred. Please try again."
       );
@@ -125,7 +125,7 @@ export default function VerifyEmail() {
 
   const handleResendCode = async () => {
     if (!email) {
-      Alert.alert("Error", "Email not found. Please go back and try again.");
+      showError("Error", "Email not found. Please go back and try again.");
       return;
     }
 
@@ -134,12 +134,12 @@ export default function VerifyEmail() {
       const { error } = await resendVerification(email);
 
       if (error) {
-        Alert.alert(
+        showError(
           "Resend Error",
           error.message || "Failed to resend verification code"
         );
       } else {
-        Alert.alert(
+        showSuccess(
           "Code Sent",
           "A new verification code has been sent to your email."
         );
@@ -147,7 +147,7 @@ export default function VerifyEmail() {
         setCode(["", "", "", "", "", ""]);
       }
     } catch (error) {
-      Alert.alert(
+      showError(
         "Resend Error",
         "An unexpected error occurred. Please try again."
       );
