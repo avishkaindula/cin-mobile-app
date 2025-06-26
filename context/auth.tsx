@@ -256,33 +256,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
         setIsLoading(true);
         const { code } = googleResponse.params;
 
-        if (Platform.OS === "web") {
-          // For web, use the standard OAuth flow with Supabase
-          const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-              redirectTo:
-                typeof window !== "undefined"
-                  ? window.location.origin
-                  : undefined,
-              queryParams: {
-                access_type: "offline",
-                scopes: "openid email profile",
-              },
-            },
-          });
+        // For mobile, exchange the code with Supabase
+        // This requires the code to be processed by Supabase's OAuth flow
+        // We'll use the exchangeCodeForSession method if available, or handle via URL
+        const redirectUrl = `${redirectTo}?code=${code}`;
+        const session = await createSessionFromUrl(redirectUrl);
 
-          if (error) throw error;
-        } else {
-          // For mobile, exchange the code with Supabase
-          // This requires the code to be processed by Supabase's OAuth flow
-          // We'll use the exchangeCodeForSession method if available, or handle via URL
-          const redirectUrl = `${redirectTo}?code=${code}`;
-          const session = await createSessionFromUrl(redirectUrl);
-
-          if (session) {
-            setSession(session);
-          }
+        if (session) {
+          setSession(session);
         }
       } catch (error) {
         console.error("Google OAuth error:", error);
