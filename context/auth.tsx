@@ -7,31 +7,14 @@ import {
 } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import {
-  makeRedirectUri,
-  useAuthRequest,
-  AuthRequestConfig,
-  DiscoveryDocument,
-} from "expo-auth-session";
+import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
-import { BASE_URL } from "@/lib/constants";
 
 // Required for web only
 WebBrowser.maybeCompleteAuthSession();
-
-// Google OAuth configuration
-const googleConfig: AuthRequestConfig = {
-  clientId: "google",
-  scopes: ["openid", "profile", "email"],
-  redirectUri: makeRedirectUri(),
-};
-
-const googleDiscovery: DiscoveryDocument = {
-  authorizationEndpoint: `${BASE_URL}/api/auth/authorize`,
-};
 
 const AuthContext = createContext<{
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
@@ -42,7 +25,6 @@ const AuthContext = createContext<{
     fullName?: string
   ) => Promise<{ error?: any; session?: Session | null }>;
   signInWithGitHub: () => Promise<{ error?: any }>;
-  signInWithGoogle: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
   verifyOtp: (
@@ -59,7 +41,6 @@ const AuthContext = createContext<{
   signOut: async () => {},
   signUp: async () => ({ error: null }),
   signInWithGitHub: async () => ({ error: null }),
-  signInWithGoogle: async () => ({ error: null }),
   sendMagicLink: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
@@ -84,12 +65,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const [isLoading, setIsLoading] = useState(true);
 
   const redirectTo = makeRedirectUri();
-
-  // Google OAuth setup
-  const [googleRequest, googleResponse, promptGoogleAsync] = useAuthRequest(
-    googleConfig,
-    googleDiscovery
-  );
 
   // Create session from URL for both web and mobile
   const createSessionFromUrl = async (url: string) => {
@@ -236,11 +211,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle Google OAuth response
-  useEffect(() => {
-    handleGoogleResponse();
-  }, [googleResponse]);
-
   // Handle linking into app from email/OAuth (mobile only)
   const url = Linking.useURL();
   useEffect(() => {
@@ -248,34 +218,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
       createSessionFromUrl(url).catch(console.error);
     }
   }, [url]);
-
-  // Handle Google OAuth response
-  const handleGoogleResponse = async () => {
-    if (googleResponse?.type === "success") {
-      try {
-        setIsLoading(true);
-        const { code } = googleResponse.params;
-
-        // For mobile, exchange the code with Supabase
-        // This requires the code to be processed by Supabase's OAuth flow
-        // We'll use the exchangeCodeForSession method if available, or handle via URL
-        const redirectUrl = `${redirectTo}?code=${code}`;
-        const session = await createSessionFromUrl(redirectUrl);
-
-        if (session) {
-          setSession(session);
-        }
-      } catch (error) {
-        console.error("Google OAuth error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    } else if (googleResponse?.type === "cancel") {
-      console.log("Google OAuth cancelled");
-    } else if (googleResponse?.type === "error") {
-      console.error("Google OAuth error:", googleResponse.error);
-    }
-  };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -394,18 +336,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }
   };
 
-  const signInWithGoogle = async () => {
-    try {
-      if (!googleRequest) {
-        return { error: new Error("Google request not initialized") };
-      }
-      await promptGoogleAsync();
-      return { error: null };
-    } catch (error) {
-      return { error };
-    }
-  };
-
   const sendMagicLink = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -463,7 +393,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signOut,
         signUp,
         signInWithGitHub,
-        signInWithGoogle,
         sendMagicLink,
         resetPassword,
         verifyOtp,

@@ -11,7 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { UserPlus, Mail, Lock, ArrowLeft, User, Github } from "lucide-react-native";
+import {
+  UserPlus,
+  Mail,
+  Lock,
+  ArrowLeft,
+  User,
+  Github,
+} from "lucide-react-native";
 import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
 import { useSession } from "@/context/auth";
 import { useAppToast } from "@/components/toast-utils";
@@ -24,7 +31,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { signUp, signInWithGitHub, signInWithGoogle } = useSession();
+  const { signUp, signInWithGitHub } = useSession();
   const { showError, showSuccess } = useAppToast();
 
   async function handleSignUp() {
@@ -51,7 +58,10 @@ export default function SignUp() {
       const { error, session } = await signUp(email, password, fullName);
 
       if (error) {
-        showError("Sign Up Error", error.message || "An unexpected error occurred");
+        showError(
+          "Sign Up Error",
+          error.message || "An unexpected error occurred"
+        );
       } else {
         // Use InteractionManager to ensure smooth navigation
         InteractionManager.runAfterInteractions(() => {
@@ -60,7 +70,10 @@ export default function SignUp() {
         });
       }
     } catch (error) {
-      showError("Sign Up Error", "An unexpected error occurred. Please try again.");
+      showError(
+        "Sign Up Error",
+        "An unexpected error occurred. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -72,28 +85,23 @@ export default function SignUp() {
       const { error } = await signInWithGitHub();
 
       if (error) {
-        showError("GitHub Sign Up Error", error.message || "Failed to sign up with GitHub");
+        showError(
+          "GitHub Sign Up Error",
+          error.message || "Failed to sign up with GitHub"
+        );
       }
     } catch (error) {
-      showError("GitHub Sign Up Error", "An unexpected error occurred with GitHub sign up");
+      showError(
+        "GitHub Sign Up Error",
+        "An unexpected error occurred with GitHub sign up"
+      );
     } finally {
       setGithubLoading(false);
     }
   }
 
   async function handleGoogleSignUp() {
-    setGoogleLoading(true);
-    try {
-      const { error } = await signInWithGoogle();
-
-      if (error) {
-        showError("Google Sign Up Error", error.message || "Failed to sign up with Google");
-      }
-    } catch (error) {
-      showError("Google Sign Up Error", "An unexpected error occurred with Google sign up");
-    } finally {
-      setGoogleLoading(false);
-    }
+    setGoogleLoading(false);
   }
 
   return (
@@ -301,7 +309,9 @@ export default function SignUp() {
                         size="lg"
                         className="text-typography-600 dark:text-typography-400 font-semibold"
                       >
-                        {githubLoading ? "Connecting..." : "Continue with GitHub"}
+                        {githubLoading
+                          ? "Connecting..."
+                          : "Continue with GitHub"}
                       </Text>
                     </HStack>
                   </Button>
@@ -320,7 +330,9 @@ export default function SignUp() {
                         size="lg"
                         className="text-typography-600 dark:text-typography-400 font-semibold"
                       >
-                        {googleLoading ? "Connecting..." : "Continue with Google"}
+                        {googleLoading
+                          ? "Connecting..."
+                          : "Continue with Google"}
                       </Text>
                     </HStack>
                   </Button>
