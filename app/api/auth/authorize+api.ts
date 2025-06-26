@@ -23,6 +23,8 @@ export async function GET(request: Request) {
 
   let platform;
 
+  console.log("Redirect URI:", redirectUri);
+
   if (redirectUri === APP_SCHEME) {
     platform = "mobile";
   } else if (redirectUri === BASE_URL) {
