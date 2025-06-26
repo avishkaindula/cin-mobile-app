@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { UserPlus, Mail, Lock, ArrowLeft, User, Github } from "lucide-react-native";
+import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
 import { useSession } from "@/context/auth";
 import { useAppToast } from "@/components/toast-utils";
 
@@ -22,7 +23,8 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
-  const { signUp, signInWithGitHub } = useSession();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { signUp, signInWithGitHub, signInWithGoogle } = useSession();
   const { showError, showSuccess } = useAppToast();
 
   async function handleSignUp() {
@@ -76,6 +78,21 @@ export default function SignUp() {
       showError("GitHub Sign Up Error", "An unexpected error occurred with GitHub sign up");
     } finally {
       setGithubLoading(false);
+    }
+  }
+
+  async function handleGoogleSignUp() {
+    setGoogleLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+
+      if (error) {
+        showError("Google Sign Up Error", error.message || "Failed to sign up with Google");
+      }
+    } catch (error) {
+      showError("Google Sign Up Error", "An unexpected error occurred with Google sign up");
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -243,7 +260,7 @@ export default function SignUp() {
                     action="primary"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading}
+                    disabled={loading || githubLoading || googleLoading}
                     onPress={handleSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -271,7 +288,7 @@ export default function SignUp() {
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading}
+                    disabled={loading || githubLoading || googleLoading}
                     onPress={handleGitHubSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -285,6 +302,25 @@ export default function SignUp() {
                         className="text-typography-600 dark:text-typography-400 font-semibold"
                       >
                         {githubLoading ? "Connecting..." : "Continue with GitHub"}
+                      </Text>
+                    </HStack>
+                  </Button>
+
+                  {/* Google OAuth Button */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    disabled={loading || githubLoading || googleLoading}
+                    onPress={handleGoogleSignUp}
+                  >
+                    <HStack space="md" className="items-center">
+                      <GoogleIcon size={20} />
+                      <Text
+                        size="lg"
+                        className="text-typography-600 dark:text-typography-400 font-semibold"
+                      >
+                        {googleLoading ? "Connecting..." : "Continue with Google"}
                       </Text>
                     </HStack>
                   </Button>

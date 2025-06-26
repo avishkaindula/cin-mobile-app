@@ -13,6 +13,7 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { useAppToast } from "@/components/toast-utils";
 import { LogIn, Shield, Mail, Lock, Github } from "lucide-react-native";
+import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
 import { useSession } from "@/context/auth";
 
 export default function SignIn() {
@@ -20,7 +21,8 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
-  const { signIn, signInWithGitHub } = useSession();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { signIn, signInWithGitHub, signInWithGoogle } = useSession();
   const { showError, showSuccess } = useAppToast();
 
   async function handleSignIn() {
@@ -49,6 +51,21 @@ export default function SignIn() {
       );
     }
     setGithubLoading(false);
+  }
+
+  async function handleGoogleSignIn() {
+    setGoogleLoading(true);
+    const { error } = await signInWithGoogle();
+
+    if (error) {
+      showError("Google Sign In Error!", error.message);
+    } else {
+      showSuccess(
+        "Google Connected!",
+        "You have successfully signed in with Google."
+      );
+    }
+    setGoogleLoading(false);
   }
 
   return (
@@ -144,7 +161,7 @@ export default function SignIn() {
                   action="primary"
                   size="lg"
                   className="w-full"
-                  disabled={loading || githubLoading}
+                  disabled={loading || githubLoading || googleLoading}
                   onPress={handleSignIn}
                 >
                   <HStack space="md" className="items-center">
@@ -172,7 +189,7 @@ export default function SignIn() {
                   variant="outline"
                   size="lg"
                   className="w-full"
-                  disabled={loading || githubLoading}
+                  disabled={loading || githubLoading || googleLoading}
                   onPress={handleGitHubSignIn}
                 >
                   <HStack space="md" className="items-center">
@@ -186,6 +203,25 @@ export default function SignIn() {
                       className="text-typography-600 dark:text-typography-400 font-semibold"
                     >
                       {githubLoading ? "Connecting..." : "Continue with GitHub"}
+                    </Text>
+                  </HStack>
+                </Button>
+
+                {/* Google OAuth Button */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  disabled={loading || githubLoading || googleLoading}
+                  onPress={handleGoogleSignIn}
+                >
+                  <HStack space="md" className="items-center">
+                    <GoogleIcon size={20} />
+                    <Text
+                      size="lg"
+                      className="text-typography-600 dark:text-typography-400 font-semibold"
+                    >
+                      {googleLoading ? "Connecting..." : "Continue with Google"}
                     </Text>
                   </HStack>
                 </Button>
