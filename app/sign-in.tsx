@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView, Alert } from "react-native";
+import { SafeAreaView } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -11,26 +11,30 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
+import { useAppToast } from "@/components/toast-utils";
 import { LogIn, Shield, Mail, Lock, Github } from "lucide-react-native";
-import { useSession } from "@/context/ctx";
+import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
+import { useSession } from "@/context/auth";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { signIn, signInWithGitHub } = useSession();
+  const { showError, showSuccess } = useAppToast();
 
   async function handleSignIn() {
     setLoading(true);
     const { error } = await signIn(email, password);
 
     if (error) {
-      Alert.alert("Sign In Error", error.message);
+      showError("Sign In Error!", error.message);
     } else {
-      // Navigation is handled by the Stack.Protected guard
-      // No need to manually navigate
+      showSuccess("Welcome Back!", "You have successfully signed in.");
     }
+
     setLoading(false);
   }
 
@@ -39,9 +43,18 @@ export default function SignIn() {
     const { error } = await signInWithGitHub();
 
     if (error) {
-      Alert.alert("GitHub Sign In Error", error.message);
+      showError("GitHub Sign In Error!", error.message);
+    } else {
+      showSuccess(
+        "GitHub Connected!",
+        "You have successfully signed in with GitHub."
+      );
     }
     setGithubLoading(false);
+  }
+
+  async function handleGoogleSignIn() {
+    setGoogleLoading(false);
   }
 
   return (
@@ -137,7 +150,7 @@ export default function SignIn() {
                   action="primary"
                   size="lg"
                   className="w-full"
-                  disabled={loading || githubLoading}
+                  disabled={loading || githubLoading || googleLoading}
                   onPress={handleSignIn}
                 >
                   <HStack space="md" className="items-center">
@@ -165,7 +178,7 @@ export default function SignIn() {
                   variant="outline"
                   size="lg"
                   className="w-full"
-                  disabled={loading || githubLoading}
+                  disabled={loading || githubLoading || googleLoading}
                   onPress={handleGitHubSignIn}
                 >
                   <HStack space="md" className="items-center">
@@ -179,6 +192,25 @@ export default function SignIn() {
                       className="text-typography-600 dark:text-typography-400 font-semibold"
                     >
                       {githubLoading ? "Connecting..." : "Continue with GitHub"}
+                    </Text>
+                  </HStack>
+                </Button>
+
+                {/* Google OAuth Button */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  disabled={loading || githubLoading || googleLoading}
+                  onPress={handleGoogleSignIn}
+                >
+                  <HStack space="md" className="items-center">
+                    <GoogleIcon size={20} />
+                    <Text
+                      size="lg"
+                      className="text-typography-600 dark:text-typography-400 font-semibold"
+                    >
+                      {googleLoading ? "Connecting..." : "Continue with Google"}
                     </Text>
                   </HStack>
                 </Button>

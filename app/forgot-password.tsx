@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView, Alert } from "react-native";
+import { SafeAreaView } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -12,17 +12,19 @@ import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { KeyRound, Mail, ArrowLeft, CheckCircle } from "lucide-react-native";
-import { useSession } from "@/context/ctx";
+import { useSession } from "@/context/auth";
+import { useAppToast } from "@/components/toast-utils";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const { resetPassword } = useSession();
+  const { showError, showSuccess } = useAppToast();
 
   async function handleResetPassword() {
     if (!email) {
-      Alert.alert("Email Required", "Please enter your email address");
+      showError("Email Required", "Please enter your email address");
       return;
     }
 
@@ -30,9 +32,13 @@ export default function ForgotPassword() {
     const { error } = await resetPassword(email);
 
     if (error) {
-      Alert.alert("Reset Password Error", error.message);
+      showError("Reset Password Error", error.message);
     } else {
       setEmailSent(true);
+      showSuccess(
+        "Email Sent",
+        "Check your email for password reset instructions"
+      );
     }
     setLoading(false);
   }
@@ -63,7 +69,7 @@ export default function ForgotPassword() {
                 size="lg"
                 className="text-typography-900 dark:text-typography-950 font-semibold ml-2"
               >
-                Password Reset
+                Go Back
               </Text>
             </HStack>
 

@@ -14,7 +14,7 @@ import { Divider } from "@/components/ui/divider";
 import { useLanguage } from "@/components/i18n/LanguageContext";
 import LanguageSettings from "@/components/settings/LanguageSettings";
 import { useColorScheme } from "nativewind";
-import { useSession } from "@/context/ctx";
+import { useSession } from "@/context/auth";
 import {
   User,
   Award,
