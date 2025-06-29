@@ -7,14 +7,32 @@ import {
 } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { makeRedirectUri } from "expo-auth-session";
+import {
+  makeRedirectUri,
+  useAuthRequest,
+  AuthRequestConfig,
+  DiscoveryDocument,
+} from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
+import { BASE_URL } from "@/lib/constants";
 
 // Required for web only
 WebBrowser.maybeCompleteAuthSession();
+
+// Google OAuth configuration
+const googleConfig: AuthRequestConfig = {
+  clientId: "google",
+  scopes: ["openid", "profile", "email"],
+  redirectUri: makeRedirectUri(),
+};
+
+const googleDiscovery: DiscoveryDocument = {
+  authorizationEndpoint: `${BASE_URL}/api/auth/authorize`,
+  tokenEndpoint: `${BASE_URL}/api/auth/token`,
+};
 
 const AuthContext = createContext<{
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
@@ -25,6 +43,7 @@ const AuthContext = createContext<{
     fullName?: string
   ) => Promise<{ error?: any; session?: Session | null }>;
   signInWithGitHub: () => Promise<{ error?: any }>;
+  signInWithGoogle: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
   verifyOtp: (
@@ -41,6 +60,7 @@ const AuthContext = createContext<{
   signOut: async () => {},
   signUp: async () => ({ error: null }),
   signInWithGitHub: async () => ({ error: null }),
+  signInWithGoogle: async () => ({ error: null }),
   sendMagicLink: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
@@ -65,6 +85,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const [isLoading, setIsLoading] = useState(true);
 
   const redirectTo = makeRedirectUri();
+
+  // Google OAuth setup
+  const [googleRequest, googleResponse, promptGoogleAsync] = useAuthRequest(
+    googleConfig,
+    googleDiscovery
+  );
 
   // Create session from URL for both web and mobile
   const createSessionFromUrl = async (url: string) => {
@@ -211,6 +237,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Handle Google OAuth response
+  useEffect(() => {
+    handleGoogleResponse();
+  }, [googleResponse]);
+
   // Handle linking into app from email/OAuth (mobile only)
   const url = Linking.useURL();
   useEffect(() => {
@@ -218,6 +249,62 @@ export function SessionProvider({ children }: PropsWithChildren) {
       createSessionFromUrl(url).catch(console.error);
     }
   }, [url]);
+
+  // Handle Google OAuth response
+  const handleGoogleResponse = async () => {
+    // This function is called when Google redirects back to our app
+    // The response contains the authorization code that we'll exchange for tokens
+    if (googleResponse?.type === "success") {
+      try {
+        setIsLoading(true);
+        // Extract the authorization code from the response
+        // This code is what we'll exchange for access and refresh tokens
+        const { code } = googleResponse.params;
+
+        // Create form data to send to our token endpoint
+        // We include both the code and platform information
+        // The platform info helps our server handle web vs native differently
+        const formData = new FormData();
+        formData.append("code", code);
+
+        // Add platform information for the backend to handle appropriately
+        if (Platform.OS === "web") {
+          formData.append("platform", "web");
+        }
+
+        // Get the code verifier from the request object
+        // This is the same verifier that was used to generate the code challenge
+        if (googleRequest?.codeVerifier) {
+          formData.append("code_verifier", googleRequest.codeVerifier);
+        } else {
+          console.warn("No code verifier found in request object");
+        }
+
+        // Send the authorization code to our token endpoint
+        // The server will exchange this code with Google for access and refresh tokens
+        // For web: credentials are included to handle cookies
+        // For native: we'll receive the tokens directly in the response
+        const tokenResponse = await fetch(`${BASE_URL}/api/auth/token`, {
+          method: "POST",
+          body: formData,
+        });
+
+        // For web: The server sets the tokens in HTTP-only cookies
+        // We just need to get the user data from the response
+        const userData = await tokenResponse.json();
+
+        console.log("Google OAuth user data:", userData);
+      } catch (e) {
+        console.error("Error handling auth response:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (googleResponse?.type === "cancel") {
+      alert("Sign in cancelled");
+    } else if (googleResponse?.type === "error") {
+      console.error("Google OAuth error:", googleResponse?.error);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -336,6 +423,18 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      if (!googleRequest) {
+        return { error: new Error("Google request not initialized") };
+      }
+      await promptGoogleAsync();
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
+  };
+
   const sendMagicLink = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -393,6 +492,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signOut,
         signUp,
         signInWithGitHub,
+        signInWithGoogle,
         sendMagicLink,
         resetPassword,
         verifyOtp,

@@ -31,7 +31,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { signUp, signInWithGitHub } = useSession();
+  const { signUp, signInWithGitHub, signInWithGoogle } = useSession();
   const { showError, showSuccess } = useAppToast();
 
   async function handleSignUp() {
@@ -101,7 +101,24 @@ export default function SignUp() {
   }
 
   async function handleGoogleSignUp() {
-    setGoogleLoading(false);
+    setGoogleLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+
+      if (error) {
+        showError(
+          "Google Sign Up Error",
+          error.message || "Failed to sign up with Google"
+        );
+      }
+    } catch (error) {
+      showError(
+        "Google Sign Up Error",
+        "An unexpected error occurred with Google sign up"
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
   }
 
   return (
