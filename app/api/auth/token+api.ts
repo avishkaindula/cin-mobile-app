@@ -19,42 +19,59 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
   try {
-    // Parse as JSON first, then fallback to other methods
     let code = "";
     let codeVerifier = "";
 
     const contentType = request.headers.get("content-type") || "";
     console.log("Content-Type:", contentType);
 
-    try {
-      // Try JSON first
+    // Handle different content types
+    if (contentType.includes("application/json")) {
+      // Handle JSON requests
       const body = await request.json();
+      console.log("Parsed JSON body:", body);
       code = body.code || "";
       codeVerifier = body.code_verifier || "";
-      console.log("JSON parsing - code:", code ? "present" : "missing");
-      console.log(
-        "JSON parsing - code_verifier:",
-        codeVerifier ? "present" : "missing"
-      );
-    } catch (jsonError) {
-      console.log("JSON parsing failed, trying other methods:", jsonError);
-
-      // Fallback to text parsing
+    } else if (contentType.includes("application/x-www-form-urlencoded")) {
+      // Handle URL-encoded form data
+      const text = await request.text();
+      console.log("Raw request text:", text);
+      const params = new URLSearchParams(text);
+      code = params.get("code") || "";
+      codeVerifier = params.get("code_verifier") || "";
+    } else if (contentType.includes("multipart/form-data")) {
+      // Handle multipart form data
+      try {
+        const formData = await request.formData();
+        console.log("Parsed FormData successfully");
+        
+        // Use type assertion to access FormData methods
+        const formDataAny = formData as any;
+        
+        code = formDataAny.get?.("code") || "";
+        codeVerifier = formDataAny.get?.("code_verifier") || "";
+        
+        // Log form fields for debugging
+        if (formDataAny.forEach) {
+          const formEntries: string[] = [];
+          formDataAny.forEach((value: any, key: any) => {
+            formEntries.push(`${key}: ${typeof value === 'string' ? value : '[File/Blob]'}`);
+          });
+          console.log("FormData entries:", formEntries.join(", "));
+        }
+      } catch (formError) {
+        console.log("FormData parsing failed:", formError);
+      }
+    } else {
+      // Fallback: try to parse as text/URLSearchParams
       try {
         const text = await request.text();
         console.log("Raw request text:", text);
-
-        // Try as URLSearchParams
         const params = new URLSearchParams(text);
         code = params.get("code") || "";
         codeVerifier = params.get("code_verifier") || "";
-
-        console.log(
-          "URLSearchParams parsing - code:",
-          code ? "present" : "missing"
-        );
-      } catch (textError) {
-        console.log("Text parsing also failed:", textError);
+      } catch (error) {
+        console.log("Failed to parse request body:", error);
       }
     }
 
@@ -63,6 +80,14 @@ export async function POST(request: Request) {
       "Final parsed - code_verifier:",
       codeVerifier ? "present" : "missing"
     );
+    
+    // Log the actual values for debugging (first few characters only)
+    if (code) {
+      console.log("Code preview:", code.substring(0, 10) + "...");
+    }
+    if (codeVerifier) {
+      console.log("Code verifier preview:", codeVerifier.substring(0, 10) + "...");
+    }
 
     if (!code) {
       return Response.json(
