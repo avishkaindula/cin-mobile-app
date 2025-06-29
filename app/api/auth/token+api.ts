@@ -194,58 +194,133 @@ export async function POST(request: Request) {
       return Response.json({ error: userError.message }, { status: 400 });
     }
 
-    // Generate a Supabase session for the user (works for both new and existing users)
-    console.log("Generating magic link for email:", googleUser.email);
-    const { data: sessionData, error: sessionError } =
+    // For existing users, we need to handle them differently
+    if (!userId) {
+      console.log("User already exists, need to find their ID...");
+      
+      // Try to get user by listing users - we'll need to paginate through to find the user
+      let foundUser = null;
+      let page = 1;
+      const perPage = 100; // Reasonable page size
+      
+      while (!foundUser && page <= 10) { // Limit to 10 pages (1000 users) to prevent infinite loops
+        const { data: users, error: listError } = 
+          await supabaseAdmin.auth.admin.listUsers({
+            page,
+            perPage,
+          });
+        
+        if (listError) {
+          console.error("Error listing users:", listError);
+          break;
+        }
+        
+        // Find user by email
+        foundUser = users.users.find(user => user.email === googleUser.email);
+        
+        if (!foundUser && users.users.length < perPage) {
+          // We've reached the end of the user list
+          break;
+        }
+        
+        page++;
+      }
+      
+      if (foundUser) {
+        userId = foundUser.id;
+        console.log("Found existing user:", userId);
+      } else {
+        console.error("No user found for email:", googleUser.email);
+        return Response.json({ error: "User not found" }, { status: 400 });
+      }
+    }
+
+    // Update user metadata to include Google information
+    const { data: updatedUser, error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          full_name: googleUser.name,
+          avatar_url: googleUser.picture,
+          provider: "google",
+          provider_id: googleUser.id,
+          given_name: googleUser.given_name,
+          family_name: googleUser.family_name,
+        },
+      });
+
+    if (updateError) {
+      console.warn("Failed to update user metadata:", updateError);
+      // Continue anyway, this is not critical
+    } else {
+      console.log("Updated user metadata successfully");
+    }
+
+    // Generate a magic link and extract tokens from it
+    console.log("Generating magic link for session creation...");
+    const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: "magiclink",
         email: googleUser.email,
+        options: {
+          redirectTo: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/callback`,
+        },
       });
 
-    if (sessionError) {
-      console.error("Supabase session generation error:", sessionError);
+    if (linkError) {
+      console.error("Supabase link generation error:", linkError);
       return Response.json(
         { error: "Failed to create session" },
         { status: 500 }
       );
     }
 
-    console.log(
-      "Generated session data:",
-      JSON.stringify(sessionData, null, 2)
-    );
+    // Parse the magic link to extract the token
+    const linkUrl = new URL(linkData.properties.action_link);
+    const token = linkUrl.searchParams.get("token");
+    const type = linkUrl.searchParams.get("type");
 
-    // Extract the tokens from the generated link
-    const url = new URL(sessionData.properties.action_link);
-    console.log("Action link URL:", sessionData.properties.action_link);
-    console.log("URL search params:", url.searchParams.toString());
-
-    const accessToken = url.searchParams.get("access_token");
-    const refreshToken = url.searchParams.get("refresh_token");
-
-    console.log("Extracted access_token:", accessToken ? "present" : "missing");
-    console.log(
-      "Extracted refresh_token:",
-      refreshToken ? "present" : "missing"
-    );
-
-    if (!accessToken || !refreshToken) {
-      console.error(
-        "Missing tokens in generated link. Available params:",
-        Array.from(url.searchParams.keys())
-      );
+    if (!token || type !== "magiclink") {
+      console.error("Invalid magic link generated");
       return Response.json(
-        { error: "Failed to generate tokens" },
+        { error: "Failed to generate valid session token" },
         { status: 500 }
       );
     }
 
+    // Verify the magic link token to create a session
+    console.log("Verifying magic link token...");
+    const { data: sessionData, error: verifyError } =
+      await supabaseAdmin.auth.verifyOtp({
+        token_hash: token,
+        type: "magiclink",
+      });
+
+    if (verifyError) {
+      console.error("Token verification error:", verifyError);
+      return Response.json(
+        { error: "Failed to verify session token" },
+        { status: 500 }
+      );
+    }
+
+    console.log("Session created successfully");
+    console.log("Session user:", sessionData.user?.email);
+
     // Return the Supabase tokens
+    if (!sessionData.session) {
+      console.error("No session created from verification");
+      return Response.json(
+        { error: "Failed to create session" },
+        { status: 500 }
+      );
+    }
+
     return Response.json({
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      access_token: sessionData.session.access_token,
+      refresh_token: sessionData.session.refresh_token,
       token_type: "bearer",
-      expires_in: 3600,
+      expires_in: sessionData.session.expires_in || 3600,
+      user: sessionData.user,
     });
   } catch (error) {
     console.error("Token exchange error:", error);

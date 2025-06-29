@@ -282,27 +282,54 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
         // Send the authorization code to our token endpoint
         // The server will exchange this code with Google for access and refresh tokens
-        // For web: credentials are included to handle cookies
-        // For native: we'll receive the tokens directly in the response
+        // Then create a Supabase session and return the tokens
         const tokenResponse = await fetch(`${BASE_URL}/api/auth/token`, {
           method: "POST",
           body: formData,
         });
 
-        // For web: The server sets the tokens in HTTP-only cookies
-        // We just need to get the user data from the response
         const userData = await tokenResponse.json();
-
         console.log("Google OAuth user data:", userData);
+
+        if (tokenResponse.ok && userData.access_token && userData.refresh_token) {
+          // Set the session using the tokens from our backend
+          const { data: sessionData, error: sessionError } = 
+            await supabase.auth.setSession({
+              access_token: userData.access_token,
+              refresh_token: userData.refresh_token,
+            });
+
+          if (sessionError) {
+            console.error("Error setting session:", sessionError);
+            throw new Error(`Failed to set session: ${sessionError.message}`);
+          } 
+          
+          if (!sessionData.session) {
+            console.error("No session returned from setSession");
+            throw new Error("Failed to create session");
+          }
+          
+          console.log("Session set successfully:", sessionData.user?.email);
+          setSession(sessionData.session);
+        } else {
+          console.error("Invalid response from token endpoint:", userData);
+          throw new Error(userData.error || "Authentication failed");
+        }
       } catch (e) {
         console.error("Error handling auth response:", e);
+        // Show user-friendly error
+        if (Platform.OS === "web") {
+          alert(`Authentication failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+        }
       } finally {
         setIsLoading(false);
       }
     } else if (googleResponse?.type === "cancel") {
-      alert("Sign in cancelled");
+      console.log("Google sign in cancelled");
+      setIsLoading(false);
     } else if (googleResponse?.type === "error") {
       console.error("Google OAuth error:", googleResponse?.error);
+      setIsLoading(false);
     }
   };
 
