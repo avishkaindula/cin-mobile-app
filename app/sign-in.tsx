@@ -23,6 +23,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const { signIn, signInWithGitHub, signInWithGoogle, isGoogleProcessing, session } = useSession();
   const { showError, showSuccess } = useAppToast();
 
@@ -35,16 +36,69 @@ export default function SignIn() {
   }, [session, isGoogleProcessing, googleLoading]);
 
   async function handleSignIn() {
-    setLoading(true);
-    const { error } = await signIn(email, password);
+    // Debounce: Prevent rapid multiple submissions
+    const now = Date.now();
+    if (now - lastSubmitTime < 2000) { // 2 second debounce
+      console.log("Ignoring rapid button press");
+      return;
+    }
+    setLastSubmitTime(now);
 
-    if (error) {
-      showError("Sign In Error!", error.message);
-    } else {
-      showSuccess("Welcome Back!", "You have successfully signed in.");
+    // Prevent double submission
+    if (loading) {
+      console.log("Sign in already in progress, ignoring duplicate request");
+      return;
     }
 
-    setLoading(false);
+    // Validation
+    if (!email.trim()) {
+      showError("Email Required", "Please enter your email address");
+      return;
+    }
+
+    if (!password.trim()) {
+      showError("Password Required", "Please enter your password");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showError("Invalid Email", "Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      console.log("Starting sign in process for:", email);
+      
+      const { error } = await signIn(email, password);
+
+      console.log("Sign in response:", { 
+        hasError: !!error, 
+        errorMessage: error?.message 
+      });
+
+      if (error) {
+        console.error("Sign in error:", error);
+        showError("Sign In Error!", error.message);
+      } else {
+        console.log("Sign in successful");
+        showSuccess("Welcome Back!", "You have successfully signed in.");
+      }
+    } catch (error) {
+      console.error("Unexpected sign in error:", error);
+      showError(
+        "Sign In Error",
+        "An unexpected error occurred. Please try again."
+      );
+    } finally {
+      // Add a small delay before re-enabling the button to prevent rapid double-clicks
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
   }
 
   async function handleGitHubSignIn() {
@@ -176,11 +230,22 @@ export default function SignIn() {
                   action="primary"
                   size="lg"
                   className="w-full"
-                  disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
+                  disabled={
+                    loading || 
+                    githubLoading || 
+                    googleLoading || 
+                    isGoogleProcessing ||
+                    !email.trim() ||
+                    !password.trim()
+                  }
                   onPress={handleSignIn}
                 >
                   <HStack space="md" className="items-center">
-                    <Icon as={LogIn} size="md" className="text-white" />
+                    {loading ? (
+                      <Spinner size="small" color="white" />
+                    ) : (
+                      <Icon as={LogIn} size="md" className="text-white" />
+                    )}
                     <Text size="lg" className="text-white font-semibold">
                       {loading ? "Signing In..." : "Sign In"}
                     </Text>

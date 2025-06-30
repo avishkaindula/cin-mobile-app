@@ -32,6 +32,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const { signUp, signInWithGitHub, signInWithGoogle, isGoogleProcessing, session } = useSession();
   const { showError, showSuccess } = useAppToast();
 
@@ -44,8 +45,33 @@ export default function SignUp() {
   }, [session, isGoogleProcessing, googleLoading]);
 
   async function handleSignUp() {
+    // Debounce: Prevent rapid multiple submissions
+    const now = Date.now();
+    if (now - lastSubmitTime < 2000) { // 2 second debounce
+      console.log("Ignoring rapid button press");
+      return;
+    }
+    setLastSubmitTime(now);
+
+    // Prevent double submission
+    if (loading) {
+      console.log("Sign up already in progress, ignoring duplicate request");
+      return;
+    }
+
+    // Validation
+    if (!email.trim()) {
+      showError("Email Required", "Please enter your email address");
+      return;
+    }
+
     if (!fullName.trim()) {
       showError("Name Required", "Please enter your full name");
+      return;
+    }
+
+    if (!password.trim()) {
+      showError("Password Required", "Please enter a password");
       return;
     }
 
@@ -62,29 +88,59 @@ export default function SignUp() {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showError("Invalid Email", "Please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
+    
     try {
+      console.log("Starting sign up process for:", email);
+      
       const { error, session } = await signUp(email, password, fullName);
 
+      console.log("Sign up response:", { 
+        hasError: !!error, 
+        errorMessage: error?.message, 
+        hasSession: !!session 
+      });
+
       if (error) {
+        console.error("Sign up error:", error);
         showError(
           "Sign Up Error",
           error.message || "An unexpected error occurred"
         );
       } else {
+        console.log("Sign up successful, navigating to verify-email");
+        showSuccess(
+          "Account Created!",
+          "Please check your email to verify your account."
+        );
+        
         // Use InteractionManager to ensure smooth navigation
         InteractionManager.runAfterInteractions(() => {
-          router.push("/verify-email" as any);
-          setTimeout(() => router.setParams({ email }), 100);
+          // Small delay to ensure state is updated
+          setTimeout(() => {
+            router.push("/verify-email" as any);
+            setTimeout(() => router.setParams({ email }), 100);
+          }, 100);
         });
       }
     } catch (error) {
+      console.error("Unexpected sign up error:", error);
       showError(
         "Sign Up Error",
         "An unexpected error occurred. Please try again."
       );
     } finally {
-      setLoading(false);
+      // Add a small delay before re-enabling the button to prevent rapid double-clicks
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     }
   }
 
@@ -294,11 +350,24 @@ export default function SignUp() {
                     action="primary"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
+                    disabled={
+                      loading || 
+                      githubLoading || 
+                      googleLoading || 
+                      isGoogleProcessing ||
+                      !email.trim() ||
+                      !fullName.trim() ||
+                      !password.trim() ||
+                      !confirmPassword.trim()
+                    }
                     onPress={handleSignUp}
                   >
                     <HStack space="md" className="items-center">
-                      <Icon as={UserPlus} size="md" className="text-white" />
+                      {loading ? (
+                        <Spinner size="small" color="white" />
+                      ) : (
+                        <Icon as={UserPlus} size="md" className="text-white" />
+                      )}
                       <Text size="lg" className="text-white font-semibold">
                         {loading ? "Creating Account..." : "Create Account"}
                       </Text>
