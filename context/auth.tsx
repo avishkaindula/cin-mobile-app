@@ -55,6 +55,7 @@ const AuthContext = createContext<{
   session: Session | null;
   user: Session["user"] | null;
   isLoading: boolean;
+  isGoogleProcessing: boolean;
 }>({
   signIn: async () => ({ error: null }),
   signOut: async () => {},
@@ -68,6 +69,7 @@ const AuthContext = createContext<{
   session: null,
   user: null,
   isLoading: true,
+  isGoogleProcessing: false,
 });
 
 // This hook can be used to access the user info.
@@ -83,6 +85,7 @@ export function useSession() {
 export function SessionProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGoogleProcessing, setIsGoogleProcessing] = useState(false);
 
   const redirectTo = makeRedirectUri();
 
@@ -256,7 +259,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     // The response contains the authorization code that we'll exchange for tokens
     if (googleResponse?.type === "success") {
       try {
-        setIsLoading(true);
+        setIsGoogleProcessing(true);
+        console.log("Starting Google OAuth token exchange...");
+        
         // Extract the authorization code from the response
         // This code is what we'll exchange for access and refresh tokens
         const { code } = googleResponse.params;
@@ -283,15 +288,17 @@ export function SessionProvider({ children }: PropsWithChildren) {
         // Send the authorization code to our token endpoint
         // The server will exchange this code with Google for access and refresh tokens
         // Then create a Supabase session and return the tokens
+        console.log("Exchanging code for tokens...");
         const tokenResponse = await fetch(`${BASE_URL}/api/auth/token`, {
           method: "POST",
           body: formData,
         });
 
         const userData = await tokenResponse.json();
-        console.log("Google OAuth user data:", userData);
+        console.log("Token exchange response received");
 
         if (tokenResponse.ok && userData.access_token && userData.refresh_token) {
+          console.log("Setting session with received tokens...");
           // Set the session using the tokens from our backend
           const { data: sessionData, error: sessionError } = 
             await supabase.auth.setSession({
@@ -309,8 +316,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
             throw new Error("Failed to create session");
           }
           
-          console.log("Session set successfully:", sessionData.user?.email);
+          console.log("Google OAuth completed successfully:", sessionData.user?.email);
           setSession(sessionData.session);
+          
+          // The success message will be handled by the auth state change in the UI components
         } else {
           console.error("Invalid response from token endpoint:", userData);
           throw new Error(userData.error || "Authentication failed");
@@ -322,13 +331,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
           alert(`Authentication failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
         }
       } finally {
+        setIsGoogleProcessing(false);
         setIsLoading(false);
       }
     } else if (googleResponse?.type === "cancel") {
       console.log("Google sign in cancelled");
+      setIsGoogleProcessing(false);
       setIsLoading(false);
     } else if (googleResponse?.type === "error") {
       console.error("Google OAuth error:", googleResponse?.error);
+      setIsGoogleProcessing(false);
       setIsLoading(false);
     }
   };
@@ -527,6 +539,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         session,
         user: session?.user || null,
         isLoading,
+        isGoogleProcessing,
       }}
     >
       {children}

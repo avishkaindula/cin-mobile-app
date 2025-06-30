@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, InteractionManager } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
+import { Spinner } from "@/components/ui/spinner";
 import {
   UserPlus,
   Mail,
@@ -31,8 +32,16 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { signUp, signInWithGitHub, signInWithGoogle } = useSession();
+  const { signUp, signInWithGitHub, signInWithGoogle, isGoogleProcessing, session } = useSession();
   const { showError, showSuccess } = useAppToast();
+
+  // Show success message when Google OAuth completes
+  useEffect(() => {
+    if (session && isGoogleProcessing === false && googleLoading === false) {
+      // This means we just completed Google OAuth
+      showSuccess("Welcome!", "You have successfully signed up with Google.");
+    }
+  }, [session, isGoogleProcessing, googleLoading]);
 
   async function handleSignUp() {
     if (!fullName.trim()) {
@@ -285,7 +294,7 @@ export default function SignUp() {
                     action="primary"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading}
+                    disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
                     onPress={handleSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -313,7 +322,7 @@ export default function SignUp() {
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading}
+                    disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
                     onPress={handleGitHubSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -338,7 +347,7 @@ export default function SignUp() {
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading}
+                    disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
                     onPress={handleGoogleSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -347,8 +356,8 @@ export default function SignUp() {
                         size="lg"
                         className="text-typography-600 dark:text-typography-400 font-semibold"
                       >
-                        {googleLoading
-                          ? "Connecting..."
+                        {googleLoading || isGoogleProcessing
+                          ? (isGoogleProcessing ? "Processing..." : "Connecting...")
                           : "Continue with Google"}
                       </Text>
                     </HStack>
@@ -430,6 +439,28 @@ export default function SignUp() {
           </Box>
         </Box>
       </ScrollView>
+      
+      {/* Google Processing Overlay */}
+      {isGoogleProcessing && (
+        <Box className="absolute inset-0 bg-black/50 flex-1 justify-center items-center">
+          <Card className="p-8 m-6">
+            <VStack space="lg" className="items-center">
+              <Spinner size="large" />
+              <VStack space="xs" className="items-center">
+                <Heading size="md" className="text-typography-900 dark:text-typography-950">
+                  Completing Sign Up
+                </Heading>
+                <Text 
+                  size="sm" 
+                  className="text-typography-600 dark:text-typography-750 text-center"
+                >
+                  Securely connecting your Google account...
+                </Text>
+              </VStack>
+            </VStack>
+          </Card>
+        </Box>
+      )}
     </SafeAreaView>
   );
 }
