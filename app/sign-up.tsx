@@ -33,7 +33,13 @@ export default function SignUp() {
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
-  const { signUp, signInWithGitHub, signInWithGoogle, isGoogleProcessing, session } = useSession();
+  const {
+    signUp,
+    signInWithGitHub,
+    signInWithGoogle,
+    isGoogleProcessing,
+    session,
+  } = useSession();
   const { showError, showSuccess } = useAppToast();
 
   // Show success message when Google OAuth completes
@@ -47,7 +53,8 @@ export default function SignUp() {
   async function handleSignUp() {
     // Debounce: Prevent rapid multiple submissions
     const now = Date.now();
-    if (now - lastSubmitTime < 2000) { // 2 second debounce
+    if (now - lastSubmitTime < 2000) {
+      // 2 second debounce
       console.log("Ignoring rapid button press");
       return;
     }
@@ -96,16 +103,16 @@ export default function SignUp() {
     }
 
     setLoading(true);
-    
+
     try {
       console.log("Starting sign up process for:", email);
-      
+
       const { error, session } = await signUp(email, password, fullName);
 
-      console.log("Sign up response:", { 
-        hasError: !!error, 
-        errorMessage: error?.message, 
-        hasSession: !!session 
+      console.log("Sign up response:", {
+        hasError: !!error,
+        errorMessage: error?.message,
+        hasSession: !!session,
       });
 
       if (error) {
@@ -120,7 +127,7 @@ export default function SignUp() {
           "Account Created!",
           "Please check your email to verify your account."
         );
-        
+
         // Use InteractionManager to ensure smooth navigation
         InteractionManager.runAfterInteractions(() => {
           // Small delay to ensure state is updated
@@ -351,9 +358,9 @@ export default function SignUp() {
                     size="lg"
                     className="w-full"
                     disabled={
-                      loading || 
-                      githubLoading || 
-                      googleLoading || 
+                      loading ||
+                      githubLoading ||
+                      googleLoading ||
                       isGoogleProcessing ||
                       !email.trim() ||
                       !fullName.trim() ||
@@ -386,12 +393,45 @@ export default function SignUp() {
                     <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
                   </HStack>
 
+                  {/* Google OAuth Button */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    disabled={
+                      loading ||
+                      githubLoading ||
+                      googleLoading ||
+                      isGoogleProcessing
+                    }
+                    onPress={handleGoogleSignUp}
+                  >
+                    <HStack space="md" className="items-center">
+                      <GoogleIcon size={20} />
+                      <Text
+                        size="lg"
+                        className="text-typography-600 dark:text-typography-400 font-semibold"
+                      >
+                        {googleLoading || isGoogleProcessing
+                          ? isGoogleProcessing
+                            ? "Processing..."
+                            : "Connecting..."
+                          : "Continue with Google"}
+                      </Text>
+                    </HStack>
+                  </Button>
+
                   {/* GitHub OAuth Button */}
                   <Button
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
+                    disabled={
+                      loading ||
+                      githubLoading ||
+                      googleLoading ||
+                      isGoogleProcessing
+                    }
                     onPress={handleGitHubSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -407,27 +447,6 @@ export default function SignUp() {
                         {githubLoading
                           ? "Connecting..."
                           : "Continue with GitHub"}
-                      </Text>
-                    </HStack>
-                  </Button>
-
-                  {/* Google OAuth Button */}
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
-                    disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
-                    onPress={handleGoogleSignUp}
-                  >
-                    <HStack space="md" className="items-center">
-                      <GoogleIcon size={20} />
-                      <Text
-                        size="lg"
-                        className="text-typography-600 dark:text-typography-400 font-semibold"
-                      >
-                        {googleLoading || isGoogleProcessing
-                          ? (isGoogleProcessing ? "Processing..." : "Connecting...")
-                          : "Continue with Google"}
                       </Text>
                     </HStack>
                   </Button>
@@ -508,7 +527,7 @@ export default function SignUp() {
           </Box>
         </Box>
       </ScrollView>
-      
+
       {/* Google Processing Overlay */}
       {isGoogleProcessing && (
         <Box className="absolute inset-0 bg-black/50 flex-1 justify-center items-center">
@@ -516,11 +535,14 @@ export default function SignUp() {
             <VStack space="lg" className="items-center">
               <Spinner size="large" />
               <VStack space="xs" className="items-center">
-                <Heading size="md" className="text-typography-900 dark:text-typography-950">
+                <Heading
+                  size="md"
+                  className="text-typography-900 dark:text-typography-950"
+                >
                   Completing Sign Up
                 </Heading>
-                <Text 
-                  size="sm" 
+                <Text
+                  size="sm"
                   className="text-typography-600 dark:text-typography-750 text-center"
                 >
                   Securely connecting your Google account...

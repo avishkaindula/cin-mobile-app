@@ -24,21 +24,31 @@ export default function SignIn() {
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
-  const { signIn, signInWithGitHub, signInWithGoogle, isGoogleProcessing, session } = useSession();
+  const {
+    signIn,
+    signInWithGitHub,
+    signInWithGoogle,
+    isGoogleProcessing,
+    session,
+  } = useSession();
   const { showError, showSuccess } = useAppToast();
 
   // Show success message when Google OAuth completes
   useEffect(() => {
     if (session && isGoogleProcessing === false && googleLoading === false) {
       // This means we just completed Google OAuth
-      showSuccess("Welcome Back!", "You have successfully signed in with Google.");
+      showSuccess(
+        "Welcome Back!",
+        "You have successfully signed in with Google."
+      );
     }
   }, [session, isGoogleProcessing, googleLoading]);
 
   async function handleSignIn() {
     // Debounce: Prevent rapid multiple submissions
     const now = Date.now();
-    if (now - lastSubmitTime < 2000) { // 2 second debounce
+    if (now - lastSubmitTime < 2000) {
+      // 2 second debounce
       console.log("Ignoring rapid button press");
       return;
     }
@@ -69,15 +79,15 @@ export default function SignIn() {
     }
 
     setLoading(true);
-    
+
     try {
       console.log("Starting sign in process for:", email);
-      
+
       const { error } = await signIn(email, password);
 
-      console.log("Sign in response:", { 
-        hasError: !!error, 
-        errorMessage: error?.message 
+      console.log("Sign in response:", {
+        hasError: !!error,
+        errorMessage: error?.message,
       });
 
       if (error) {
@@ -231,9 +241,9 @@ export default function SignIn() {
                   size="lg"
                   className="w-full"
                   disabled={
-                    loading || 
-                    githubLoading || 
-                    googleLoading || 
+                    loading ||
+                    githubLoading ||
+                    googleLoading ||
                     isGoogleProcessing ||
                     !email.trim() ||
                     !password.trim()
@@ -264,6 +274,34 @@ export default function SignIn() {
                   <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
                 </HStack>
 
+                {/* Google OAuth Button */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  disabled={
+                    loading ||
+                    githubLoading ||
+                    googleLoading ||
+                    isGoogleProcessing
+                  }
+                  onPress={handleGoogleSignIn}
+                >
+                  <HStack space="md" className="items-center">
+                    <GoogleIcon size={20} />
+                    <Text
+                      size="lg"
+                      className="text-typography-600 dark:text-typography-400 font-semibold"
+                    >
+                      {googleLoading || isGoogleProcessing
+                        ? isGoogleProcessing
+                          ? "Processing..."
+                          : "Connecting..."
+                        : "Continue with Google"}
+                    </Text>
+                  </HStack>
+                </Button>
+
                 {/* GitHub OAuth Button */}
                 <Button
                   variant="outline"
@@ -283,28 +321,6 @@ export default function SignIn() {
                       className="text-typography-600 dark:text-typography-400 font-semibold"
                     >
                       {githubLoading ? "Connecting..." : "Continue with GitHub"}
-                    </Text>
-                  </HStack>
-                </Button>
-
-                {/* Google OAuth Button */}
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                  disabled={loading || githubLoading || googleLoading || isGoogleProcessing}
-                  onPress={handleGoogleSignIn}
-                >
-                  <HStack space="md" className="items-center">
-                    <GoogleIcon size={20} />
-                    <Text
-                      size="lg"
-                      className="text-typography-600 dark:text-typography-400 font-semibold"
-                    >
-                      {googleLoading || isGoogleProcessing ? 
-                        (isGoogleProcessing ? "Processing..." : "Connecting...") : 
-                        "Continue with Google"
-                      }
                     </Text>
                   </HStack>
                 </Button>
@@ -392,7 +408,7 @@ export default function SignIn() {
           </VStack>
         </Box>
       </ScrollView>
-      
+
       {/* Google Processing Overlay */}
       {isGoogleProcessing && (
         <Box className="absolute inset-0 bg-black/50 flex-1 justify-center items-center">
@@ -400,11 +416,14 @@ export default function SignIn() {
             <VStack space="lg" className="items-center">
               <Spinner size="large" />
               <VStack space="xs" className="items-center">
-                <Heading size="md" className="text-typography-900 dark:text-typography-950">
+                <Heading
+                  size="md"
+                  className="text-typography-900 dark:text-typography-950"
+                >
                   Completing Sign In
                 </Heading>
-                <Text 
-                  size="sm" 
+                <Text
+                  size="sm"
                   className="text-typography-600 dark:text-typography-750 text-center"
                 >
                   Securely connecting your Google account...
