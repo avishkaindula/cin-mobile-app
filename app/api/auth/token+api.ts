@@ -232,26 +232,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update user metadata to include Google information
-    const { data: updatedUser, error: updateError } =
-      await supabaseAdmin.auth.admin.updateUserById(userId, {
-        user_metadata: {
-          full_name: googleUser.name,
-          avatar_url: googleUser.picture,
-          provider: "google",
-          provider_id: googleUser.id,
-          given_name: googleUser.given_name,
-          family_name: googleUser.family_name,
-        },
-      });
-
-    if (updateError) {
-      console.warn("Failed to update user metadata:", updateError);
-      // Continue anyway, this is not critical
-    } else {
-      console.log("Updated user metadata successfully");
-    }
-
     // Generate a magic link and extract tokens from it
     console.log("Generating magic link for session creation...");
     const { data: linkData, error: linkError } =
