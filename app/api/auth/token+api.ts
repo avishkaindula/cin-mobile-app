@@ -19,18 +19,56 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
   try {
-    // Fast path: Google OAuth typically sends URL-encoded data
-    const contentType = request.headers.get("content-type") || "";
     let code = "";
+    let codeVerifier = "";
 
+    const contentType = request.headers.get("content-type") || "";
+
+    // Handle different content types
     if (contentType.includes("application/json")) {
+      // Handle JSON requests
       const body = await request.json();
       code = body.code || "";
-    } else {
-      // Default to URL-encoded parsing (most common for OAuth)
+      codeVerifier = body.code_verifier || "";
+    } else if (contentType.includes("application/x-www-form-urlencoded")) {
+      // Handle URL-encoded form data
       const text = await request.text();
       const params = new URLSearchParams(text);
       code = params.get("code") || "";
+      codeVerifier = params.get("code_verifier") || "";
+    } else if (contentType.includes("multipart/form-data")) {
+      // Handle multipart form data
+      try {
+        const formData = await request.formData();
+
+        // Use type assertion to access FormData methods
+        const formDataAny = formData as any;
+
+        code = formDataAny.get?.("code") || "";
+        codeVerifier = formDataAny.get?.("code_verifier") || "";
+
+        // Log form fields for debugging
+        if (formDataAny.forEach) {
+          const formEntries: string[] = [];
+          formDataAny.forEach((value: any, key: any) => {
+            formEntries.push(
+              `${key}: ${typeof value === "string" ? value : "[File/Blob]"}`
+            );
+          });
+        }
+      } catch (formError) {
+        console.log("FormData parsing failed:", formError);
+      }
+    } else {
+      // Fallback: try to parse as text/URLSearchParams
+      try {
+        const text = await request.text();
+        const params = new URLSearchParams(text);
+        code = params.get("code") || "";
+        codeVerifier = params.get("code_verifier") || "";
+      } catch (error) {
+        console.log("Failed to parse request body:", error);
+      }
     }
 
     if (!code) {
