@@ -19,79 +19,18 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
   try {
-    let code = "";
-    let codeVerifier = "";
-
+    // Fast path: Google OAuth typically sends URL-encoded data
     const contentType = request.headers.get("content-type") || "";
-    console.log("Content-Type:", contentType);
+    let code = "";
 
-    // Handle different content types
     if (contentType.includes("application/json")) {
-      // Handle JSON requests
       const body = await request.json();
-      console.log("Parsed JSON body:", body);
       code = body.code || "";
-      codeVerifier = body.code_verifier || "";
-    } else if (contentType.includes("application/x-www-form-urlencoded")) {
-      // Handle URL-encoded form data
+    } else {
+      // Default to URL-encoded parsing (most common for OAuth)
       const text = await request.text();
-      console.log("Raw request text:", text);
       const params = new URLSearchParams(text);
       code = params.get("code") || "";
-      codeVerifier = params.get("code_verifier") || "";
-    } else if (contentType.includes("multipart/form-data")) {
-      // Handle multipart form data
-      try {
-        const formData = await request.formData();
-        console.log("Parsed FormData successfully");
-
-        // Use type assertion to access FormData methods
-        const formDataAny = formData as any;
-
-        code = formDataAny.get?.("code") || "";
-        codeVerifier = formDataAny.get?.("code_verifier") || "";
-
-        // Log form fields for debugging
-        if (formDataAny.forEach) {
-          const formEntries: string[] = [];
-          formDataAny.forEach((value: any, key: any) => {
-            formEntries.push(
-              `${key}: ${typeof value === "string" ? value : "[File/Blob]"}`
-            );
-          });
-          console.log("FormData entries:", formEntries.join(", "));
-        }
-      } catch (formError) {
-        console.log("FormData parsing failed:", formError);
-      }
-    } else {
-      // Fallback: try to parse as text/URLSearchParams
-      try {
-        const text = await request.text();
-        console.log("Raw request text:", text);
-        const params = new URLSearchParams(text);
-        code = params.get("code") || "";
-        codeVerifier = params.get("code_verifier") || "";
-      } catch (error) {
-        console.log("Failed to parse request body:", error);
-      }
-    }
-
-    console.log("Final parsed - code:", code ? "present" : "missing");
-    console.log(
-      "Final parsed - code_verifier:",
-      codeVerifier ? "present" : "missing"
-    );
-
-    // Log the actual values for debugging (first few characters only)
-    if (code) {
-      console.log("Code preview:", code.substring(0, 10) + "...");
-    }
-    if (codeVerifier) {
-      console.log(
-        "Code verifier preview:",
-        codeVerifier.substring(0, 10) + "..."
-      );
     }
 
     if (!code) {
@@ -101,14 +40,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Debug the OAuth configuration
-    console.log("GOOGLE_CLIENT_ID:", GOOGLE_CLIENT_ID ? "present" : "missing");
-    console.log(
-      "GOOGLE_CLIENT_SECRET:",
-      GOOGLE_CLIENT_SECRET ? "present" : "missing"
-    );
-    console.log("GOOGLE_REDIRECT_URI:", GOOGLE_REDIRECT_URI);
-
     // Exchange authorization code for Google tokens
     const tokenExchangeParams = {
       client_id: GOOGLE_CLIENT_ID,
@@ -116,14 +47,7 @@ export async function POST(request: Request) {
       redirect_uri: GOOGLE_REDIRECT_URI,
       grant_type: "authorization_code",
       code: code,
-      // Don't include code_verifier since our custom OAuth flow doesn't use PKCE
     };
-
-    console.log("Token exchange params:", {
-      ...tokenExchangeParams,
-      client_secret: "***",
-      code: "***",
-    });
 
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -162,10 +86,14 @@ export async function POST(request: Request) {
     }
 
     const googleUser = await userResponse.json();
-    console.log("Google user info:", {
-      email: googleUser.email,
-      name: googleUser.name,
-    });
+
+    // Validate Google user data
+    if (!googleUser.email) {
+      return Response.json(
+        { error: "No email received from Google" },
+        { status: 400 }
+      );
+    }
 
     // Try to create user, if it fails because user exists, we'll generate a session anyway
     let userId: string | undefined;
@@ -186,14 +114,12 @@ export async function POST(request: Request) {
 
     if (userData?.user) {
       userId = userData.user.id;
-      console.log("Created new user:", userId);
     } else if (
       userError &&
       (userError.message.includes("already exists") ||
         userError.message.includes("already been registered"))
     ) {
-      console.log("User already exists, proceeding with session generation...");
-      // We'll generate a magic link anyway, which should work for existing users
+      // User exists, we'll look them up next
     } else if (userError) {
       console.error("Supabase user creation error:", userError);
       return Response.json({ error: userError.message }, { status: 400 });
@@ -201,26 +127,17 @@ export async function POST(request: Request) {
 
     // For existing users, query the profiles table directly
     if (!userId) {
-      console.log("User already exists, looking up ID from profiles table...");
-
       const { data: profile, error: profileError } = await supabaseAdmin
         .from("profiles")
         .select("id")
         .eq("email", googleUser.email)
         .single();
 
-      if (profileError) {
-        console.error("Error looking up user profile:", profileError);
+      if (profileError || !profile) {
         return Response.json({ error: "User not found" }, { status: 400 });
       }
 
-      if (profile) {
-        userId = profile.id;
-        console.log("Found existing user:", userId);
-      } else {
-        console.error("No profile found for email:", googleUser.email);
-        return Response.json({ error: "User not found" }, { status: 400 });
-      }
+      userId = profile.id;
     }
 
     // Ensure we have a userId before proceeding
@@ -233,7 +150,6 @@ export async function POST(request: Request) {
     }
 
     // Generate a magic link and extract tokens from it
-    console.log("Generating magic link for session creation...");
     const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: "magiclink",
@@ -257,7 +173,6 @@ export async function POST(request: Request) {
     const type = linkUrl.searchParams.get("type");
 
     if (!token || type !== "magiclink") {
-      console.error("Invalid magic link generated");
       return Response.json(
         { error: "Failed to generate valid session token" },
         { status: 500 }
@@ -265,29 +180,16 @@ export async function POST(request: Request) {
     }
 
     // Verify the magic link token to create a session
-    console.log("Verifying magic link token...");
     const { data: sessionData, error: verifyError } =
       await supabaseAdmin.auth.verifyOtp({
         token_hash: token,
         type: "magiclink",
       });
 
-    if (verifyError) {
+    if (verifyError || !sessionData.session) {
       console.error("Token verification error:", verifyError);
       return Response.json(
         { error: "Failed to verify session token" },
-        { status: 500 }
-      );
-    }
-
-    console.log("Session created successfully");
-    console.log("Session user:", sessionData.user?.email);
-
-    // Return the Supabase tokens
-    if (!sessionData.session) {
-      console.error("No session created from verification");
-      return Response.json(
-        { error: "Failed to create session" },
         { status: 500 }
       );
     }
