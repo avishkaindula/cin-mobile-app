@@ -44,18 +44,20 @@ export async function POST(request: Request) {
       try {
         const formData = await request.formData();
         console.log("Parsed FormData successfully");
-        
+
         // Use type assertion to access FormData methods
         const formDataAny = formData as any;
-        
+
         code = formDataAny.get?.("code") || "";
         codeVerifier = formDataAny.get?.("code_verifier") || "";
-        
+
         // Log form fields for debugging
         if (formDataAny.forEach) {
           const formEntries: string[] = [];
           formDataAny.forEach((value: any, key: any) => {
-            formEntries.push(`${key}: ${typeof value === 'string' ? value : '[File/Blob]'}`);
+            formEntries.push(
+              `${key}: ${typeof value === "string" ? value : "[File/Blob]"}`
+            );
           });
           console.log("FormData entries:", formEntries.join(", "));
         }
@@ -80,13 +82,16 @@ export async function POST(request: Request) {
       "Final parsed - code_verifier:",
       codeVerifier ? "present" : "missing"
     );
-    
+
     // Log the actual values for debugging (first few characters only)
     if (code) {
       console.log("Code preview:", code.substring(0, 10) + "...");
     }
     if (codeVerifier) {
-      console.log("Code verifier preview:", codeVerifier.substring(0, 10) + "...");
+      console.log(
+        "Code verifier preview:",
+        codeVerifier.substring(0, 10) + "..."
+      );
     }
 
     if (!code) {
@@ -194,45 +199,37 @@ export async function POST(request: Request) {
       return Response.json({ error: userError.message }, { status: 400 });
     }
 
-    // For existing users, we need to handle them differently
+    // For existing users, query the profiles table directly
     if (!userId) {
-      console.log("User already exists, need to find their ID...");
-      
-      // Try to get user by listing users - we'll need to paginate through to find the user
-      let foundUser = null;
-      let page = 1;
-      const perPage = 100; // Reasonable page size
-      
-      while (!foundUser && page <= 10) { // Limit to 10 pages (1000 users) to prevent infinite loops
-        const { data: users, error: listError } = 
-          await supabaseAdmin.auth.admin.listUsers({
-            page,
-            perPage,
-          });
-        
-        if (listError) {
-          console.error("Error listing users:", listError);
-          break;
-        }
-        
-        // Find user by email
-        foundUser = users.users.find(user => user.email === googleUser.email);
-        
-        if (!foundUser && users.users.length < perPage) {
-          // We've reached the end of the user list
-          break;
-        }
-        
-        page++;
-      }
-      
-      if (foundUser) {
-        userId = foundUser.id;
-        console.log("Found existing user:", userId);
-      } else {
-        console.error("No user found for email:", googleUser.email);
+      console.log("User already exists, looking up ID from profiles table...");
+
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("email", googleUser.email)
+        .single();
+
+      if (profileError) {
+        console.error("Error looking up user profile:", profileError);
         return Response.json({ error: "User not found" }, { status: 400 });
       }
+
+      if (profile) {
+        userId = profile.id;
+        console.log("Found existing user:", userId);
+      } else {
+        console.error("No profile found for email:", googleUser.email);
+        return Response.json({ error: "User not found" }, { status: 400 });
+      }
+    }
+
+    // Ensure we have a userId before proceeding
+    if (!userId) {
+      console.error("No userId found after user lookup");
+      return Response.json(
+        { error: "User authentication failed" },
+        { status: 500 }
+      );
     }
 
     // Update user metadata to include Google information
