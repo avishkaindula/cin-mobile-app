@@ -20,55 +20,20 @@ const supabaseAdmin = createClient(
 export async function POST(request: Request) {
   try {
     let code = "";
-    let codeVerifier = "";
 
-    const contentType = request.headers.get("content-type") || "";
+    // Handle multipart/form-data (which is what the client is sending)
+    try {
+      const formData = await request.formData();
 
-    // Handle different content types
-    if (contentType.includes("application/json")) {
-      // Handle JSON requests
-      const body = await request.json();
-      code = body.code || "";
-      codeVerifier = body.code_verifier || "";
-    } else if (contentType.includes("application/x-www-form-urlencoded")) {
-      // Handle URL-encoded form data
-      const text = await request.text();
-      const params = new URLSearchParams(text);
-      code = params.get("code") || "";
-      codeVerifier = params.get("code_verifier") || "";
-    } else if (contentType.includes("multipart/form-data")) {
-      // Handle multipart form data
-      try {
-        const formData = await request.formData();
+      // Use type assertion to access FormData methods
+      const formDataAny = formData as any;
 
-        // Use type assertion to access FormData methods
-        const formDataAny = formData as any;
-
-        code = formDataAny.get?.("code") || "";
-        codeVerifier = formDataAny.get?.("code_verifier") || "";
-
-        // Log form fields for debugging
-        if (formDataAny.forEach) {
-          const formEntries: string[] = [];
-          formDataAny.forEach((value: any, key: any) => {
-            formEntries.push(
-              `${key}: ${typeof value === "string" ? value : "[File/Blob]"}`
-            );
-          });
-        }
-      } catch (formError) {
-        console.log("FormData parsing failed:", formError);
-      }
-    } else {
-      // Fallback: try to parse as text/URLSearchParams
-      try {
-        const text = await request.text();
-        const params = new URLSearchParams(text);
-        code = params.get("code") || "";
-        codeVerifier = params.get("code_verifier") || "";
-      } catch (error) {
-        console.log("Failed to parse request body:", error);
-      }
+      code = formDataAny.get?.("code") || "";
+    } catch (formError) {
+      return Response.json(
+        { error: "Failed to parse request data" },
+        { status: 400 }
+      );
     }
 
     if (!code) {
