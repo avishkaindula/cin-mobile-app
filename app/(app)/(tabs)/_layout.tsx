@@ -3,9 +3,7 @@ import React from "react";
 import { Home, Target, Map, Users, User } from "lucide-react-native";
 import { Platform } from "react-native";
 import { useColorScheme } from "nativewind";
-
 import { HapticTab } from "@/components/HapticTab";
-import TabBarBackground from "@/components/TabBarBackground";
 
 function TabBarIcon({
   IconComponent,
@@ -19,7 +17,7 @@ function TabBarIcon({
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
-  
+
   return (
     <Tabs
       screenOptions={{
@@ -27,7 +25,6 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colorScheme === "dark" ? "#9CA3AF" : "#6B7280", // gray-400 for dark, gray-500 for light
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
         tabBarStyle: {
           backgroundColor: colorScheme === "dark" ? "#181719" : "#FFFFFF", // match background-dark and white
           borderTopColor: colorScheme === "dark" ? "#2D2D2D" : "#E5E7EB", // darker border for dark mode
@@ -36,8 +33,12 @@ export default function TabLayout() {
             ios: {
               // Use a transparent background on iOS to show the blur effect
               position: "absolute",
+              paddingTop: 8, // Adjust padding for iOS
             },
-            default: {},
+            default: {
+              position: "absolute",
+              paddingTop: 8, // Adjust padding for iOS
+            },
           }),
         },
       }}
