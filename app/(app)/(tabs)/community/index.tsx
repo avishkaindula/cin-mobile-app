@@ -136,7 +136,7 @@ export default function CommunityScreen() {
 
   const handleCommunityPress = (community: any) => {
     router.push({
-      pathname: "./details",
+      pathname: "/community/details",
       params: { id: community.id, name: community.name }
     });
   };
