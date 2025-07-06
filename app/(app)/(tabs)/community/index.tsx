@@ -1,6 +1,7 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -133,8 +134,15 @@ export default function CommunityScreen() {
     },
   ];
 
+  const handleCommunityPress = (community: any) => {
+    router.push({
+      pathname: "./details",
+      params: { id: community.id, name: community.name }
+    });
+  };
+
   const CommunityCard = ({ community }: { community: any }) => (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => handleCommunityPress(community)}>
       <Card className="w-72 mr-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
         <VStack space="sm" className="p-4">
           {/* Community Image and Badge */}
