@@ -1,6 +1,11 @@
-import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import {
+  SafeAreaView,
+  TextInput,
+  Keyboard,
+  InteractionManager,
+} from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -10,216 +15,340 @@ import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { Spinner } from "@/components/ui/spinner";
-import { Mail, CheckCircle, ArrowLeft, RefreshCw } from "lucide-react-native";
+import { Mail, ArrowLeft } from "lucide-react-native";
+import { useSession } from "@/context/auth";
 import { useAppToast } from "@/lib/toast-utils";
 
-export default function VerifyEmailScreen() {
+export default function VerifyEmail() {
+  const { email } = useLocalSearchParams<{ email: string }>();
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [countdown, setCountdown] = useState(0);
+  const [isReady, setIsReady] = useState(false);
+  const { verifyOtp, resendVerification } = useSession();
   const { showError, showSuccess } = useAppToast();
 
+  const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  // Wait for the screen to fully load before showing interactive elements
+  useFocusEffect(
+    useCallback(() => {
+      const task = InteractionManager.runAfterInteractions(() => {
+        setIsReady(true);
+      });
+      return () => task.cancel();
+    }, [])
+  );
+
+  // Clean up keyboard and input refs on unmount
   useEffect(() => {
-    let timer: any;
-    if (countdown > 0) {
-      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-    }
     return () => {
-      if (timer) clearTimeout(timer);
+      // Dismiss keyboard when component unmounts
+      Keyboard.dismiss();
+      // Clear input refs
+      inputRefs.current = [];
     };
-  }, [countdown]);
+  }, []);
 
-  async function handleResendEmail() {
-    setResendLoading(true);
-    setCountdown(60); // 60 second cooldown
-    
-    // Simulate API call
-    setTimeout(() => {
-      showSuccess(
-        "Verification Email Sent! 📧",
-        "Check your inbox (and spam folder) for the verification link!"
-      );
-      setResendLoading(false);
-    }, 2000);
-  }
+  const handleCodeChange = (value: string, index: number) => {
+    if (!isReady) return; // Don't handle input until screen is ready
+    if (value.length > 1) return; // Prevent multiple characters
 
-  async function handleVerifyLater() {
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      // Use setTimeout to avoid focus issues during state updates
+      setTimeout(() => {
+        if (inputRefs.current[index + 1]) {
+          inputRefs.current[index + 1]?.focus();
+        }
+      }, 50);
+    }
+  };
+
+  const handleKeyPress = (e: any, index: number) => {
+    if (!isReady) return; // Don't handle input until screen is ready
+    // Handle backspace to focus previous input
+    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0) {
+      // Use setTimeout to avoid focus issues during state updates
+      setTimeout(() => {
+        if (inputRefs.current[index - 1]) {
+          inputRefs.current[index - 1]?.focus();
+        }
+      }, 50);
+    }
+  };
+
+  const handleVerify = async () => {
+    const verificationCode = code.join("");
+
+    if (verificationCode.length !== 6) {
+      showError("Invalid Code", "Please enter all 6 digits");
+      return;
+    }
+
+    if (!email) {
+      showError("Error", "Email not found. Please go back and try again.");
+      return;
+    }
+
     setLoading(true);
-    
-    // Simulate navigation delay
-    setTimeout(() => {
-      showSuccess(
-        "Welcome to Climate Heroes! 🌟",
-        "You can verify your email later in settings."
+    try {
+      const { error, session } = await verifyOtp(
+        email,
+        verificationCode,
+        "signup"
       );
+
+      if (error) {
+        showError(
+          "Verification Failed",
+          "The verification code is invalid or has expired. Please check your code or request a new one."
+        );
+      } else {
+        showSuccess(
+          "Email Verified!",
+          "Your email has been successfully verified."
+        );
+        // Navigate after a short delay to let user see the success message
+        setTimeout(() => {
+          router.push("/sign-in");
+        }, 1500);
+      }
+    } catch (error) {
+      showError(
+        "Verification Error",
+        "An unexpected error occurred. Please try again."
+      );
+    } finally {
       setLoading(false);
-      router.replace("/(app)" as any);
-    }, 1500);
-  }
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!email) {
+      showError("Error", "Email not found. Please go back and try again.");
+      return;
+    }
+
+    setResendLoading(true);
+    try {
+      const { error } = await resendVerification(email);
+
+      if (error) {
+        showError(
+          "Resend Error",
+          error.message || "Failed to resend verification code"
+        );
+      } else {
+        showSuccess(
+          "Code Sent",
+          "A new verification code has been sent to your email."
+        );
+        // Clear the current code
+        setCode(["", "", "", "", "", ""]);
+      }
+    } catch (error) {
+      showError(
+        "Resend Error",
+        "An unexpected error occurred. Please try again."
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView
       style={{ flex: 1 }}
-      className="bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100"
+      className="bg-white dark:bg-background-dark"
     >
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-        <Box className="flex-1 justify-center p-6">
-          <VStack space="xl" className="items-center">
-            {/* Back Button */}
-            <HStack className="w-full justify-start mb-4">
-              <Button
-                variant="link"
-                size="sm"
-                onPress={() => router.push("/sign-in")}
-              >
-                <HStack space="sm" className="items-center">
-                  <Icon as={ArrowLeft} size="sm" className="text-purple-600" />
-                  <Text size="sm" className="text-purple-600 font-bold">
-                    🔙 Back to Sign In
-                  </Text>
-                </HStack>
-              </Button>
-            </HStack>
+        <Box className="flex-1 p-6">
+          {/* Back Button */}
+          <HStack className="items-center mb-6">
+            <Button
+              variant="link"
+              size="sm"
+              onPress={() => router.back()}
+              className="p-2 -ml-2"
+            >
+              <Icon as={ArrowLeft} size="md" className="text-typography-600" />
+            </Button>
+            <Text
+              size="lg"
+              className="text-typography-900 dark:text-typography-950 font-semibold ml-2"
+            >
+              Go Back
+            </Text>
+          </HStack>
 
-            <VStack space="lg" className="items-center mb-8">
-              <Box className="p-6 bg-gradient-to-br from-pink-200 to-purple-300 rounded-full shadow-xl border-4 border-pink-400 transform rotate-6">
-                <Icon as={Mail} size="xl" className="text-purple-600" />
-              </Box>
-              <VStack space="xs" className="items-center">
-                <Heading
-                  size="2xl"
-                  className="text-center font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
-                >
-                  📧 Check Your Email! ✨
-                </Heading>
+          <Box className="flex-1 justify-center">
+            <VStack space="xl" className="items-center">
+              {/* Header */}
+              <VStack space="lg" className="items-center mb-8">
+                <Box className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full">
+                  <Icon as={Mail} size="xl" className="text-primary-500" />
+                </Box>
+                <VStack space="xs" className="items-center">
+                  <Heading
+                    size="2xl"
+                    className="text-typography-900 dark:text-typography-950 text-center"
+                  >
+                    Verify Your Email
+                  </Heading>
+                  <Text
+                    size="lg"
+                    className="text-typography-600 dark:text-typography-750 text-center"
+                  >
+                    We've sent a 6-digit code to
+                  </Text>
+                  <Text
+                    size="lg"
+                    className="text-primary-500 font-semibold text-center"
+                  >
+                    {email}
+                  </Text>
+                </VStack>
+              </VStack>
+
+              {/* Verification Card */}
+              <Card className="w-full max-w-sm p-8">
+                <VStack space="lg">
+                  <VStack space="md" className="items-center">
+                    <Heading
+                      size="lg"
+                      className="text-typography-900 dark:text-typography-950"
+                    >
+                      Enter Verification Code
+                    </Heading>
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750 text-center"
+                    >
+                      Enter the 6-digit code sent to your email, or click the
+                      verification link in your email to activate your account
+                      instantly.
+                    </Text>
+                  </VStack>
+
+                  {/* Code Input */}
+                  <HStack space="sm" className="justify-center">
+                    {code.map((digit, index) => (
+                      <Box
+                        key={index}
+                        className="w-12 h-12 border border-outline-300 dark:border-outline-600 rounded-lg bg-background-50 dark:bg-background-900"
+                      >
+                        <TextInput
+                          ref={(ref) => {
+                            if (isReady) {
+                              inputRefs.current[index] = ref;
+                            }
+                          }}
+                          value={digit}
+                          onChangeText={(value) =>
+                            handleCodeChange(value, index)
+                          }
+                          onKeyPress={(e) => handleKeyPress(e, index)}
+                          keyboardType="numeric"
+                          maxLength={1}
+                          textAlign="center"
+                          autoCorrect={false}
+                          autoComplete="off"
+                          textContentType="none"
+                          editable={isReady}
+                          style={{
+                            flex: 1,
+                            fontSize: 18,
+                            fontWeight: "600",
+                            color: "#000", // You might want to adjust this for dark mode
+                          }}
+                          className="text-typography-900 dark:text-typography-50"
+                        />
+                      </Box>
+                    ))}
+                  </HStack>
+
+                  {/* Verify Button */}
+                  <Button
+                    variant="solid"
+                    action="primary"
+                    size="lg"
+                    className="w-full"
+                    disabled={
+                      !isReady ||
+                      loading ||
+                      resendLoading ||
+                      code.some((digit) => !digit)
+                    }
+                    onPress={handleVerify}
+                  >
+                    <Text size="lg" className="text-white font-semibold">
+                      {loading ? "Verifying..." : "Verify Email"}
+                    </Text>
+                  </Button>
+
+                  {/* Resend Code */}
+                  <VStack space="xs" className="items-center">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
+                      Didn't receive the code?
+                    </Text>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      disabled={loading || resendLoading}
+                      onPress={handleResendCode}
+                    >
+                      <Text
+                        size="sm"
+                        className="text-primary-500 font-semibold"
+                      >
+                        {resendLoading ? "Sending..." : "Resend Code"}
+                      </Text>
+                    </Button>
+                  </VStack>
+
+                  {/* Alternative option */}
+                  <VStack space="xs" className="items-center">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
+                      Already clicked the email link?
+                    </Text>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onPress={() => router.push("/sign-in")}
+                    >
+                      <Text
+                        size="sm"
+                        className="text-primary-500 font-semibold"
+                      >
+                        Go to Sign In
+                      </Text>
+                    </Button>
+                  </VStack>
+                </VStack>
+              </Card>
+
+              {/* Help Text */}
+              <VStack space="xs" className="w-full max-w-sm">
                 <Text
-                  size="lg"
-                  className="text-purple-600 text-center font-semibold"
+                  size="xs"
+                  className="text-typography-500 dark:text-typography-300 text-center"
                 >
-                  We sent you a magical verification link! 🪄
+                  Check your spam folder if you don't see the email
                 </Text>
               </VStack>
             </VStack>
-
-            {/* Verify Email Card */}
-            <Card className="w-full max-w-sm p-8" variant="elevated">
-              <VStack space="lg" className="items-center">
-                <VStack space="md" className="items-center">
-                  <Heading
-                    size="lg"
-                    className="text-purple-700 font-black"
-                  >
-                    📬 Verification Step
-                  </Heading>
-                  <Text
-                    size="sm"
-                    className="text-purple-600 text-center font-medium"
-                  >
-                    Click the link in your email to activate your climate hero powers! 🦸‍♀️
-                  </Text>
-                </VStack>
-
-                {/* Status Icon */}
-                <Box className="p-4 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full border-2 border-yellow-400">
-                  <Icon as={CheckCircle} size="lg" className="text-orange-600" />
-                </Box>
-
-                {/* Resend Button */}
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                  disabled={resendLoading || countdown > 0}
-                  onPress={handleResendEmail}
-                >
-                  <HStack space="md" className="items-center">
-                    {resendLoading ? (
-                      <Spinner size="small" color="purple" />
-                    ) : (
-                      <Icon as={RefreshCw} size="md" className="text-purple-600" />
-                    )}
-                    <Text size="lg" className="text-purple-600 font-bold">
-                      {resendLoading 
-                        ? "📧 Sending..." 
-                        : countdown > 0 
-                        ? `⏰ Resend in ${countdown}s`
-                        : "📧 Resend Email"}
-                    </Text>
-                  </HStack>
-                </Button>
-
-                {/* Continue Button */}
-                <Button
-                  variant="solid"
-                  action="primary"
-                  size="lg"
-                  className="w-full"
-                  disabled={loading}
-                  onPress={handleVerifyLater}
-                >
-                  <HStack space="md" className="items-center">
-                    {loading ? (
-                      <Spinner size="small" color="white" />
-                    ) : (
-                      <Icon as={CheckCircle} size="md" className="text-white" />
-                    )}
-                    <Text size="lg" className="text-white font-black">
-                      {loading ? "🚀 Starting Adventure..." : "🌟 Continue to App"}
-                    </Text>
-                  </HStack>
-                </Button>
-
-                <VStack space="xs" className="items-center">
-                  <Text
-                    size="xs"
-                    className="text-purple-500 text-center font-medium"
-                  >
-                    You can verify your email later in the app settings! 😊
-                  </Text>
-                </VStack>
-              </VStack>
-            </Card>
-
-            {/* Help Section */}
-            <VStack space="md" className="w-full max-w-sm">
-              <Text
-                size="sm"
-                className="text-purple-700 text-center font-black"
-              >
-                🔍 Can't find the email?
-              </Text>
-              <VStack space="xs">
-                <HStack space="md" className="items-center">
-                  <Box className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-600 rounded-full shadow-md" />
-                  <Text
-                    size="sm"
-                    className="text-purple-700 font-medium"
-                  >
-                    📧 Check your spam/junk folder
-                  </Text>
-                </HStack>
-                <HStack space="md" className="items-center">
-                  <Box className="w-3 h-3 bg-gradient-to-r from-pink-400 to-blue-600 rounded-full shadow-md" />
-                  <Text
-                    size="sm"
-                    className="text-purple-700 font-medium"
-                  >
-                    ⏰ Sometimes it takes a few minutes
-                  </Text>
-                </HStack>
-                <HStack space="md" className="items-center">
-                  <Box className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full shadow-md" />
-                  <Text
-                    size="sm"
-                    className="text-purple-700 font-medium"
-                  >
-                    🔄 You can always request a new one
-                  </Text>
-                </HStack>
-              </VStack>
-            </VStack>
-          </VStack>
+          </Box>
         </Box>
       </ScrollView>
     </SafeAreaView>
