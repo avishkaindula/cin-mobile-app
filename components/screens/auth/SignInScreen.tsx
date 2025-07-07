@@ -176,20 +176,21 @@ export default function SignInScreen() {
             </VStack>
 
             {/* Sign In Card */}
-            <Card className="w-full max-w-sm p-8" variant="elevated">
+            <Card className="w-full max-w-sm p-8">
               <VStack space="lg" className="items-center">
                 <VStack space="md" className="items-center">
                   <Heading
                     size="lg"
-                    className="text-purple-700 font-black"
+                    className="text-typography-900 dark:text-typography-950"
                   >
-                    🎮 Climate Intelligence Network 🎮
+                    Climate Intelligence Network
                   </Heading>
                   <Text
                     size="sm"
-                    className="text-purple-600 text-center font-medium"
+                    className="text-typography-600 dark:text-typography-750 text-center"
                   >
-                    Join thousands of young climate heroes making our planet awesome! 🌟
+                    Join thousands of climate scientists and environmental
+                    enthusiasts making a difference
                   </Text>
                 </VStack>
 
@@ -197,14 +198,14 @@ export default function SignInScreen() {
                 <VStack space="xs" className="w-full">
                   <Text
                     size="sm"
-                    className="text-purple-700 font-bold"
+                    className="text-typography-600 dark:text-typography-750"
                   >
-                    📧 Your Super Email
+                    Email
                   </Text>
-                  <Input className="w-full" variant="rounded" size="lg">
+                  <Input className="w-full">
                     <InputIcon as={Mail} className="ml-3" />
                     <InputField
-                      placeholder="your.awesome@email.com"
+                      placeholder="email@address.com"
                       value={email}
                       onChangeText={setEmail}
                       autoCapitalize="none"
@@ -217,14 +218,14 @@ export default function SignInScreen() {
                 <VStack space="xs" className="w-full">
                   <Text
                     size="sm"
-                    className="text-purple-700 font-bold"
+                    className="text-typography-600 dark:text-typography-750"
                   >
-                    🔒 Secret Password
+                    Password
                   </Text>
-                  <Input className="w-full" variant="rounded" size="lg">
+                  <Input className="w-full">
                     <InputIcon as={Lock} className="ml-3" />
                     <InputField
-                      placeholder="Your secret code!"
+                      placeholder="Password"
                       value={password}
                       onChangeText={setPassword}
                       secureTextEntry={true}
@@ -255,22 +256,22 @@ export default function SignInScreen() {
                     ) : (
                       <Icon as={LogIn} size="md" className="text-white" />
                     )}
-                    <Text size="lg" className="text-white font-black">
-                      {loading ? "🚀 Starting Adventure..." : "🌟 Start My Climate Adventure!"}
+                    <Text size="lg" className="text-white font-semibold">
+                      {loading ? "Signing In..." : "Sign In"}
                     </Text>
                   </HStack>
                 </Button>
 
                 {/* Divider */}
                 <HStack className="items-center w-full">
-                  <Box className="flex-1 h-1 bg-gradient-to-r from-purple-300 to-blue-300 rounded-full" />
+                  <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
                   <Text
                     size="sm"
-                    className="px-4 text-purple-500 font-bold"
+                    className="px-4 text-typography-500 dark:text-typography-400"
                   >
-                    ✨ or ✨
+                    or
                   </Text>
-                  <Box className="flex-1 h-1 bg-gradient-to-r from-blue-300 to-purple-300 rounded-full" />
+                  <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
                 </HStack>
 
                 {/* Google OAuth Button */}
@@ -287,16 +288,16 @@ export default function SignInScreen() {
                   onPress={handleGoogleSignIn}
                 >
                   <HStack space="md" className="items-center">
-                    <GoogleIcon size={24} />
+                    <GoogleIcon size={20} />
                     <Text
                       size="lg"
-                      className="text-blue-600 font-bold"
+                      className="text-typography-600 dark:text-typography-400 font-semibold"
                     >
                       {googleLoading || isGoogleProcessing
                         ? isGoogleProcessing
-                          ? "🔄 Processing..."
-                          : "🚀 Connecting..."
-                        : "🎉 Continue with Google"}
+                          ? "Processing..."
+                          : "Connecting..."
+                        : "Continue with Google"}
                     </Text>
                   </HStack>
                 </Button>
@@ -313,13 +314,13 @@ export default function SignInScreen() {
                     <Icon
                       as={Github}
                       size="md"
-                      className="text-gray-700"
+                      className="text-typography-600 dark:text-typography-400"
                     />
                     <Text
                       size="lg"
-                      className="text-gray-700 font-bold"
+                      className="text-typography-600 dark:text-typography-400 font-semibold"
                     >
-                      {githubLoading ? "🔄 Connecting..." : "🐙 Continue with GitHub"}
+                      {githubLoading ? "Connecting..." : "Continue with GitHub"}
                     </Text>
                   </HStack>
                 </Button>
@@ -330,8 +331,8 @@ export default function SignInScreen() {
                   size="sm"
                   onPress={() => router.push("/forgot-password")}
                 >
-                  <Text size="sm" className="text-orange-500 font-bold">
-                    🤔 Forgot Your Secret Code?
+                  <Text size="sm" className="text-primary-500 font-semibold">
+                    Forgot Password?
                   </Text>
                 </Button>
 
@@ -339,17 +340,17 @@ export default function SignInScreen() {
                 <VStack space="xs" className="items-center">
                   <Text
                     size="sm"
-                    className="text-purple-600 font-medium"
+                    className="text-typography-600 dark:text-typography-750"
                   >
-                    New climate hero? 🦸‍♀️🦸‍♂️
+                    Don't have an account?
                   </Text>
                   <Button
                     variant="link"
                     size="sm"
                     onPress={() => router.push("/sign-up")}
                   >
-                    <Text size="sm" className="text-green-500 font-bold">
-                      🌟 Start Your Adventure Here!
+                    <Text size="sm" className="text-primary-500 font-semibold">
+                      Create Account
                     </Text>
                   </Button>
                 </VStack>
@@ -357,9 +358,10 @@ export default function SignInScreen() {
                 <VStack space="xs" className="items-center">
                   <Text
                     size="xs"
-                    className="text-purple-500 text-center font-medium"
+                    className="text-typography-500 dark:text-typography-300 text-center"
                   >
-                    By joining, you agree to help save our amazing planet! 🌎💙
+                    By signing in, you agree to our Terms of Service and Privacy
+                    Policy
                   </Text>
                 </VStack>
               </VStack>
@@ -369,36 +371,36 @@ export default function SignInScreen() {
             <VStack space="md" className="w-full max-w-sm">
               <Text
                 size="sm"
-                className="text-purple-700 text-center font-black"
+                className="text-typography-600 dark:text-typography-750 text-center font-semibold"
               >
-                🎁 What awesome things await you:
+                What you'll get:
               </Text>
               <VStack space="xs">
                 <HStack space="md" className="items-center">
-                  <Box className="w-3 h-3 bg-gradient-to-r from-green-400 to-green-600 rounded-full shadow-md" />
+                  <Box className="w-2 h-2 bg-green-500 rounded-full" />
                   <Text
                     size="sm"
-                    className="text-green-700 font-medium"
+                    className="text-typography-600 dark:text-typography-750"
                   >
-                    🌱 Fun climate missions and cool data collection
+                    Access to climate missions and data collection
                   </Text>
                 </HStack>
                 <HStack space="md" className="items-center">
-                  <Box className="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full shadow-md" />
+                  <Box className="w-2 h-2 bg-blue-500 rounded-full" />
                   <Text
                     size="sm"
-                    className="text-blue-700 font-medium"
+                    className="text-typography-600 dark:text-typography-750"
                   >
-                    🤝 Connect with young heroes around the world
+                    Connect with a global community of researchers
                   </Text>
                 </HStack>
                 <HStack space="md" className="items-center">
-                  <Box className="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full shadow-md" />
+                  <Box className="w-2 h-2 bg-purple-500 rounded-full" />
                   <Text
                     size="sm"
-                    className="text-purple-700 font-medium"
+                    className="text-typography-600 dark:text-typography-750"
                   >
-                    🏆 Earn badges and track your planet-saving impact
+                    Track your environmental impact and achievements
                   </Text>
                 </HStack>
               </VStack>
@@ -409,22 +411,22 @@ export default function SignInScreen() {
 
       {/* Google Processing Overlay */}
       {isGoogleProcessing && (
-        <Box className="absolute inset-0 bg-purple-900/50 flex-1 justify-center items-center">
-          <Card className="p-8 m-6" variant="elevated">
+        <Box className="absolute inset-0 bg-black/50 flex-1 justify-center items-center">
+          <Card className="p-8 m-6">
             <VStack space="lg" className="items-center">
               <Spinner size="large" />
               <VStack space="xs" className="items-center">
                 <Heading
                   size="md"
-                  className="text-purple-700 font-black"
+                  className="text-typography-900 dark:text-typography-950"
                 >
-                  🚀 Almost Ready!
+                  Completing Sign In
                 </Heading>
                 <Text
                   size="sm"
-                  className="text-purple-600 text-center font-medium"
+                  className="text-typography-600 dark:text-typography-750 text-center"
                 >
-                  Connecting your Google account safely... ✨
+                  Securely connecting your Google account...
                 </Text>
               </VStack>
             </VStack>
