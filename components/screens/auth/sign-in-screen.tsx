@@ -14,7 +14,7 @@ import { ScrollView } from "@/components/ui/scroll-view";
 import { Spinner } from "@/components/ui/spinner";
 import { useAppToast } from "@/lib/toast-utils";
 import { LogIn, Shield, Mail, Lock, Github } from "lucide-react-native";
-import { GoogleIcon } from "@/assets/Icons/google-icon";
+import { GoogleIcon } from "@/assets/ico/google-icon";
 import { useSession } from "@/context/auth";
 
 export default function SignInScreen() {
