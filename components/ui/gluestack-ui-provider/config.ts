@@ -161,12 +161,12 @@ export const config = {
     "--color-primary-200": "21 128 61",
     "--color-primary-300": "22 163 74",
     "--color-primary-400": "34 197 94",
-    "--color-primary-500": "74 222 128",
-    "--color-primary-600": "134 239 172",
-    "--color-primary-700": "187 247 208",
-    "--color-primary-800": "220 252 231",
-    "--color-primary-900": "240 253 244",
-    "--color-primary-950": "255 255 255",
+    "--color-primary-500": "22 163 74",
+    "--color-primary-600": "21 128 61",
+    "--color-primary-700": "22 101 52",
+    "--color-primary-800": "20 83 45",
+    "--color-primary-900": "5 46 22",
+    "--color-primary-950": "3 25 12",
 
     /* Secondary  */
     "--color-secondary-0": "20 20 20",
