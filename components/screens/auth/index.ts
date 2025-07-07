@@ -1,5 +1,5 @@
-export { default as SignInScreen } from './SignInScreen';
-export { default as SignUpScreen } from './SignUpScreen';
-export { default as ForgotPasswordScreen } from './ForgotPasswordScreen';
-export { default as ResetPasswordScreen } from './ResetPasswordScreen';
-export { default as VerifyEmailScreen } from './VerifyEmailScreen';
+export { default as SignInScreen } from './sign-in-screen';
+export { default as SignUpScreen } from './sign-up-screen';
+export { default as ForgotPasswordScreen } from './forgot-password-screen';
+export { default as ResetPasswordScreen } from './reset-password-screen';
+export { default as VerifyEmailScreen } from './verify-email-screen';

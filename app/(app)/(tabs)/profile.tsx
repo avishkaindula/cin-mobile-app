@@ -12,7 +12,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Divider } from "@/components/ui/divider";
 import { Pressable as UIPressable } from "@/components/ui/pressable";
-import { useLanguage, availableLanguages } from "@/components/i18n/LanguageContext";
+import { useLanguage, availableLanguages } from "@/components/i18n/language-context";
 import { useColorScheme } from "nativewind";
 import { useSession } from "@/context/auth";
 import {
