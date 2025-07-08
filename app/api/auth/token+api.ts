@@ -19,50 +19,22 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
   try {
-    // Parse as JSON first, then fallback to other methods
     let code = "";
-    let codeVerifier = "";
 
-    const contentType = request.headers.get("content-type") || "";
-    console.log("Content-Type:", contentType);
-
+    // Handle multipart/form-data (which is what the client is sending)
     try {
-      // Try JSON first
-      const body = await request.json();
-      code = body.code || "";
-      codeVerifier = body.code_verifier || "";
-      console.log("JSON parsing - code:", code ? "present" : "missing");
-      console.log(
-        "JSON parsing - code_verifier:",
-        codeVerifier ? "present" : "missing"
+      const formData = await request.formData();
+
+      // Use type assertion to access FormData methods
+      const formDataAny = formData as any;
+
+      code = formDataAny.get?.("code") || "";
+    } catch (formError) {
+      return Response.json(
+        { error: "Failed to parse request data" },
+        { status: 400 }
       );
-    } catch (jsonError) {
-      console.log("JSON parsing failed, trying other methods:", jsonError);
-
-      // Fallback to text parsing
-      try {
-        const text = await request.text();
-        console.log("Raw request text:", text);
-
-        // Try as URLSearchParams
-        const params = new URLSearchParams(text);
-        code = params.get("code") || "";
-        codeVerifier = params.get("code_verifier") || "";
-
-        console.log(
-          "URLSearchParams parsing - code:",
-          code ? "present" : "missing"
-        );
-      } catch (textError) {
-        console.log("Text parsing also failed:", textError);
-      }
     }
-
-    console.log("Final parsed - code:", code ? "present" : "missing");
-    console.log(
-      "Final parsed - code_verifier:",
-      codeVerifier ? "present" : "missing"
-    );
 
     if (!code) {
       return Response.json(
@@ -71,14 +43,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Debug the OAuth configuration
-    console.log("GOOGLE_CLIENT_ID:", GOOGLE_CLIENT_ID ? "present" : "missing");
-    console.log(
-      "GOOGLE_CLIENT_SECRET:",
-      GOOGLE_CLIENT_SECRET ? "present" : "missing"
-    );
-    console.log("GOOGLE_REDIRECT_URI:", GOOGLE_REDIRECT_URI);
-
     // Exchange authorization code for Google tokens
     const tokenExchangeParams = {
       client_id: GOOGLE_CLIENT_ID,
@@ -86,14 +50,7 @@ export async function POST(request: Request) {
       redirect_uri: GOOGLE_REDIRECT_URI,
       grant_type: "authorization_code",
       code: code,
-      // Don't include code_verifier since our custom OAuth flow doesn't use PKCE
     };
-
-    console.log("Token exchange params:", {
-      ...tokenExchangeParams,
-      client_secret: "***",
-      code: "***",
-    });
 
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -132,10 +89,14 @@ export async function POST(request: Request) {
     }
 
     const googleUser = await userResponse.json();
-    console.log("Google user info:", {
-      email: googleUser.email,
-      name: googleUser.name,
-    });
+
+    // Validate Google user data
+    if (!googleUser.email) {
+      return Response.json(
+        { error: "No email received from Google" },
+        { status: 400 }
+      );
+    }
 
     // Try to create user, if it fails because user exists, we'll generate a session anyway
     let userId: string | undefined;
@@ -156,71 +117,92 @@ export async function POST(request: Request) {
 
     if (userData?.user) {
       userId = userData.user.id;
-      console.log("Created new user:", userId);
     } else if (
       userError &&
       (userError.message.includes("already exists") ||
         userError.message.includes("already been registered"))
     ) {
-      console.log("User already exists, proceeding with session generation...");
-      // We'll generate a magic link anyway, which should work for existing users
+      // User exists, we'll look them up next
     } else if (userError) {
       console.error("Supabase user creation error:", userError);
       return Response.json({ error: userError.message }, { status: 400 });
     }
 
-    // Generate a Supabase session for the user (works for both new and existing users)
-    console.log("Generating magic link for email:", googleUser.email);
-    const { data: sessionData, error: sessionError } =
+    // For existing users, query the profiles table directly
+    if (!userId) {
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("email", googleUser.email)
+        .single();
+
+      if (profileError || !profile) {
+        return Response.json({ error: "User not found" }, { status: 400 });
+      }
+
+      userId = profile.id;
+    }
+
+    // Ensure we have a userId before proceeding
+    if (!userId) {
+      console.error("No userId found after user lookup");
+      return Response.json(
+        { error: "User authentication failed" },
+        { status: 500 }
+      );
+    }
+
+    // Generate a magic link and extract tokens from it
+    const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: "magiclink",
         email: googleUser.email,
+        options: {
+          redirectTo: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/callback`,
+        },
       });
 
-    if (sessionError) {
-      console.error("Supabase session generation error:", sessionError);
+    if (linkError) {
+      console.error("Supabase link generation error:", linkError);
       return Response.json(
         { error: "Failed to create session" },
         { status: 500 }
       );
     }
 
-    console.log(
-      "Generated session data:",
-      JSON.stringify(sessionData, null, 2)
-    );
+    // Parse the magic link to extract the token
+    const linkUrl = new URL(linkData.properties.action_link);
+    const token = linkUrl.searchParams.get("token");
+    const type = linkUrl.searchParams.get("type");
 
-    // Extract the tokens from the generated link
-    const url = new URL(sessionData.properties.action_link);
-    console.log("Action link URL:", sessionData.properties.action_link);
-    console.log("URL search params:", url.searchParams.toString());
-
-    const accessToken = url.searchParams.get("access_token");
-    const refreshToken = url.searchParams.get("refresh_token");
-
-    console.log("Extracted access_token:", accessToken ? "present" : "missing");
-    console.log(
-      "Extracted refresh_token:",
-      refreshToken ? "present" : "missing"
-    );
-
-    if (!accessToken || !refreshToken) {
-      console.error(
-        "Missing tokens in generated link. Available params:",
-        Array.from(url.searchParams.keys())
-      );
+    if (!token || type !== "magiclink") {
       return Response.json(
-        { error: "Failed to generate tokens" },
+        { error: "Failed to generate valid session token" },
         { status: 500 }
       );
     }
 
-    // Return the Supabase tokens
+    // Verify the magic link token to create a session
+    const { data: sessionData, error: verifyError } =
+      await supabaseAdmin.auth.verifyOtp({
+        token_hash: token,
+        type: "magiclink",
+      });
+
+    if (verifyError || !sessionData.session) {
+      console.error("Token verification error:", verifyError);
+      return Response.json(
+        { error: "Failed to verify session token" },
+        { status: 500 }
+      );
+    }
+
     return Response.json({
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      access_token: sessionData.session.access_token,
+      refresh_token: sessionData.session.refresh_token,
       token_type: "bearer",
-      expires_in: 3600,
+      expires_in: sessionData.session.expires_in || 3600,
+      user: sessionData.user,
     });
   } catch (error) {
     console.error("Token exchange error:", error);

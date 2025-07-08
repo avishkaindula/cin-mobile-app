@@ -7,14 +7,32 @@ import {
 } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { makeRedirectUri } from "expo-auth-session";
+import {
+  makeRedirectUri,
+  useAuthRequest,
+  AuthRequestConfig,
+  DiscoveryDocument,
+} from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
+import { BASE_URL } from "@/lib/constants";
 
 // Required for web only
 WebBrowser.maybeCompleteAuthSession();
+
+// Google OAuth configuration
+const googleConfig: AuthRequestConfig = {
+  clientId: "google",
+  scopes: ["openid", "profile", "email"],
+  redirectUri: makeRedirectUri(),
+};
+
+const googleDiscovery: DiscoveryDocument = {
+  authorizationEndpoint: `${BASE_URL}/api/auth/authorize`,
+  tokenEndpoint: `${BASE_URL}/api/auth/token`,
+};
 
 const AuthContext = createContext<{
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
@@ -25,6 +43,7 @@ const AuthContext = createContext<{
     fullName?: string
   ) => Promise<{ error?: any; session?: Session | null }>;
   signInWithGitHub: () => Promise<{ error?: any }>;
+  signInWithGoogle: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
   verifyOtp: (
@@ -36,11 +55,13 @@ const AuthContext = createContext<{
   session: Session | null;
   user: Session["user"] | null;
   isLoading: boolean;
+  isGoogleProcessing: boolean;
 }>({
   signIn: async () => ({ error: null }),
   signOut: async () => {},
   signUp: async () => ({ error: null }),
   signInWithGitHub: async () => ({ error: null }),
+  signInWithGoogle: async () => ({ error: null }),
   sendMagicLink: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
@@ -48,6 +69,7 @@ const AuthContext = createContext<{
   session: null,
   user: null,
   isLoading: true,
+  isGoogleProcessing: false,
 });
 
 // This hook can be used to access the user info.
@@ -63,8 +85,15 @@ export function useSession() {
 export function SessionProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGoogleProcessing, setIsGoogleProcessing] = useState(false);
 
   const redirectTo = makeRedirectUri();
+
+  // Google OAuth setup
+  const [googleRequest, googleResponse, promptGoogleAsync] = useAuthRequest(
+    googleConfig,
+    googleDiscovery
+  );
 
   // Create session from URL for both web and mobile
   const createSessionFromUrl = async (url: string) => {
@@ -211,6 +240,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Handle Google OAuth response
+  useEffect(() => {
+    handleGoogleResponse();
+  }, [googleResponse]);
+
   // Handle linking into app from email/OAuth (mobile only)
   const url = Linking.useURL();
   useEffect(() => {
@@ -218,6 +252,98 @@ export function SessionProvider({ children }: PropsWithChildren) {
       createSessionFromUrl(url).catch(console.error);
     }
   }, [url]);
+
+  // Handle Google OAuth response
+  const handleGoogleResponse = async () => {
+    // This function is called when Google redirects back to our app
+    // The response contains the authorization code that we'll exchange for tokens
+    if (googleResponse?.type === "success") {
+      try {
+        setIsGoogleProcessing(true);
+        console.log("Starting Google OAuth token exchange...");
+        
+        // Extract the authorization code from the response
+        // This code is what we'll exchange for access and refresh tokens
+        const { code } = googleResponse.params;
+
+        // Create form data to send to our token endpoint
+        // We include both the code and platform information
+        // The platform info helps our server handle web vs native differently
+        const formData = new FormData();
+        formData.append("code", code);
+
+        // Add platform information for the backend to handle appropriately
+        if (Platform.OS === "web") {
+          formData.append("platform", "web");
+        }
+
+        // Get the code verifier from the request object
+        // This is the same verifier that was used to generate the code challenge
+        if (googleRequest?.codeVerifier) {
+          formData.append("code_verifier", googleRequest.codeVerifier);
+        } else {
+          console.warn("No code verifier found in request object");
+        }
+
+        // Send the authorization code to our token endpoint
+        // The server will exchange this code with Google for access and refresh tokens
+        // Then create a Supabase session and return the tokens
+        console.log("Exchanging code for tokens...");
+        const tokenResponse = await fetch(`${BASE_URL}/api/auth/token`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const userData = await tokenResponse.json();
+        console.log("Token exchange response received");
+
+        if (tokenResponse.ok && userData.access_token && userData.refresh_token) {
+          console.log("Setting session with received tokens...");
+          // Set the session using the tokens from our backend
+          const { data: sessionData, error: sessionError } = 
+            await supabase.auth.setSession({
+              access_token: userData.access_token,
+              refresh_token: userData.refresh_token,
+            });
+
+          if (sessionError) {
+            console.error("Error setting session:", sessionError);
+            throw new Error(`Failed to set session: ${sessionError.message}`);
+          } 
+          
+          if (!sessionData.session) {
+            console.error("No session returned from setSession");
+            throw new Error("Failed to create session");
+          }
+          
+          console.log("Google OAuth completed successfully:", sessionData.user?.email);
+          setSession(sessionData.session);
+          
+          // The success message will be handled by the auth state change in the UI components
+        } else {
+          console.error("Invalid response from token endpoint:", userData);
+          throw new Error(userData.error || "Authentication failed");
+        }
+      } catch (e) {
+        console.error("Error handling auth response:", e);
+        // Show user-friendly error
+        if (Platform.OS === "web") {
+          alert(`Authentication failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+        }
+      } finally {
+        setIsGoogleProcessing(false);
+        setIsLoading(false);
+      }
+    } else if (googleResponse?.type === "cancel") {
+      console.log("Google sign in cancelled");
+      setIsGoogleProcessing(false);
+      setIsLoading(false);
+    } else if (googleResponse?.type === "error") {
+      console.error("Google OAuth error:", googleResponse?.error);
+      setIsGoogleProcessing(false);
+      setIsLoading(false);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -336,6 +462,18 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      if (!googleRequest) {
+        return { error: new Error("Google request not initialized") };
+      }
+      await promptGoogleAsync();
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
+  };
+
   const sendMagicLink = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -393,6 +531,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signOut,
         signUp,
         signInWithGitHub,
+        signInWithGoogle,
         sendMagicLink,
         resetPassword,
         verifyOtp,
@@ -400,6 +539,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         session,
         user: session?.user || null,
         isLoading,
+        isGoogleProcessing,
       }}
     >
       {children}
