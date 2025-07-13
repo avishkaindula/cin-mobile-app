@@ -42,46 +42,6 @@ types/
 - Clear, documented API for all backend operations
 - Type-safe operations with TypeScript
 
-## Usage
-
-### Authentication Service
-
-```typescript
-import { authService } from '@/services';
-
-// Sign in
-const result = await authService.signIn({ email, password });
-if (result.error) {
-  // Handle error
-} else {
-  // Success - user is signed in
-}
-
-// Sign up
-const result = await authService.signUp({ 
-  email, 
-  password, 
-  fullName 
-}, redirectUrl);
-
-// Update password
-const result = await authService.updatePassword({ password });
-```
-
-### OAuth Service
-
-```typescript
-import { oauthService } from '@/services';
-
-// GitHub OAuth
-const result = await oauthService.signInWithGitHub({
-  redirectTo: 'your-redirect-url'
-});
-
-// Create session from OAuth URL
-const result = await oauthService.createSessionFromUrl(url);
-```
-
 ## Available Services
 
 ### AuthService
@@ -117,30 +77,6 @@ All service methods use strongly typed interfaces defined in `/types/auth.ts`:
 - `PasswordResetRequest` - Password reset data
 - `PasswordUpdateRequest` - Password update data
 - And more...
-
-## Migration Guide
-
-If you have existing code that directly imports and uses Supabase:
-
-### Before
-```typescript
-import { supabase } from '@/lib/supabase';
-
-const { data, error } = await supabase.auth.signInWithPassword({
-  email,
-  password
-});
-```
-
-### After
-```typescript
-import { authService } from '@/services';
-
-const { error, session, user } = await authService.signIn({ 
-  email, 
-  password 
-});
-```
 
 ## Best Practices
 
