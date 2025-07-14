@@ -131,7 +131,7 @@ export async function POST(request: Request) {
     // For existing users, query the profiles table directly
     if (!userId) {
       const { data: profile, error: profileError } = await supabaseAdmin
-        .from("profiles")
+        .from("players")
         .select("id")
         .eq("email", googleUser.email)
         .single();
