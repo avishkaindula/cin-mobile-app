@@ -10,7 +10,7 @@ import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useLanguage } from "@/components/i18n/language-context";
+import { useLanguage } from "@/components/i18n/LanguageContext";
 import { Globe, Thermometer, Users, Trophy, Leaf } from "lucide-react-native";
 
 const HomePage = () => {

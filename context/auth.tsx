@@ -6,14 +6,14 @@ import {
   useState,
 } from "react";
 import { Session } from "@supabase/supabase-js";
-import { authService, oauthService } from "@/services";
-import { AuthContextType } from "@/types";
+import { supabase } from "@/lib/supabase";
 import {
   makeRedirectUri,
   useAuthRequest,
   AuthRequestConfig,
   DiscoveryDocument,
 } from "expo-auth-session";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
@@ -34,7 +34,29 @@ const googleDiscovery: DiscoveryDocument = {
   tokenEndpoint: `${BASE_URL}/api/auth/token`,
 };
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<{
+  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signOut: () => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName?: string
+  ) => Promise<{ error?: any; session?: Session | null }>;
+  signInWithGitHub: () => Promise<{ error?: any }>;
+  signInWithGoogle: () => Promise<{ error?: any }>;
+  sendMagicLink: (email: string) => Promise<{ error?: any }>;
+  resetPassword: (email: string) => Promise<{ error?: any }>;
+  verifyOtp: (
+    email: string,
+    token: string,
+    type: "signup" | "recovery" | "email_change"
+  ) => Promise<{ error?: any; session?: Session | null }>;
+  resendVerification: (email: string) => Promise<{ error?: any }>;
+  session: Session | null;
+  user: Session["user"] | null;
+  isLoading: boolean;
+  isGoogleProcessing: boolean;
+}>({
   signIn: async () => ({ error: null }),
   signOut: async () => {},
   signUp: async () => ({ error: null }),
@@ -75,7 +97,98 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   // Create session from URL for both web and mobile
   const createSessionFromUrl = async (url: string) => {
-    return await oauthService.createSessionFromUrl(url);
+    try {
+      if (Platform.OS === "web") {
+        // Parse both query parameters and hash fragments
+        const urlObj = new URL(url);
+        const searchParams = urlObj.searchParams;
+        const hashFragment = urlObj.hash.substring(1); // Remove the #
+        const hashParams = new URLSearchParams(hashFragment);
+
+        // Check for authorization code (PKCE flow)
+        const code = searchParams.get("code");
+        const error_description =
+          searchParams.get("error_description") ||
+          hashParams.get("error_description");
+
+        if (error_description) throw new Error(error_description);
+
+        if (code) {
+          // Exchange authorization code for session (PKCE flow)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            code
+          );
+
+          if (error) {
+            console.error("Error exchanging code:", error);
+            throw error;
+          }
+
+          // Clean the URL after processing (but only if not on reset-password page)
+          if (
+            typeof window !== "undefined" &&
+            !window.location.pathname.includes("/reset-password")
+          ) {
+            window.history.replaceState({}, "", window.location.pathname);
+          }
+
+          return data.session;
+        }
+
+        // Fallback: Check for direct access token (implicit flow)
+        const access_token = hashParams.get("access_token");
+        const refresh_token = hashParams.get("refresh_token");
+
+        if (access_token) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token: refresh_token || "",
+          });
+
+          if (error) throw error;
+
+          // Clean the URL after processing
+          if (typeof window !== "undefined") {
+            window.history.replaceState({}, "", window.location.pathname);
+          }
+
+          return data.session;
+        }
+
+        return null;
+      } else {
+        // For mobile, use the existing QueryParams approach
+        const { params, errorCode } = QueryParams.getQueryParams(url);
+
+        if (errorCode) throw new Error(errorCode);
+
+        const { access_token, refresh_token, code } = params;
+
+        if (code) {
+          // Exchange authorization code for session (PKCE flow)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            code
+          );
+          if (error) throw error;
+          return data.session;
+        }
+
+        if (access_token) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          });
+
+          if (error) throw error;
+          return data.session;
+        }
+
+        return null;
+      }
+    } catch (error) {
+      console.error("Error creating session from URL:", error);
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -91,9 +204,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
             currentUrl.includes("#error=") ||
             currentUrl.includes("?error=")
           ) {
-            const sessionResult = await createSessionFromUrl(currentUrl);
-            if (sessionResult.session) {
-              setSession(sessionResult.session);
+            const session = await createSessionFromUrl(currentUrl);
+            if (session) {
+              setSession(session);
               setIsLoading(false);
               return; // Early return if we successfully created a session
             }
@@ -101,10 +214,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
         }
 
         // Get initial session
-        const { session, error } = await authService.getCurrentSession();
-        if (error) {
-          console.error("Error getting session:", error);
-        }
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
         setSession(session);
         setIsLoading(false);
@@ -117,7 +230,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     initializeAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = authService.onAuthStateChange((event: string, session: Session | null) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setIsLoading(false);
     });
@@ -185,23 +300,24 @@ export function SessionProvider({ children }: PropsWithChildren) {
         if (tokenResponse.ok && userData.access_token && userData.refresh_token) {
           console.log("Setting session with received tokens...");
           // Set the session using the tokens from our backend
-          const sessionResult = await authService.setSession({
-            access_token: userData.access_token,
-            refresh_token: userData.refresh_token,
-          });
+          const { data: sessionData, error: sessionError } = 
+            await supabase.auth.setSession({
+              access_token: userData.access_token,
+              refresh_token: userData.refresh_token,
+            });
 
-          if (sessionResult.error) {
-            console.error("Error setting session:", sessionResult.error);
-            throw new Error(`Failed to set session: ${sessionResult.error.message}`);
+          if (sessionError) {
+            console.error("Error setting session:", sessionError);
+            throw new Error(`Failed to set session: ${sessionError.message}`);
           } 
           
-          if (!sessionResult.session) {
+          if (!sessionData.session) {
             console.error("No session returned from setSession");
             throw new Error("Failed to create session");
           }
           
-          console.log("Google OAuth completed successfully:", sessionResult.user?.email);
-          setSession(sessionResult.session);
+          console.log("Google OAuth completed successfully:", sessionData.user?.email);
+          setSession(sessionData.session);
           
           // The success message will be handled by the auth state change in the UI components
         } else {
@@ -230,15 +346,22 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signIn = async (email: string, password: string) => {
-    return await authService.signIn({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
   };
 
   const signOut = async () => {
     try {
-      const result = await authService.signOut();
-      
-      if (result.error) {
-        console.error("Sign out error:", result.error);
+      // Use scope: 'local' for web to avoid the 403 error
+      const { error } = await supabase.auth.signOut({
+        scope: Platform.OS === "web" ? "local" : "global",
+      });
+
+      if (error) {
+        console.error("Sign out error:", error);
         // If there's an error, still clear the local session
         setSession(null);
         return;
@@ -249,6 +372,18 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
       // Web-specific cleanup
       if (Platform.OS === "web" && typeof window !== "undefined") {
+        // Clear any remaining localStorage items
+        try {
+          const keys = Object.keys(localStorage);
+          keys.forEach((key) => {
+            if (key.includes("supabase") || key.includes("auth")) {
+              localStorage.removeItem(key);
+            }
+          });
+        } catch (storageError) {
+          console.warn("Error clearing localStorage:", storageError);
+        }
+
         // Force a page refresh to ensure clean state
         window.location.reload();
       }
@@ -264,22 +399,67 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectToUrl = Platform.OS === "web" && typeof window !== "undefined"
-      ? window.location.origin
-      : redirectTo;
-    
-    return await authService.signUp({ email, password, fullName }, redirectToUrl);
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo:
+          Platform.OS === "web" && typeof window !== "undefined"
+            ? window.location.origin
+            : redirectTo,
+        data: {
+          full_name: fullName || "",
+        },
+      },
+    });
+    return { error, session };
   };
 
   const signInWithGitHub = async () => {
-    const redirectToUrl = Platform.OS === "web" && typeof window !== "undefined"
-      ? window.location.origin
-      : redirectTo;
-      
-    return await oauthService.signInWithGitHub({ 
-      redirectTo: redirectToUrl,
-      skipBrowserRedirect: Platform.OS !== "web"
-    });
+    try {
+      if (Platform.OS === "web") {
+        // For web, use standard OAuth flow
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: "github",
+          options: {
+            redirectTo:
+              typeof window !== "undefined"
+                ? window.location.origin
+                : undefined,
+          },
+        });
+        return { error };
+      } else {
+        // For mobile, use deep linking flow
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: "github",
+          options: {
+            redirectTo,
+            skipBrowserRedirect: true,
+          },
+        });
+
+        if (error) throw error;
+
+        const res = await WebBrowser.openAuthSessionAsync(
+          data?.url ?? "",
+          redirectTo
+        );
+
+        if (res.type === "success") {
+          const { url } = res;
+          await createSessionFromUrl(url);
+          return { error: null };
+        }
+
+        return { error: new Error("OAuth cancelled") };
+      }
+    } catch (error) {
+      return { error };
+    }
   };
 
   const signInWithGoogle = async () => {
@@ -290,24 +470,31 @@ export function SessionProvider({ children }: PropsWithChildren) {
       await promptGoogleAsync();
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error };
     }
   };
 
   const sendMagicLink = async (email: string) => {
-    const redirectToUrl = Platform.OS === "web" && typeof window !== "undefined"
-      ? window.location.origin
-      : redirectTo;
-      
-    return await authService.sendMagicLink({ email }, redirectToUrl);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo:
+          Platform.OS === "web" && typeof window !== "undefined"
+            ? window.location.origin
+            : redirectTo,
+      },
+    });
+    return { error };
   };
 
   const resetPassword = async (email: string) => {
-    const redirectToUrl = Platform.OS === "web" && typeof window !== "undefined"
-      ? `${window.location.origin}/reset-password`
-      : "com.climateintelligencedemo://reset-password";
-      
-    return await authService.resetPassword({ email }, redirectToUrl);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo:
+        Platform.OS === "web" && typeof window !== "undefined"
+          ? `${window.location.origin}/reset-password`
+          : "com.climateintelligencedemo://reset-password",
+    });
+    return { error };
   };
 
   const verifyOtp = async (
@@ -315,15 +502,26 @@ export function SessionProvider({ children }: PropsWithChildren) {
     token: string,
     type: "signup" | "recovery" | "email_change"
   ) => {
-    return await authService.verifyOtp({ email, token, type });
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type,
+    });
+    return { error, session: data.session };
   };
 
   const resendVerification = async (email: string) => {
-    const redirectToUrl = Platform.OS === "web" && typeof window !== "undefined"
-      ? window.location.origin
-      : redirectTo;
-      
-    return await authService.resendVerification({ email }, redirectToUrl);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo:
+          Platform.OS === "web" && typeof window !== "undefined"
+            ? window.location.origin
+            : redirectTo,
+      },
+    });
+    return { error };
   };
 
   return (
