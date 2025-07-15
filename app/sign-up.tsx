@@ -20,9 +20,9 @@ import {
   User,
   Github,
 } from "lucide-react-native";
-import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
 import { useSession } from "@/context/auth";
-import { useAppToast } from "@/components/toast-utils";
+import { useAppToast } from "@/lib/toast-utils";
+import { GoogleIcon } from "@/assets/ico/google-icon";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
