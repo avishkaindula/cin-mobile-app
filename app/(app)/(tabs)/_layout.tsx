@@ -3,7 +3,7 @@ import React from "react";
 import { Home, Target, Calendar, Users, User } from "lucide-react-native";
 import { Platform } from "react-native";
 import { useColorScheme } from "nativewind";
-import { HapticTab } from "@/components/haptic-tab";
+import { HapticTab } from "@/components/HapticTab";
 
 function TabBarIcon({
   IconComponent,
