@@ -3,7 +3,6 @@ import React from "react";
 import { Home, Target, Calendar, Users, User } from "lucide-react-native";
 import { Platform } from "react-native";
 import { useColorScheme } from "nativewind";
-import { HapticTab } from "@/components/HapticTab";
 
 function TabBarIcon({
   IconComponent,
@@ -24,7 +23,6 @@ export default function TabLayout() {
         tabBarActiveTintColor: "#059669", // green-600
         tabBarInactiveTintColor: colorScheme === "dark" ? "#9CA3AF" : "#6B7280", // gray-400 for dark, gray-500 for light
         headerShown: false,
-        tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: colorScheme === "dark" ? "#181719" : "#FFFFFF", // match background-dark and white
           borderTopColor: colorScheme === "dark" ? "#2D2D2D" : "#E5E7EB", // darker border for dark mode
