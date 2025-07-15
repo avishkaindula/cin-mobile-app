@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Image } from "@/components/ui/image";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useLanguage } from "@/components/i18n/LanguageContext";
+import { useLanguage } from "@/components/i18n/language-context";
 import {
   Users,
   MessageCircle,

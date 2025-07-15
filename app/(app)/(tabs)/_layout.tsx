@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Home, Target, Map, Users, User } from "lucide-react-native";
+import { Home, Target, Calendar, Users, User } from "lucide-react-native";
 import { Platform } from "react-native";
 import { useColorScheme } from "nativewind";
 import { HapticTab } from "@/components/HapticTab";
@@ -65,12 +65,13 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="map"
+        name="events"
         options={{
-          title: "Map",
+          title: "Events",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon IconComponent={Map} color={color} />
+            <TabBarIcon IconComponent={Calendar} color={color} />
           ),
+          tabBarBadge: "4",
         }}
       />
 

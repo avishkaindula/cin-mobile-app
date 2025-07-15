@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView } from "react-native";
+import { SafeAreaView, ScrollView, Pressable } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -11,8 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Divider } from "@/components/ui/divider";
-import { useLanguage } from "@/components/i18n/LanguageContext";
-import LanguageSettings from "@/components/settings/LanguageSettings";
+import { Pressable as UIPressable } from "@/components/ui/pressable";
+import { useLanguage, availableLanguages } from "@/components/i18n/language-context";
 import { useColorScheme } from "nativewind";
 import { useSession } from "@/context/auth";
 import {
@@ -27,10 +27,12 @@ import {
   Moon,
   Sun,
   LogOut,
+  Check,
+  X,
 } from "lucide-react-native";
 
 const ProfilePage = () => {
-  const { t, currentLanguage } = useLanguage();
+  const { t, currentLanguage, setLanguage } = useLanguage();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const { signOut } = useSession();
@@ -42,6 +44,11 @@ const ProfilePage = () => {
       pt: "Português",
     };
     return languageNames[currentLanguage] || "English";
+  };
+
+  const handleLanguageChange = async (languageCode: "en" | "es" | "pt") => {
+    await setLanguage(languageCode);
+    setShowLanguageModal(false);
   };
 
   const achievements = [
@@ -150,18 +157,14 @@ const ProfilePage = () => {
               <Button variant="outline">
                 <Text>{t("editProfile")}</Text>
               </Button>
-              <Button 
-                variant="solid" 
-                action="negative" 
+              <Button
+                variant="solid"
+                action="negative"
                 onPress={signOut}
                 className="w-full"
               >
                 <HStack space="xs" className="items-center">
-                  <Icon
-                    as={LogOut}
-                    size="sm"
-                    className="text-white"
-                  />
+                  <Icon as={LogOut} size="sm" className="text-white" />
                   <Text className="text-white">Sign Out</Text>
                 </HStack>
               </Button>
@@ -432,9 +435,57 @@ const ProfilePage = () => {
         </Box>
       </ScrollView>
 
-      {/* Language Settings */}
+      {/* Language Settings Modal */}
       {showLanguageModal && (
-        <LanguageSettings onClose={() => setShowLanguageModal(false)} />
+        <Box className="absolute inset-0 bg-black/50 flex justify-center items-center z-50">
+          <Pressable className="absolute inset-0" onPress={() => setShowLanguageModal(false)} />
+          <Card className="p-6 m-4 max-w-md w-full">
+            <VStack space="lg">
+              <HStack className="justify-between items-center">
+                <Heading
+                  size="md"
+                  className="text-typography-900 dark:text-typography-950"
+                >
+                  Select Language
+                </Heading>
+                <UIPressable onPress={() => setShowLanguageModal(false)}>
+                  <Icon as={X} size="md" className="text-typography-500" />
+                </UIPressable>
+              </HStack>
+
+              <VStack space="md">
+                {availableLanguages.map((language) => (
+                  <UIPressable
+                    key={language.code}
+                    onPress={() => handleLanguageChange(language.code)}
+                    className="p-4 rounded-lg border border-outline-200 dark:border-outline-700"
+                  >
+                    <HStack className="justify-between items-center">
+                      <VStack space="xs">
+                        <Text className="font-semibold text-typography-900 dark:text-typography-950">
+                          {language.nativeName}
+                        </Text>
+                        <Text
+                          size="sm"
+                          className="text-typography-600 dark:text-typography-300"
+                        >
+                          {language.name}
+                        </Text>
+                      </VStack>
+                      {currentLanguage === language.code && (
+                        <Icon
+                          as={Check}
+                          size="md"
+                          className="text-primary-600 dark:text-primary-400"
+                        />
+                      )}
+                    </HStack>
+                  </UIPressable>
+                ))}
+              </VStack>
+            </VStack>
+          </Card>
+        </Box>
       )}
     </SafeAreaView>
   );
