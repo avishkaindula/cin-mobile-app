@@ -18,6 +18,29 @@ import {
  * 
  * Handles OAuth flows for various providers like GitHub and Google
  */
+
+// Utility function to check if URL contains auth parameters
+const hasAuthParameters = (url: string): boolean => {
+  try {
+    const urlObj = new URL(url);
+    const searchParams = urlObj.searchParams;
+    const hashFragment = urlObj.hash.substring(1);
+    const hashParams = new URLSearchParams(hashFragment);
+
+    // Check for various auth parameters
+    return !!(
+      searchParams.get("code") ||
+      searchParams.get("access_token") ||
+      searchParams.get("error") ||
+      hashParams.get("access_token") ||
+      hashParams.get("error") ||
+      hashParams.get("refresh_token")
+    );
+  } catch {
+    return false;
+  }
+};
+
 export class OAuthService {
   private static instance: OAuthService;
 
@@ -147,6 +170,11 @@ export class OAuthService {
    */
   async createSessionFromUrl({ url, platform }: CreateSessionFromUrlRequest): Promise<SessionResponse> {
     try {
+      // Early check to avoid processing URLs without auth parameters
+      if (!hasAuthParameters(url)) {
+        return { error: new Error("NO_AUTH_PARAMETERS") };
+      }
+
       if (platform === "web" || Platform.OS === "web") {
         return this.handleWebOAuthCallback(url);
       } else {
@@ -223,7 +251,7 @@ export class OAuthService {
         return result;
       }
 
-      return { error: new Error("No valid auth parameters found in URL") };
+      return { error: new Error("NO_AUTH_PARAMETERS") };
     } catch (error) {
       return {
         error: error as Error,
@@ -254,7 +282,7 @@ export class OAuthService {
         return await authService.setSession(access_token, refresh_token);
       }
 
-      return { error: new Error("No valid auth parameters found in URL") };
+      return { error: new Error("NO_AUTH_PARAMETERS") };
     } catch (error) {
       return {
         error: error as Error,

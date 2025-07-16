@@ -21,6 +21,21 @@ import { BASE_URL } from "@/lib/constants";
 // Required for web only
 WebBrowser.maybeCompleteAuthSession();
 
+// Utility function to check if URL contains auth parameters
+const hasAuthParameters = (url: string): boolean => {
+  return (
+    url.includes("?code=") ||
+    url.includes("#access_token=") ||
+    url.includes("#error=") ||
+    url.includes("?error=") ||
+    url.includes("&code=") ||
+    url.includes("&access_token=") ||
+    url.includes("&error=") ||
+    url.includes("refresh_token=") ||
+    url.includes("token_type=")
+  );
+};
+
 // Google OAuth configuration
 const googleConfig: AuthRequestConfig = {
   clientId: "google",
@@ -95,6 +110,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   );
 
   // Create session from URL for both web and mobile
+  // Note: Returns null for URLs without auth parameters to avoid noise in logs
   const createSessionFromUrl = async (url: string) => {
     try {
       const { error, session } = await oauthService.createSessionFromUrl({ 
@@ -103,12 +119,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
       });
       
       if (error) {
+        // Don't throw for missing auth parameters - this is normal for non-auth URLs
+        if (error.message.includes("NO_AUTH_PARAMETERS") || error.message.includes("No valid auth parameters found in URL")) {
+          return null;
+        }
         throw error;
       }
       
       return session;
     } catch (error) {
-      console.error("Error creating session from URL:", error);
+      // Only log non-parameter errors to reduce noise
+      if (error instanceof Error && !error.message.includes("NO_AUTH_PARAMETERS") && !error.message.includes("No valid auth parameters found in URL")) {
+        console.error("Error creating session from URL:", error);
+      }
       throw error;
     }
   };
@@ -120,17 +143,21 @@ export function SessionProvider({ children }: PropsWithChildren) {
         if (Platform.OS === "web" && typeof window !== "undefined") {
           const currentUrl = window.location.href;
 
-          if (
-            currentUrl.includes("?code=") ||
-            currentUrl.includes("#access_token=") ||
-            currentUrl.includes("#error=") ||
-            currentUrl.includes("?error=")
-          ) {
-            const session = await createSessionFromUrl(currentUrl);
-            if (session) {
-              setSession(session);
-              setIsLoading(false);
-              return; // Early return if we successfully created a session
+          if (hasAuthParameters(currentUrl)) {
+            try {
+              const session = await createSessionFromUrl(currentUrl);
+              if (session) {
+                setSession(session);
+                setIsLoading(false);
+                return; // Early return if we successfully created a session
+              }
+            } catch (urlError) {
+              // Only log URL processing errors if they're not about missing auth parameters
+              // This prevents spam when navigating normally without auth parameters
+              if (urlError instanceof Error && !urlError.message.includes("NO_AUTH_PARAMETERS") && !urlError.message.includes("No valid auth parameters found in URL")) {
+                console.error("Error processing auth URL:", urlError);
+              }
+              // Continue to regular session check even if URL processing fails
             }
           }
         }
@@ -165,7 +192,15 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const url = Linking.useURL();
   useEffect(() => {
     if (url && Platform.OS !== "web") {
-      createSessionFromUrl(url).catch(console.error);
+      // Only process URLs that likely contain auth parameters to avoid noise
+      if (hasAuthParameters(url)) {
+        createSessionFromUrl(url).catch((error) => {
+          // Only log non-parameter errors
+          if (error instanceof Error && !error.message.includes("NO_AUTH_PARAMETERS") && !error.message.includes("No valid auth parameters found in URL")) {
+            console.error("Mobile deep link auth error:", error);
+          }
+        });
+      }
     }
   }, [url]);
 
