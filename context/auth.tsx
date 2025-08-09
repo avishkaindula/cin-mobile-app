@@ -6,15 +6,47 @@ import {
   useState,
 } from "react";
 import { Session } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
-import { makeRedirectUri } from "expo-auth-session";
-import * as QueryParams from "expo-auth-session/build/QueryParams";
+import { authService, oauthService } from "@/services";
+import {
+  makeRedirectUri,
+  useAuthRequest,
+  AuthRequestConfig,
+  DiscoveryDocument,
+} from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
+import { BASE_URL } from "@/lib/constants";
 
 // Required for web only
 WebBrowser.maybeCompleteAuthSession();
+
+// Utility function to check if URL contains auth parameters
+const hasAuthParameters = (url: string): boolean => {
+  return (
+    url.includes("?code=") ||
+    url.includes("#access_token=") ||
+    url.includes("#error=") ||
+    url.includes("?error=") ||
+    url.includes("&code=") ||
+    url.includes("&access_token=") ||
+    url.includes("&error=") ||
+    url.includes("refresh_token=") ||
+    url.includes("token_type=")
+  );
+};
+
+// Google OAuth configuration
+const googleConfig: AuthRequestConfig = {
+  clientId: "google",
+  scopes: ["openid", "profile", "email"],
+  redirectUri: makeRedirectUri(),
+};
+
+const googleDiscovery: DiscoveryDocument = {
+  authorizationEndpoint: `${BASE_URL}/api/auth/authorize`,
+  tokenEndpoint: `${BASE_URL}/api/auth/token`,
+};
 
 const AuthContext = createContext<{
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
@@ -25,6 +57,7 @@ const AuthContext = createContext<{
     fullName?: string
   ) => Promise<{ error?: any; session?: Session | null }>;
   signInWithGitHub: () => Promise<{ error?: any }>;
+  signInWithGoogle: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
   verifyOtp: (
@@ -36,11 +69,13 @@ const AuthContext = createContext<{
   session: Session | null;
   user: Session["user"] | null;
   isLoading: boolean;
+  isGoogleProcessing: boolean;
 }>({
   signIn: async () => ({ error: null }),
   signOut: async () => {},
   signUp: async () => ({ error: null }),
   signInWithGitHub: async () => ({ error: null }),
+  signInWithGoogle: async () => ({ error: null }),
   sendMagicLink: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
@@ -48,6 +83,7 @@ const AuthContext = createContext<{
   session: null,
   user: null,
   isLoading: true,
+  isGoogleProcessing: false,
 });
 
 // This hook can be used to access the user info.
@@ -63,101 +99,39 @@ export function useSession() {
 export function SessionProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGoogleProcessing, setIsGoogleProcessing] = useState(false);
 
   const redirectTo = makeRedirectUri();
 
+  // Google OAuth setup
+  const [googleRequest, googleResponse, promptGoogleAsync] = useAuthRequest(
+    googleConfig,
+    googleDiscovery
+  );
+
   // Create session from URL for both web and mobile
+  // Note: Returns null for URLs without auth parameters to avoid noise in logs
   const createSessionFromUrl = async (url: string) => {
     try {
-      if (Platform.OS === "web") {
-        // Parse both query parameters and hash fragments
-        const urlObj = new URL(url);
-        const searchParams = urlObj.searchParams;
-        const hashFragment = urlObj.hash.substring(1); // Remove the #
-        const hashParams = new URLSearchParams(hashFragment);
-
-        // Check for authorization code (PKCE flow)
-        const code = searchParams.get("code");
-        const error_description =
-          searchParams.get("error_description") ||
-          hashParams.get("error_description");
-
-        if (error_description) throw new Error(error_description);
-
-        if (code) {
-          // Exchange authorization code for session (PKCE flow)
-          const { data, error } = await supabase.auth.exchangeCodeForSession(
-            code
-          );
-
-          if (error) {
-            console.error("Error exchanging code:", error);
-            throw error;
-          }
-
-          // Clean the URL after processing (but only if not on reset-password page)
-          if (
-            typeof window !== "undefined" &&
-            !window.location.pathname.includes("/reset-password")
-          ) {
-            window.history.replaceState({}, "", window.location.pathname);
-          }
-
-          return data.session;
+      const { error, session } = await oauthService.createSessionFromUrl({ 
+        url, 
+        platform: Platform.OS as "web" | "mobile" 
+      });
+      
+      if (error) {
+        // Don't throw for missing auth parameters - this is normal for non-auth URLs
+        if (error.message.includes("NO_AUTH_PARAMETERS") || error.message.includes("No valid auth parameters found in URL")) {
+          return null;
         }
-
-        // Fallback: Check for direct access token (implicit flow)
-        const access_token = hashParams.get("access_token");
-        const refresh_token = hashParams.get("refresh_token");
-
-        if (access_token) {
-          const { data, error } = await supabase.auth.setSession({
-            access_token,
-            refresh_token: refresh_token || "",
-          });
-
-          if (error) throw error;
-
-          // Clean the URL after processing
-          if (typeof window !== "undefined") {
-            window.history.replaceState({}, "", window.location.pathname);
-          }
-
-          return data.session;
-        }
-
-        return null;
-      } else {
-        // For mobile, use the existing QueryParams approach
-        const { params, errorCode } = QueryParams.getQueryParams(url);
-
-        if (errorCode) throw new Error(errorCode);
-
-        const { access_token, refresh_token, code } = params;
-
-        if (code) {
-          // Exchange authorization code for session (PKCE flow)
-          const { data, error } = await supabase.auth.exchangeCodeForSession(
-            code
-          );
-          if (error) throw error;
-          return data.session;
-        }
-
-        if (access_token) {
-          const { data, error } = await supabase.auth.setSession({
-            access_token,
-            refresh_token,
-          });
-
-          if (error) throw error;
-          return data.session;
-        }
-
-        return null;
+        throw error;
       }
+      
+      return session;
     } catch (error) {
-      console.error("Error creating session from URL:", error);
+      // Only log non-parameter errors to reduce noise
+      if (error instanceof Error && !error.message.includes("NO_AUTH_PARAMETERS") && !error.message.includes("No valid auth parameters found in URL")) {
+        console.error("Error creating session from URL:", error);
+      }
       throw error;
     }
   };
@@ -169,28 +143,28 @@ export function SessionProvider({ children }: PropsWithChildren) {
         if (Platform.OS === "web" && typeof window !== "undefined") {
           const currentUrl = window.location.href;
 
-          if (
-            currentUrl.includes("?code=") ||
-            currentUrl.includes("#access_token=") ||
-            currentUrl.includes("#error=") ||
-            currentUrl.includes("?error=")
-          ) {
-            const session = await createSessionFromUrl(currentUrl);
-            if (session) {
-              setSession(session);
-              setIsLoading(false);
-              return; // Early return if we successfully created a session
+          if (hasAuthParameters(currentUrl)) {
+            try {
+              const session = await createSessionFromUrl(currentUrl);
+              if (session) {
+                setSession(session);
+                setIsLoading(false);
+                return; // Early return if we successfully created a session
+              }
+            } catch (urlError) {
+              // Only log URL processing errors if they're not about missing auth parameters
+              // This prevents spam when navigating normally without auth parameters
+              if (urlError instanceof Error && !urlError.message.includes("NO_AUTH_PARAMETERS") && !urlError.message.includes("No valid auth parameters found in URL")) {
+                console.error("Error processing auth URL:", urlError);
+              }
+              // Continue to regular session check even if URL processing fails
             }
           }
         }
 
         // Get initial session
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        setSession(session);
+        const { session } = await authService.getCurrentSession();
+        setSession(session || null);
         setIsLoading(false);
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -201,9 +175,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     initializeAuth();
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = authService.onAuthStateChange((session: Session | null) => {
       setSession(session);
       setIsLoading(false);
     });
@@ -211,28 +183,105 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Handle Google OAuth response
+  useEffect(() => {
+    handleGoogleResponse();
+  }, [googleResponse]);
+
   // Handle linking into app from email/OAuth (mobile only)
   const url = Linking.useURL();
   useEffect(() => {
     if (url && Platform.OS !== "web") {
-      createSessionFromUrl(url).catch(console.error);
+      // Only process URLs that likely contain auth parameters to avoid noise
+      if (hasAuthParameters(url)) {
+        createSessionFromUrl(url).catch((error) => {
+          // Only log non-parameter errors
+          if (error instanceof Error && !error.message.includes("NO_AUTH_PARAMETERS") && !error.message.includes("No valid auth parameters found in URL")) {
+            console.error("Mobile deep link auth error:", error);
+          }
+        });
+      }
     }
   }, [url]);
 
+  // Handle Google OAuth response
+  const handleGoogleResponse = async () => {
+    // This function is called when Google redirects back to our app
+    // The response contains the authorization code that we'll exchange for tokens
+    if (googleResponse?.type === "success") {
+      try {
+        setIsGoogleProcessing(true);
+        console.log("Starting Google OAuth token exchange...");
+        
+        // Extract the authorization code from the response
+        const { code } = googleResponse.params;
+
+        // Exchange the code for tokens using our OAuth service
+        const { access_token, refresh_token, error: exchangeError } = 
+          await oauthService.exchangeGoogleCode({
+            code,
+            codeVerifier: googleRequest?.codeVerifier,
+            platform: Platform.OS as "web" | "mobile",
+          });
+
+        if (exchangeError) {
+          console.error("Error exchanging Google code:", exchangeError);
+          throw exchangeError;
+        }
+
+        if (access_token && refresh_token) {
+          console.log("Setting session with received tokens...");
+          // Set the session using the tokens from our backend
+          const { error: sessionError, session: sessionData } = 
+            await authService.setSession(access_token, refresh_token);
+
+          if (sessionError) {
+            console.error("Error setting session:", sessionError);
+            throw new Error(`Failed to set session: ${sessionError.message}`);
+          } 
+          
+          if (!sessionData) {
+            console.error("No session returned from setSession");
+            throw new Error("Failed to create session");
+          }
+          
+          console.log("Google OAuth completed successfully:", sessionData.user?.email);
+          setSession(sessionData);
+          
+          // The success message will be handled by the auth state change in the UI components
+        } else {
+          console.error("No tokens received from exchange");
+          throw new Error("Authentication failed - no tokens received");
+        }
+      } catch (e) {
+        console.error("Error handling auth response:", e);
+        // Show user-friendly error
+        if (Platform.OS === "web") {
+          alert(`Authentication failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+        }
+      } finally {
+        setIsGoogleProcessing(false);
+        setIsLoading(false);
+      }
+    } else if (googleResponse?.type === "cancel") {
+      console.log("Google sign in cancelled");
+      setIsGoogleProcessing(false);
+      setIsLoading(false);
+    } else if (googleResponse?.type === "error") {
+      console.error("Google OAuth error:", googleResponse?.error);
+      setIsGoogleProcessing(false);
+      setIsLoading(false);
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await authService.signIn({ email, password });
     return { error };
   };
 
   const signOut = async () => {
     try {
-      // Use scope: 'local' for web to avoid the 403 error
-      const { error } = await supabase.auth.signOut({
-        scope: Platform.OS === "web" ? "local" : "global",
-      });
+      const { error } = await authService.signOut();
 
       if (error) {
         console.error("Sign out error:", error);
@@ -244,20 +293,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
       // Clear local session state
       setSession(null);
 
-      // Web-specific cleanup
+      // Web-specific cleanup - handled by authService
       if (Platform.OS === "web" && typeof window !== "undefined") {
-        // Clear any remaining localStorage items
-        try {
-          const keys = Object.keys(localStorage);
-          keys.forEach((key) => {
-            if (key.includes("supabase") || key.includes("auth")) {
-              localStorage.removeItem(key);
-            }
-          });
-        } catch (storageError) {
-          console.warn("Error clearing localStorage:", storageError);
-        }
-
         // Force a page refresh to ensure clean state
         window.location.reload();
       }
@@ -273,89 +310,44 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signUp = async (email: string, password: string, fullName?: string) => {
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo:
-          Platform.OS === "web" && typeof window !== "undefined"
-            ? window.location.origin
-            : redirectTo,
-        data: {
-          full_name: fullName || "",
-        },
-      },
+    const { error, session } = await authService.signUp({ 
+      email, 
+      password, 
+      fullName 
     });
     return { error, session };
   };
 
   const signInWithGitHub = async () => {
     try {
-      if (Platform.OS === "web") {
-        // For web, use standard OAuth flow
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: "github",
-          options: {
-            redirectTo:
-              typeof window !== "undefined"
-                ? window.location.origin
-                : undefined,
-          },
-        });
-        return { error };
-      } else {
-        // For mobile, use deep linking flow
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: "github",
-          options: {
-            redirectTo,
-            skipBrowserRedirect: true,
-          },
-        });
+      return await oauthService.signInWithGitHub(redirectTo);
+    } catch (error) {
+      return { error };
+    }
+  };
 
-        if (error) throw error;
-
-        const res = await WebBrowser.openAuthSessionAsync(
-          data?.url ?? "",
-          redirectTo
-        );
-
-        if (res.type === "success") {
-          const { url } = res;
-          await createSessionFromUrl(url);
-          return { error: null };
-        }
-
-        return { error: new Error("OAuth cancelled") };
+  const signInWithGoogle = async () => {
+    try {
+      if (!googleRequest) {
+        return { error: new Error("Google request not initialized") };
       }
+      await promptGoogleAsync();
+      return { error: null };
     } catch (error) {
       return { error };
     }
   };
 
   const sendMagicLink = async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo:
-          Platform.OS === "web" && typeof window !== "undefined"
-            ? window.location.origin
-            : redirectTo,
-      },
+    const { error } = await authService.sendMagicLink({ 
+      email, 
+      redirectTo 
     });
     return { error };
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo:
-        Platform.OS === "web" && typeof window !== "undefined"
-          ? `${window.location.origin}/reset-password`
-          : "com.climateintelligencedemo://reset-password",
-    });
+    const { error } = await authService.resetPassword({ email });
     return { error };
   };
 
@@ -364,24 +356,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
     token: string,
     type: "signup" | "recovery" | "email_change"
   ) => {
-    const { data, error } = await supabase.auth.verifyOtp({
+    const { error, session } = await authService.verifyOtp({
       email,
       token,
       type,
     });
-    return { error, session: data.session };
+    return { error, session };
   };
 
   const resendVerification = async (email: string) => {
-    const { error } = await supabase.auth.resend({
-      type: "signup",
+    const { error } = await authService.resendVerification({
       email,
-      options: {
-        emailRedirectTo:
-          Platform.OS === "web" && typeof window !== "undefined"
-            ? window.location.origin
-            : redirectTo,
-      },
+      type: "signup",
+      redirectTo,
     });
     return { error };
   };
@@ -393,6 +380,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signOut,
         signUp,
         signInWithGitHub,
+        signInWithGoogle,
         sendMagicLink,
         resetPassword,
         verifyOtp,
@@ -400,6 +388,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         session,
         user: session?.user || null,
         isLoading,
+        isGoogleProcessing,
       }}
     >
       {children}

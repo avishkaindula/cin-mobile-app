@@ -10,11 +10,11 @@ import {
   Inter_700Bold,
   Inter_900Black,
 } from "@expo-google-fonts/inter";
-import { LanguageProvider } from "@/components/i18n/LanguageContext";
+import { LanguageProvider } from "@/components/i18n/language-context";
 
 import "../global.css";
 import { SessionProvider, useSession } from "@/context/auth";
-import { SplashScreenController } from "@/components/SplashController";
+import { SplashScreenController } from "@/components/splash-controller";
 
 export {
   // Catch any errors thrown by the Layout component.

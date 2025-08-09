@@ -13,7 +13,7 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { KeyRound, Mail, ArrowLeft, CheckCircle } from "lucide-react-native";
 import { useSession } from "@/context/auth";
-import { useAppToast } from "@/components/toast-utils";
+import { useAppToast } from "@/lib/toast-utils";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

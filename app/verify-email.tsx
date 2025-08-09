@@ -1,6 +1,11 @@
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { SafeAreaView, TextInput, Keyboard, InteractionManager } from "react-native";
+import {
+  SafeAreaView,
+  TextInput,
+  Keyboard,
+  InteractionManager,
+} from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -12,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Mail, ArrowLeft } from "lucide-react-native";
 import { useSession } from "@/context/auth";
-import { useAppToast } from "@/components/toast-utils";
+import { useAppToast } from "@/lib/toast-utils";
 
 export default function VerifyEmail() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -274,7 +279,10 @@ export default function VerifyEmail() {
                     size="lg"
                     className="w-full"
                     disabled={
-                      !isReady || loading || resendLoading || code.some((digit) => !digit)
+                      !isReady ||
+                      loading ||
+                      resendLoading ||
+                      code.some((digit) => !digit)
                     }
                     onPress={handleVerify}
                   >

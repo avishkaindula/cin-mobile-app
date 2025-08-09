@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { KeyRound, Lock, CheckCircle, AlertCircle } from "lucide-react-native";
-import { supabase } from "@/lib/supabase";
-import { useAppToast } from "@/components/toast-utils";
+import { KeyRound, Lock, CheckCircle } from "lucide-react-native";
+import { authService } from "@/services";
+import { useAppToast } from "@/lib/toast-utils";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -38,7 +38,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await authService.updatePassword({
         password: password,
       });
 

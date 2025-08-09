@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, InteractionManager } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
+import { Spinner } from "@/components/ui/spinner";
 import {
   UserPlus,
   Mail,
@@ -19,9 +20,9 @@ import {
   User,
   Github,
 } from "lucide-react-native";
-import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
 import { useSession } from "@/context/auth";
-import { useAppToast } from "@/components/toast-utils";
+import { useAppToast } from "@/lib/toast-utils";
+import { GoogleIcon } from "@/assets/ico/google-icon";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
@@ -31,12 +32,53 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { signUp, signInWithGitHub } = useSession();
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const {
+    signUp,
+    signInWithGitHub,
+    signInWithGoogle,
+    isGoogleProcessing,
+    session,
+  } = useSession();
   const { showError, showSuccess } = useAppToast();
 
+  // Show success message when Google OAuth completes
+  useEffect(() => {
+    if (session && isGoogleProcessing === false && googleLoading === false) {
+      // This means we just completed Google OAuth
+      showSuccess("Welcome!", "You have successfully signed up with Google.");
+    }
+  }, [session, isGoogleProcessing, googleLoading]);
+
   async function handleSignUp() {
+    // Debounce: Prevent rapid multiple submissions
+    const now = Date.now();
+    if (now - lastSubmitTime < 2000) {
+      // 2 second debounce
+      console.log("Ignoring rapid button press");
+      return;
+    }
+    setLastSubmitTime(now);
+
+    // Prevent double submission
+    if (loading) {
+      console.log("Sign up already in progress, ignoring duplicate request");
+      return;
+    }
+
+    // Validation
+    if (!email.trim()) {
+      showError("Email Required", "Please enter your email address");
+      return;
+    }
+
     if (!fullName.trim()) {
       showError("Name Required", "Please enter your full name");
+      return;
+    }
+
+    if (!password.trim()) {
+      showError("Password Required", "Please enter a password");
       return;
     }
 
@@ -53,29 +95,59 @@ export default function SignUp() {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showError("Invalid Email", "Please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
+
     try {
+      console.log("Starting sign up process for:", email);
+
       const { error, session } = await signUp(email, password, fullName);
 
+      console.log("Sign up response:", {
+        hasError: !!error,
+        errorMessage: error?.message,
+        hasSession: !!session,
+      });
+
       if (error) {
+        console.error("Sign up error:", error);
         showError(
           "Sign Up Error",
           error.message || "An unexpected error occurred"
         );
       } else {
+        console.log("Sign up successful, navigating to verify-email");
+        showSuccess(
+          "Account Created!",
+          "Please check your email to verify your account."
+        );
+
         // Use InteractionManager to ensure smooth navigation
         InteractionManager.runAfterInteractions(() => {
-          router.push("/verify-email" as any);
-          setTimeout(() => router.setParams({ email }), 100);
+          // Small delay to ensure state is updated
+          setTimeout(() => {
+            router.push("/verify-email" as any);
+            setTimeout(() => router.setParams({ email }), 100);
+          }, 100);
         });
       }
     } catch (error) {
+      console.error("Unexpected sign up error:", error);
       showError(
         "Sign Up Error",
         "An unexpected error occurred. Please try again."
       );
     } finally {
-      setLoading(false);
+      // Add a small delay before re-enabling the button to prevent rapid double-clicks
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     }
   }
 
@@ -101,7 +173,24 @@ export default function SignUp() {
   }
 
   async function handleGoogleSignUp() {
-    setGoogleLoading(false);
+    setGoogleLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+
+      if (error) {
+        showError(
+          "Google Sign Up Error",
+          error.message || "Failed to sign up with Google"
+        );
+      }
+    } catch (error) {
+      showError(
+        "Google Sign Up Error",
+        "An unexpected error occurred with Google sign up"
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
   }
 
   return (
@@ -268,11 +357,24 @@ export default function SignUp() {
                     action="primary"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading}
+                    disabled={
+                      loading ||
+                      githubLoading ||
+                      googleLoading ||
+                      isGoogleProcessing ||
+                      !email.trim() ||
+                      !fullName.trim() ||
+                      !password.trim() ||
+                      !confirmPassword.trim()
+                    }
                     onPress={handleSignUp}
                   >
                     <HStack space="md" className="items-center">
-                      <Icon as={UserPlus} size="md" className="text-white" />
+                      {loading ? (
+                        <Spinner size="small" color="white" />
+                      ) : (
+                        <Icon as={UserPlus} size="md" className="text-white" />
+                      )}
                       <Text size="lg" className="text-white font-semibold">
                         {loading ? "Creating Account..." : "Create Account"}
                       </Text>
@@ -291,12 +393,45 @@ export default function SignUp() {
                     <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
                   </HStack>
 
+                  {/* Google OAuth Button */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    disabled={
+                      loading ||
+                      githubLoading ||
+                      googleLoading ||
+                      isGoogleProcessing
+                    }
+                    onPress={handleGoogleSignUp}
+                  >
+                    <HStack space="md" className="items-center">
+                      <GoogleIcon size={20} />
+                      <Text
+                        size="lg"
+                        className="text-typography-600 dark:text-typography-400 font-semibold"
+                      >
+                        {googleLoading || isGoogleProcessing
+                          ? isGoogleProcessing
+                            ? "Processing..."
+                            : "Connecting..."
+                          : "Continue with Google"}
+                      </Text>
+                    </HStack>
+                  </Button>
+
                   {/* GitHub OAuth Button */}
                   <Button
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={loading || githubLoading || googleLoading}
+                    disabled={
+                      loading ||
+                      githubLoading ||
+                      googleLoading ||
+                      isGoogleProcessing
+                    }
                     onPress={handleGitHubSignUp}
                   >
                     <HStack space="md" className="items-center">
@@ -312,27 +447,6 @@ export default function SignUp() {
                         {githubLoading
                           ? "Connecting..."
                           : "Continue with GitHub"}
-                      </Text>
-                    </HStack>
-                  </Button>
-
-                  {/* Google OAuth Button */}
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
-                    disabled={loading || githubLoading || googleLoading}
-                    onPress={handleGoogleSignUp}
-                  >
-                    <HStack space="md" className="items-center">
-                      <GoogleIcon size={20} />
-                      <Text
-                        size="lg"
-                        className="text-typography-600 dark:text-typography-400 font-semibold"
-                      >
-                        {googleLoading
-                          ? "Connecting..."
-                          : "Continue with Google"}
                       </Text>
                     </HStack>
                   </Button>
@@ -413,6 +527,31 @@ export default function SignUp() {
           </Box>
         </Box>
       </ScrollView>
+
+      {/* Google Processing Overlay */}
+      {isGoogleProcessing && (
+        <Box className="absolute inset-0 bg-black/50 flex-1 justify-center items-center">
+          <Card className="p-8 m-6">
+            <VStack space="lg" className="items-center">
+              <Spinner size="large" />
+              <VStack space="xs" className="items-center">
+                <Heading
+                  size="md"
+                  className="text-typography-900 dark:text-typography-950"
+                >
+                  Completing Sign Up
+                </Heading>
+                <Text
+                  size="sm"
+                  className="text-typography-600 dark:text-typography-750 text-center"
+                >
+                  Securely connecting your Google account...
+                </Text>
+              </VStack>
+            </VStack>
+          </Card>
+        </Box>
+      )}
     </SafeAreaView>
   );
 }
