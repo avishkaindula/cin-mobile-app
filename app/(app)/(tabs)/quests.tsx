@@ -13,7 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/components/i18n/language-context";
 import {
+  Zap,
   Target,
+  Calendar,
   Clock,
   Users,
   Award,
@@ -25,35 +27,43 @@ import {
   TrendingUp,
   CheckCircle,
   Play,
+  MapPin,
+  TreePine,
+  Waves,
+  Recycle,
+  Lightbulb,
+  Heart,
+  Plus,
 } from "lucide-react-native";
 
-const MissionsPage = () => {
+const QuestsPage = () => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("all"); // all, missions, events, my
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-  const [sortBy, setSortBy] = useState("newest");
 
   // User stats
   const userStats = {
     completed: 12,
     active: 3,
     totalPoints: 850,
+    totalEnergy: 425,
     rank: 45,
   };
 
-  // My ongoing missions
-  const myMissions = [
+  // Missions data
+  const missions = [
     {
       id: 1,
+      type: "mission",
       title: "Urban Heat Island Mapping",
       description: "Help map temperature variations in your city",
-      image:
-        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=200&fit=crop",
+      image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=200&fit=crop",
       progress: 65,
       deadline: "5 days left",
       points: 150,
+      energy: 75,
       category: "dataCollection",
       difficulty: "intermediate",
       participants: 234,
@@ -61,32 +71,29 @@ const MissionsPage = () => {
     },
     {
       id: 2,
+      type: "mission",
       title: "Community Climate Workshop",
       description: "Organize climate awareness in your neighborhood",
-      image:
-        "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=300&h=200&fit=crop",
+      image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=300&h=200&fit=crop",
       progress: 30,
       deadline: "12 days left",
       points: 200,
+      energy: 100,
       category: "awareness",
       difficulty: "beginner",
       participants: 156,
       status: "ongoing",
     },
-  ];
-
-  // All available missions
-  const allMissions = [
-    ...myMissions,
     {
       id: 3,
+      type: "mission",
       title: "Biodiversity Survey",
       description: "Document local flora and fauna changes",
-      image:
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop",
+      image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop",
       progress: 0,
       deadline: "30 days left",
       points: 300,
+      energy: 150,
       category: "research",
       difficulty: "advanced",
       participants: 89,
@@ -94,84 +101,96 @@ const MissionsPage = () => {
     },
     {
       id: 4,
+      type: "mission",
       title: "Ocean Cleanup Documentation",
       description: "Report marine pollution and cleanup efforts",
-      image:
-        "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=300&h=200&fit=crop",
-      progress: 0,
-      deadline: "45 days left",
+      image: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=300&h=200&fit=crop",
+      progress: 100,
+      deadline: "Completed",
       points: 250,
+      energy: 125,
       category: "action",
       difficulty: "intermediate",
       participants: 167,
-      status: "available",
-    },
-    {
-      id: 5,
-      title: "Air Quality Monitoring",
-      description: "Track air pollution levels in urban areas",
-      image:
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop",
-      progress: 0,
-      deadline: "20 days left",
-      points: 180,
-      category: "dataCollection",
-      difficulty: "beginner",
-      participants: 245,
-      status: "available",
-    },
-    {
-      id: 6,
-      title: "Sustainable Agriculture Training",
-      description: "Learn and teach climate-smart farming",
-      image:
-        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=200&fit=crop",
-      progress: 100,
-      deadline: "Completed",
-      points: 220,
-      category: "awareness",
-      difficulty: "intermediate",
-      participants: 78,
       status: "completed",
     },
   ];
 
-  // Featured campaigns
-  const featuredCampaigns = [
+  // Events data
+  const events = [
     {
-      id: 1,
-      title: "Save the Amazon Initiative",
-      description: "Global campaign to protect rainforest ecosystems",
-      image:
-        "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=400&h=250&fit=crop",
-      points: 500,
-      participants: 2340,
-      difficulty: "expert",
-      deadline: "60 days left",
-      category: "action",
+      id: 5,
+      type: "event",
+      title: "🌊 Beach Cleanup Adventure",
+      description: "Join us for a fun day cleaning up our beautiful coastline! Help protect marine life while making new friends.",
+      image: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=300&h=200&fit=crop",
+      date: "July 12, 2025",
+      time: "9:00 AM - 12:00 PM",
+      location: "Copacabana Beach, Rio de Janeiro",
+      distance: "2.3 km away",
+      participants: 45,
+      maxParticipants: 60,
+      category: "cleanup",
+      difficulty: "easy",
+      points: 150,
+      energy: 75,
+      organizer: "Ocean Heroes",
+      isJoined: false,
+      status: "available",
     },
     {
-      id: 2,
-      title: "Climate Education for All",
-      description: "Bring climate science to underserved communities",
-      image:
-        "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&h=250&fit=crop",
-      points: 350,
-      participants: 1890,
-      difficulty: "intermediate",
-      deadline: "90 days left",
-      category: "awareness",
+      id: 6,
+      type: "event",
+      title: "🌳 Community Tree Planting",
+      description: "Help us plant 100 native trees in our local park! Every tree makes a difference for our climate.",
+      image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=200&fit=crop",
+      date: "July 15, 2025",
+      time: "8:00 AM - 11:00 AM",
+      location: "Central Park, São Paulo",
+      distance: "1.5 km away",
+      participants: 32,
+      maxParticipants: 50,
+      category: "planting",
+      difficulty: "easy",
+      points: 200,
+      energy: 100,
+      organizer: "Green Future",
+      isJoined: true,
+      status: "ongoing",
+    },
+    {
+      id: 7,
+      type: "event",
+      title: "♻️ Recycling Workshop",
+      description: "Learn creative ways to upcycle waste into useful items! Fun activities for the whole family.",
+      image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=300&h=200&fit=crop",
+      date: "July 18, 2025",
+      time: "2:00 PM - 5:00 PM",
+      location: "Community Center",
+      distance: "0.8 km away",
+      participants: 18,
+      maxParticipants: 25,
+      category: "education",
+      difficulty: "easy",
+      points: 120,
+      energy: 60,
+      organizer: "EcoMakers",
+      isJoined: false,
+      status: "available",
     },
   ];
 
+  // Combined quests data
+  const allQuests = [...missions, ...events];
+
   const getDifficultyColor = (difficulty: string) => {
     const colors: Record<string, string> = {
-      beginner:
-        "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-      intermediate:
-        "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
-      advanced:
-        "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300",
+      beginner: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
+      easy: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
+      intermediate: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
+      medium: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
+      advanced: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300",
+      hard: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300",
       expert: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
     };
     return colors[difficulty] || colors.beginner;
@@ -183,6 +202,9 @@ const MissionsPage = () => {
       research: FileText,
       awareness: Users,
       action: Target,
+      cleanup: Waves,
+      planting: TreePine,
+      education: Lightbulb,
     };
     return icons[category] || Target;
   };
@@ -193,50 +215,72 @@ const MissionsPage = () => {
       research: "text-purple-600 dark:text-purple-400",
       awareness: "text-green-600 dark:text-green-400",
       action: "text-orange-600 dark:text-orange-400",
+      cleanup: "text-blue-600 dark:text-blue-400",
+      planting: "text-green-600 dark:text-green-400",
+      education: "text-purple-600 dark:text-purple-400",
     };
     return colors[category] || "text-gray-600 dark:text-gray-400";
   };
 
-  const getStatusBadge = (status: string, progress?: number) => {
-    switch (status) {
-      case "completed":
+  const getStatusBadge = (quest: any) => {
+    if (quest.type === "mission") {
+      switch (quest.status) {
+        case "completed":
+          return (
+            <Badge variant="solid" className="bg-green-500">
+              <Text size="xs" className="text-white">Completed</Text>
+            </Badge>
+          );
+        case "ongoing":
+          return (
+            <Badge variant="solid" className="bg-blue-500">
+              <Text size="xs" className="text-white">{quest.progress}% Progress</Text>
+            </Badge>
+          );
+        default:
+          return (
+            <Badge variant="outline" className="border-primary-500">
+              <Text size="xs" className="text-primary-600 dark:text-primary-400">Available</Text>
+            </Badge>
+          );
+      }
+    } else {
+      // Event
+      if (quest.isJoined) {
         return (
           <Badge variant="solid" className="bg-green-500">
-            <Text size="xs" className="text-white">
-              {t("completed")}
-            </Text>
+            <Text size="xs" className="text-white">✅ Joined</Text>
           </Badge>
         );
-      case "ongoing":
+      } else {
         return (
-          <Badge variant="solid" className="bg-blue-500">
-            <Text size="xs" className="text-white">
-              {progress}% {t("progress")}
-            </Text>
+          <Badge variant="outline" className="border-blue-500">
+            <Text size="xs" className="text-blue-600 dark:text-blue-400">Available</Text>
           </Badge>
         );
-      default:
-        return (
-          <Badge variant="outline" className="border-primary-500">
-            <Text size="xs" className="text-primary-600 dark:text-primary-400">
-              Available
-            </Text>
-          </Badge>
-        );
+      }
     }
   };
 
-  const filteredMissions = allMissions.filter((mission) => {
-    const matchesTab =
+  const filteredQuests = allQuests.filter((quest) => {
+    const isMyQuest = quest.status === "ongoing" || quest.status === "completed" || 
+      (quest.type === "event" && (quest as any).isJoined);
+    
+    const matchesTab = 
       activeTab === "all" ||
-      (activeTab === "my" && ["ongoing", "completed"].includes(mission.status));
+      (activeTab === "missions" && quest.type === "mission") ||
+      (activeTab === "events" && quest.type === "event") ||
+      (activeTab === "my" && isMyQuest);
+    
     const matchesSearch =
-      mission.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mission.description.toLowerCase().includes(searchQuery.toLowerCase());
+      quest.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      quest.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
     const matchesCategory =
-      selectedCategory === "all" || mission.category === selectedCategory;
+      selectedCategory === "all" || quest.category === selectedCategory;
+    
     const matchesDifficulty =
-      selectedDifficulty === "all" || mission.difficulty === selectedDifficulty;
+      selectedDifficulty === "all" || quest.difficulty === selectedDifficulty;
 
     return matchesTab && matchesSearch && matchesCategory && matchesDifficulty;
   });
@@ -251,19 +295,19 @@ const MissionsPage = () => {
           {/* Header */}
           <VStack space="lg" className="mb-8">
             <HStack space="lg" className="items-center">
-              <Icon as={Target} size="xl" className="text-primary-500" />
+              <Icon as={Zap} size="xl" className="text-primary-500" />
               <VStack space="xs" className="flex-1">
                 <Heading
                   size="xl"
                   className="text-typography-900 dark:text-typography-950"
                 >
-                  {t("missions")}
+                  ⚡ Quests
                 </Heading>
                 <Text
                   size="sm"
                   className="text-typography-600 dark:text-typography-750"
                 >
-                  Contribute to climate research and action
+                  Complete missions and join events to earn rewards
                 </Text>
               </VStack>
             </HStack>
@@ -282,7 +326,7 @@ const MissionsPage = () => {
                     size="sm"
                     className="text-typography-600 dark:text-typography-750"
                   >
-                    {t("completed")}
+                    Completed
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center">
@@ -296,7 +340,7 @@ const MissionsPage = () => {
                     size="sm"
                     className="text-typography-600 dark:text-typography-750"
                   >
-                    {t("ongoing")}
+                    Active
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center">
@@ -310,7 +354,7 @@ const MissionsPage = () => {
                     size="sm"
                     className="text-typography-600 dark:text-typography-750"
                   >
-                    {t("points")}
+                    Points
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center">
@@ -318,143 +362,76 @@ const MissionsPage = () => {
                     size="2xl"
                     className="font-bold text-orange-600 dark:text-orange-400"
                   >
-                    #{userStats.rank}
+                    {userStats.totalEnergy}
                   </Text>
                   <Text
                     size="sm"
                     className="text-typography-600 dark:text-typography-750"
                   >
-                    Global Rank
+                    Energy ⚡
                   </Text>
                 </VStack>
               </HStack>
             </Card>
           </VStack>
 
-          {/* Featured Campaigns */}
-          <VStack space="lg" className="mb-8">
-            <Heading
-              size="lg"
-              className="text-typography-900 dark:text-typography-950"
-            >
-              Featured {t("campaigns")}
-            </Heading>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <HStack space="lg">
-                {featuredCampaigns.map((campaign) => (
-                  <Card
-                    key={campaign.id}
-                    className="w-80 h-56 overflow-hidden relative border border-gray-200 dark:border-gray-800"
-                  >
-                    <Box className="absolute inset-0">
-                      <Image
-                        source={{ uri: campaign.image }}
-                        className="w-full h-full"
-                        style={{ resizeMode: "cover" }}
-                      />
-                      <Box className="absolute inset-0 bg-black/60" />
-                    </Box>
-                    <Box className="absolute top-4 right-4">
-                      <Badge variant="solid" className="bg-white/90">
-                        <Text size="xs" className="text-gray-900">
-                          {campaign.points} pts
-                        </Text>
-                      </Badge>
-                    </Box>
-                    <Box className="absolute bottom-0 left-0 right-0 p-4">
-                      <VStack space="md">
-                        <HStack space="xs" className="items-center">
-                          <Badge
-                            variant="solid"
-                            className={getDifficultyColor(campaign.difficulty)}
-                          >
-                            <Text size="xs">{t(campaign.difficulty)}</Text>
-                          </Badge>
-                          <Badge variant="outline" className="border-white/40">
-                            <Text size="xs" className="text-white">
-                              {t(campaign.category)}
-                            </Text>
-                          </Badge>
-                        </HStack>
-                        <VStack space="xs">
-                          <Text
-                            className="font-bold text-white text-lg"
-                            numberOfLines={2}
-                          >
-                            {campaign.title}
-                          </Text>
-                          <Text
-                            size="sm"
-                            className="text-white/90"
-                            numberOfLines={2}
-                          >
-                            {campaign.description}
-                          </Text>
-                          <HStack space="md" className="items-center">
-                            <HStack space="xs" className="items-center">
-                              <Icon
-                                as={Users}
-                                size="sm"
-                                className="text-white/80"
-                              />
-                              <Text size="xs" className="text-white/80">
-                                {campaign.participants}
-                              </Text>
-                            </HStack>
-                            <HStack space="xs" className="items-center">
-                              <Icon
-                                as={Clock}
-                                size="sm"
-                                className="text-white/80"
-                              />
-                              <Text size="xs" className="text-white/80">
-                                {campaign.deadline}
-                              </Text>
-                            </HStack>
-                          </HStack>
-                        </VStack>
-                        <Button
-                          size="sm"
-                          className="bg-white/20 border-white/40"
-                        >
-                          <Text className="text-white">
-                            {t("joinCampaign")}
-                          </Text>
-                        </Button>
-                      </VStack>
-                    </Box>
-                  </Card>
-                ))}
-              </HStack>
-            </ScrollView>
-          </VStack>
-
           {/* Tabs and Search */}
           <VStack space="lg" className="mb-6">
             {/* Tab Navigation */}
-            <HStack space="md">
-              <Button
-                variant={activeTab === "all" ? "solid" : "outline"}
-                size="sm"
-                onPress={() => setActiveTab("all")}
-                className="flex-1"
-              >
-                <Text className={activeTab === "all" ? "text-white" : ""}>
-                  {t("allMissions")}
-                </Text>
-              </Button>
-              <Button
-                variant={activeTab === "my" ? "solid" : "outline"}
-                size="sm"
-                onPress={() => setActiveTab("my")}
-                className="flex-1"
-              >
-                <Text className={activeTab === "my" ? "text-white" : ""}>
-                  {t("myMissions")}
-                </Text>
-              </Button>
-            </HStack>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <HStack space="md">
+                <Button
+                  variant={activeTab === "all" ? "solid" : "outline"}
+                  size="sm"
+                  onPress={() => setActiveTab("all")}
+                >
+                  <Text className={activeTab === "all" ? "text-white" : ""}>
+                    All Quests
+                  </Text>
+                </Button>
+                <Button
+                  variant={activeTab === "missions" ? "solid" : "outline"}
+                  size="sm"
+                  onPress={() => setActiveTab("missions")}
+                >
+                  <HStack space="xs" className="items-center">
+                    <Icon 
+                      as={Target} 
+                      size="xs" 
+                      className={activeTab === "missions" ? "text-white" : "text-gray-500"}
+                    />
+                    <Text className={activeTab === "missions" ? "text-white" : ""}>
+                      Missions
+                    </Text>
+                  </HStack>
+                </Button>
+                <Button
+                  variant={activeTab === "events" ? "solid" : "outline"}
+                  size="sm"
+                  onPress={() => setActiveTab("events")}
+                >
+                  <HStack space="xs" className="items-center">
+                    <Icon 
+                      as={Calendar} 
+                      size="xs" 
+                      className={activeTab === "events" ? "text-white" : "text-gray-500"}
+                    />
+                    <Text className={activeTab === "events" ? "text-white" : ""}>
+                      Events
+                    </Text>
+                  </HStack>
+                </Button>
+                <Button
+                  variant={activeTab === "my" ? "solid" : "outline"}
+                  size="sm"
+                  onPress={() => setActiveTab("my")}
+                >
+                  <Text className={activeTab === "my" ? "text-white" : ""}>
+                    My Quests
+                  </Text>
+                </Button>
+              </HStack>
+            </ScrollView>
 
             {/* Search and Filters */}
             <VStack space="md">
@@ -467,7 +444,7 @@ const MissionsPage = () => {
                   <Icon as={Search} size="sm" className="text-gray-500" />
                   <Box className="flex-1">
                     <TextInput
-                      placeholder={t("searchMissions")}
+                      placeholder="Search quests..."
                       value={searchQuery}
                       onChangeText={setSearchQuery}
                       className="text-typography-900 dark:text-typography-950 flex-1"
@@ -487,7 +464,7 @@ const MissionsPage = () => {
                   >
                     <HStack space="xs" className="items-center">
                       <Icon as={Filter} size="xs" className="text-gray-500" />
-                      <Text size="sm">{t("category")}</Text>
+                      <Text size="sm">Category</Text>
                     </HStack>
                   </Button>
                   <Button
@@ -511,7 +488,7 @@ const MissionsPage = () => {
                   >
                     <HStack space="xs" className="items-center">
                       <Icon as={SortAsc} size="xs" className="text-gray-500" />
-                      <Text size="sm">{t("sortBy")}</Text>
+                      <Text size="sm">Sort By</Text>
                     </HStack>
                   </Button>
                 </HStack>
@@ -519,38 +496,50 @@ const MissionsPage = () => {
             </VStack>
           </VStack>
 
-          {/* Missions List */}
+          {/* Quests List */}
           <VStack space="lg">
-            {filteredMissions.map((mission) => (
+            {filteredQuests.map((quest) => (
               <Card
-                key={mission.id}
+                key={quest.id}
                 className="overflow-hidden border border-gray-200 dark:border-gray-800"
               >
                 <HStack space="md">
-                  {/* Mission Image with Additional Info */}
+                  {/* Quest Image with Type Indicator */}
                   <VStack space="xs" className="w-24">
                     <Box className="relative">
                       <Image
-                        source={{ uri: mission.image }}
+                        source={{ uri: quest.image }}
                         className="w-24 h-16"
                         style={{ resizeMode: "cover" }}
                       />
                       <Box className="absolute top-1 right-1">
                         <Badge variant="solid" className="bg-primary-500">
                           <Text size="xs" className="text-white">
-                            {mission.points}
+                            {quest.points}
                           </Text>
+                        </Badge>
+                      </Box>
+                      <Box className="absolute top-1 left-1">
+                        <Badge 
+                          variant="solid" 
+                          className={quest.type === "event" ? "bg-blue-500" : "bg-green-500"}
+                        >
+                          <Icon 
+                            as={quest.type === "event" ? Calendar : Target} 
+                            size="xs" 
+                            className="text-white"
+                          />
                         </Badge>
                       </Box>
                     </Box>
 
-                    {/* Additional mission info below image */}
+                    {/* Additional quest info */}
                     <VStack space="xs" className="w-full">
                       <Box className="bg-gray-50 dark:bg-gray-800 p-2 rounded">
                         <VStack space="xs" className="items-center">
                           <HStack space="xs" className="items-center">
                             <Icon
-                              as={Award}
+                              as={Zap}
                               size="xs"
                               className="text-orange-500"
                             />
@@ -558,25 +547,21 @@ const MissionsPage = () => {
                               size="xs"
                               className="text-typography-700 dark:text-typography-300 font-medium"
                             >
-                              Rank #{Math.floor(Math.random() * 50) + 1}
+                              +{quest.energy} ⚡
                             </Text>
                           </HStack>
                           <Text
                             size="xs"
                             className="text-typography-600 dark:text-typography-400 text-center"
                           >
-                            {mission.status === "completed"
-                              ? "Completed!"
-                              : mission.status === "ongoing"
-                              ? "In Progress"
-                              : "Join Now"}
+                            {quest.type === "mission" ? "Mission" : "Event"}
                           </Text>
                         </VStack>
                       </Box>
                     </VStack>
                   </VStack>
 
-                  {/* Mission Content */}
+                  {/* Quest Content */}
                   <VStack space="md" className="flex-1 p-4">
                     <VStack space="xs">
                       <HStack className="justify-between items-start">
@@ -584,60 +569,79 @@ const MissionsPage = () => {
                           className="font-semibold text-typography-900 dark:text-typography-950 flex-1"
                           numberOfLines={2}
                         >
-                          {mission.title}
+                          {quest.title}
                         </Text>
-                        {getStatusBadge(mission.status, mission.progress)}
+                        {getStatusBadge(quest)}
                       </HStack>
                       <Text
                         size="sm"
                         className="text-typography-600 dark:text-typography-750"
                         numberOfLines={2}
                       >
-                        {mission.description}
+                        {quest.description}
                       </Text>
                     </VStack>
 
                     <HStack space="xs" className="items-center">
                       <Badge
                         variant="outline"
-                        className={getDifficultyColor(mission.difficulty)}
+                        className={getDifficultyColor(quest.difficulty)}
                       >
-                        <Text size="xs">{t(mission.difficulty)}</Text>
+                        <Text size="xs">{quest.difficulty}</Text>
                       </Badge>
                       <Badge variant="outline">
                         <HStack space="xs" className="items-center">
                           <Icon
-                            as={getCategoryIcon(mission.category)}
+                            as={getCategoryIcon(quest.category)}
                             size="xs"
-                            className={getCategoryColor(mission.category)}
+                            className={getCategoryColor(quest.category)}
                           />
                           <Text
                             size="xs"
                             className="text-typography-600 dark:text-typography-750"
                           >
-                            {t(mission.category)}
+                            {quest.category}
                           </Text>
                         </HStack>
                       </Badge>
                     </HStack>
 
-                    {mission.status === "ongoing" && (
+                    {/* Mission Progress */}
+                    {quest.type === "mission" && quest.status === "ongoing" && (
                       <VStack space="xs">
                         <HStack className="justify-between">
                           <Text
                             size="sm"
                             className="text-typography-600 dark:text-typography-750"
                           >
-                            {t("progress")}
+                            Progress
                           </Text>
                           <Text
                             size="sm"
                             className="text-typography-600 dark:text-typography-750"
                           >
-                            {mission.progress}%
+                            {(quest as any).progress}%
                           </Text>
                         </HStack>
-                        <Progress value={mission.progress} className="h-2" />
+                        <Progress value={(quest as any).progress} className="h-2" />
+                      </VStack>
+                    )}
+
+                    {/* Event Details */}
+                    {quest.type === "event" && (
+                      <VStack space="xs">
+                        <HStack space="xs" className="items-center">
+                          <Icon as={Calendar} size="sm" className="text-purple-500" />
+                          <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                            {(quest as any).date} • {(quest as any).time}
+                          </Text>
+                        </HStack>
+                        <HStack space="xs" className="items-center">
+                          <Icon as={MapPin} size="sm" className="text-red-500" />
+                          <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                            {(quest as any).location} ({(quest as any).distance})
+                          </Text>
+                        </HStack>
                       </VStack>
                     )}
 
@@ -654,7 +658,10 @@ const MissionsPage = () => {
                               size="sm"
                               className="text-typography-600 dark:text-typography-750"
                             >
-                              {mission.participants}
+                              {quest.type === "event" 
+                                ? `${quest.participants}/${(quest as any).maxParticipants}`
+                                : quest.participants
+                              }
                             </Text>
                           </HStack>
                           <HStack space="xs" className="items-center">
@@ -667,47 +674,52 @@ const MissionsPage = () => {
                               size="sm"
                               className="text-typography-600 dark:text-typography-750"
                             >
-                              {mission.deadline}
+                              {quest.type === "mission" ? (quest as any).deadline : (quest as any).date}
                             </Text>
                           </HStack>
                         </HStack>
                       </HStack>
 
-                      {/* Action Button below the info */}
+                      {/* Action Button */}
                       <Button
                         size="sm"
                         variant={
-                          mission.status === "completed" ? "outline" : "solid"
+                          quest.status === "completed" || (quest.type === "event" && (quest as any).isJoined) ? "outline" : "solid"
                         }
-                        disabled={mission.status === "completed"}
+                        disabled={quest.status === "completed"}
                         className="self-end"
                       >
                         <HStack space="xs" className="items-center">
-                          {mission.status === "completed" ? (
+                          {quest.status === "completed" ? (
                             <Icon
                               as={CheckCircle}
                               size="sm"
                               className="text-green-500"
                             />
-                          ) : mission.status === "ongoing" ? (
+                          ) : quest.status === "ongoing" || (quest.type === "event" && (quest as any).isJoined) ? (
                             <Icon as={Play} size="sm" className="text-white" />
                           ) : (
                             <Icon
-                              as={Target}
+                              as={quest.type === "event" ? Calendar : Target}
                               size="sm"
                               className="text-white"
                             />
                           )}
                           <Text
                             className={
-                              mission.status === "completed" ? "" : "text-white"
+                              quest.status === "completed" ? "" : "text-white"
                             }
                           >
-                            {mission.status === "completed"
+                            {quest.status === "completed"
                               ? "Completed"
-                              : mission.status === "ongoing"
+                              : quest.status === "ongoing"
                               ? "Continue"
-                              : "Start"}
+                              : (quest.type === "event" && (quest as any).isJoined)
+                              ? "Joined"
+                              : quest.type === "event"
+                              ? "Join Event"
+                              : "Start Mission"
+                            }
                           </Text>
                         </HStack>
                       </Button>
@@ -723,4 +735,4 @@ const MissionsPage = () => {
   );
 };
 
-export default MissionsPage;
+export default QuestsPage;
