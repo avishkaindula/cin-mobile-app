@@ -26,14 +26,25 @@ import {
   Zap,
   Building,
 } from "lucide-react-native";
-import { getMissionDetails, getMissionInstructions, getMissionGuidanceSteps, MissionInstruction, GuidanceStep } from "@/services/missions/details";
-import { toggleMissionBookmark, startMission, getMissionThumbnailUrl, MissionWithStats } from "@/services/missions";
+import {
+  getMissionDetails,
+  getMissionInstructions,
+  getMissionGuidanceSteps,
+  MissionInstruction,
+  GuidanceStep,
+} from "@/services/missions/details";
+import {
+  toggleMissionBookmark,
+  startMission,
+  getMissionThumbnailUrl,
+  MissionWithStats,
+} from "@/services/missions";
 
 const MissionDetailsPage = () => {
   const { t } = useLanguage();
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  
+
   const [mission, setMission] = useState<MissionWithStats | null>(null);
   const [instructions, setInstructions] = useState<MissionInstruction[]>([]);
   const [guidanceSteps, setGuidanceSteps] = useState<GuidanceStep[]>([]);
@@ -53,7 +64,8 @@ const MissionDetailsPage = () => {
       setLoading(true);
       setError(null);
 
-      const { data: missionData, error: missionError } = await getMissionDetails(missionId);
+      const { data: missionData, error: missionError } =
+        await getMissionDetails(missionId);
 
       if (missionError) {
         setError(missionError);
@@ -67,7 +79,9 @@ const MissionDetailsPage = () => {
 
         // Load thumbnail if available
         if (missionData.thumbnail_path) {
-          const thumbnailUrl = await getMissionThumbnailUrl(missionData.thumbnail_path);
+          const thumbnailUrl = await getMissionThumbnailUrl(
+            missionData.thumbnail_path
+          );
           setThumbnailUrl(thumbnailUrl);
         }
       }
@@ -84,8 +98,10 @@ const MissionDetailsPage = () => {
 
     setActionLoading("bookmark");
     try {
-      const { success, error, is_bookmarked } = await toggleMissionBookmark(mission.id);
-      
+      const { success, error, is_bookmarked } = await toggleMissionBookmark(
+        mission.id
+      );
+
       if (success) {
         setMission({ ...mission, is_bookmarked });
       } else {
@@ -104,7 +120,7 @@ const MissionDetailsPage = () => {
     setActionLoading("start");
     try {
       const { success, error } = await startMission(mission.id);
-      
+
       if (success) {
         // Refresh mission data to get updated submission status
         await loadMissionDetails(mission.id);
@@ -124,14 +140,22 @@ const MissionDetailsPage = () => {
   };
 
   const getStatusInfo = () => {
-    if (!mission) return { text: "Unknown", color: "text-gray-500", icon: Target };
+    if (!mission)
+      return { text: "Unknown", color: "text-gray-500", icon: Target };
 
     if (mission.submission_status === "reviewed") {
       return { text: "Completed", color: "text-green-600", icon: CheckCircle };
-    } else if (mission.submission_status === "in_progress" || mission.submission_status === "started") {
-      return { text: `${mission.submission_progress}% Complete`, color: "text-blue-600", icon: Play };
+    } else if (
+      mission.submission_status === "in_progress" ||
+      mission.submission_status === "started"
+    ) {
+      return {
+        text: `${mission.submission_progress}% Complete`,
+        color: "text-blue-600",
+        icon: Play,
+      };
     } else if (mission.is_bookmarked) {
-      return { text: "Bookmarked", color: "text-purple-600", icon: BookmarkCheck };
+      return { text: "Saved", color: "text-purple-600", icon: BookmarkCheck };
     } else {
       return { text: "Available", color: "text-green-600", icon: Target };
     }
@@ -139,9 +163,14 @@ const MissionDetailsPage = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} className="bg-white dark:bg-background-dark">
+      <SafeAreaView
+        style={{ flex: 1 }}
+        className="bg-white dark:bg-background-dark"
+      >
         <Box className="flex-1 justify-center items-center p-6">
-          <Text className="text-typography-600 dark:text-typography-400">Loading mission details...</Text>
+          <Text className="text-typography-600 dark:text-typography-400">
+            Loading mission details...
+          </Text>
         </Box>
       </SafeAreaView>
     );
@@ -149,7 +178,10 @@ const MissionDetailsPage = () => {
 
   if (error || !mission) {
     return (
-      <SafeAreaView style={{ flex: 1 }} className="bg-white dark:bg-background-dark">
+      <SafeAreaView
+        style={{ flex: 1 }}
+        className="bg-white dark:bg-background-dark"
+      >
         <Box className="flex-1 justify-center items-center p-6">
           <VStack space="md" className="items-center">
             <Text className="text-red-600 dark:text-red-400">
@@ -167,10 +199,16 @@ const MissionDetailsPage = () => {
   const statusInfo = getStatusInfo();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-white dark:bg-background-dark">
+    <SafeAreaView
+      style={{ flex: 1 }}
+      className="bg-white dark:bg-background-dark"
+    >
       <ScrollView className="flex-1">
         {/* Header */}
-        <HStack space="md" className="items-center p-4 border-b border-gray-200 dark:border-gray-800">
+        <HStack
+          space="md"
+          className="items-center p-4 border-b border-gray-200 dark:border-gray-800"
+        >
           <Button
             variant="outline"
             size="sm"
@@ -208,7 +246,11 @@ const MissionDetailsPage = () => {
                   {mission.title}
                 </Heading>
                 <HStack space="xs" className="items-center">
-                  <Icon as={statusInfo.icon} size="sm" className={statusInfo.color} />
+                  <Icon
+                    as={statusInfo.icon}
+                    size="sm"
+                    className={statusInfo.color}
+                  />
                   <Text size="sm" className={statusInfo.color}>
                     {statusInfo.text}
                   </Text>
@@ -227,13 +269,19 @@ const MissionDetailsPage = () => {
                 <HStack space="md" className="items-center">
                   <HStack space="xs" className="items-center">
                     <Icon as={Building} size="sm" className="text-gray-500" />
-                    <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
                       {mission.organization_name}
                     </Text>
                   </HStack>
                   <HStack space="xs" className="items-center">
                     <Icon as={Users} size="sm" className="text-blue-500" />
-                    <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
                       {mission.participants_count} participants
                     </Text>
                   </HStack>
@@ -242,13 +290,19 @@ const MissionDetailsPage = () => {
                 <HStack space="md" className="items-center">
                   <HStack space="xs" className="items-center">
                     <Icon as={Award} size="sm" className="text-green-500" />
-                    <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
                       {mission.points_awarded} points
                     </Text>
                   </HStack>
                   <HStack space="xs" className="items-center">
                     <Icon as={Zap} size="sm" className="text-orange-500" />
-                    <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                    <Text
+                      size="sm"
+                      className="text-typography-600 dark:text-typography-750"
+                    >
                       {mission.energy_awarded} energy
                     </Text>
                   </HStack>
@@ -269,11 +323,13 @@ const MissionDetailsPage = () => {
                   <Icon
                     as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
                     size="sm"
-                    className={mission.is_bookmarked ? "text-primary-600" : "text-gray-500"}
+                    className={
+                      mission.is_bookmarked
+                        ? "text-primary-600"
+                        : "text-gray-500"
+                    }
                   />
-                  <Text>
-                    {mission.is_bookmarked ? "Bookmarked" : "Bookmark"}
-                  </Text>
+                  <Text>{mission.is_bookmarked ? "Saved" : "Save"}</Text>
                 </HStack>
               </Button>
 
@@ -287,7 +343,9 @@ const MissionDetailsPage = () => {
                   <HStack space="xs" className="items-center">
                     <Icon as={Play} size="sm" className="text-white" />
                     <Text className="text-white">
-                      {mission.submission_status === "reviewed" ? "Completed" : "Continue"}
+                      {mission.submission_status === "reviewed"
+                        ? "Completed"
+                        : "Continue"}
                     </Text>
                   </HStack>
                 </Button>
@@ -326,7 +384,10 @@ const MissionDetailsPage = () => {
                   >
                     <HStack space="md" className="items-start">
                       <Box className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full items-center justify-center">
-                        <Text size="sm" className="font-bold text-primary-600 dark:text-primary-400">
+                        <Text
+                          size="sm"
+                          className="font-bold text-primary-600 dark:text-primary-400"
+                        >
                           {index + 1}
                         </Text>
                       </Box>
@@ -367,7 +428,10 @@ const MissionDetailsPage = () => {
                     <VStack space="md">
                       <HStack space="md" className="items-start">
                         <Box className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full items-center justify-center">
-                          <Text size="sm" className="font-bold text-blue-600 dark:text-blue-400">
+                          <Text
+                            size="sm"
+                            className="font-bold text-blue-600 dark:text-blue-400"
+                          >
                             {index + 1}
                           </Text>
                         </Box>
@@ -386,7 +450,10 @@ const MissionDetailsPage = () => {
 
                       {step.requiredEvidence.length > 0 && (
                         <VStack space="xs">
-                          <Text size="sm" className="font-medium text-blue-900 dark:text-blue-100">
+                          <Text
+                            size="sm"
+                            className="font-medium text-blue-900 dark:text-blue-100"
+                          >
                             Required Evidence:
                           </Text>
                           <HStack space="xs" className="flex-wrap">
@@ -396,7 +463,10 @@ const MissionDetailsPage = () => {
                                 variant="outline"
                                 className="border-blue-300 dark:border-blue-700"
                               >
-                                <Text size="xs" className="text-blue-700 dark:text-blue-300">
+                                <Text
+                                  size="xs"
+                                  className="text-blue-700 dark:text-blue-300"
+                                >
                                   {evidence}
                                 </Text>
                               </Badge>
@@ -417,8 +487,12 @@ const MissionDetailsPage = () => {
               <Text className="font-semibold text-typography-900 dark:text-typography-950">
                 💡 Ready to make an impact?
               </Text>
-              <Text size="sm" className="text-typography-600 dark:text-typography-750">
-                Follow the instructions above and submit your evidence to complete this mission and earn rewards!
+              <Text
+                size="sm"
+                className="text-typography-600 dark:text-typography-750"
+              >
+                Follow the instructions above and submit your evidence to
+                complete this mission and earn rewards!
               </Text>
             </VStack>
           </Card>
