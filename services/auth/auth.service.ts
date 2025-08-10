@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { supabase } from "@/lib/supabase";
+import { supabase, handleAuthError } from "@/lib/supabase";
 import { 
   SignInRequest, 
   SignInResponse, 
@@ -125,12 +125,34 @@ export class AuthService {
     try {
       const { data, error } = await supabase.auth.getSession();
       
+      if (error) {
+        // Handle refresh token errors
+        const handled = await handleAuthError(error);
+        if (handled) {
+          return {
+            error: null,
+            session: null,
+            user: null,
+          };
+        }
+      }
+      
       return {
         error,
         session: data.session,
         user: data.session?.user || null,
       };
     } catch (error) {
+      // Handle refresh token errors
+      const handled = await handleAuthError(error);
+      if (handled) {
+        return {
+          error: null,
+          session: null,
+          user: null,
+        };
+      }
+      
       return {
         error: error as Error,
       };

@@ -17,6 +17,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
 import { BASE_URL } from "@/lib/constants";
+import { handleAuthError } from "@/lib/supabase";
 
 // Required for web only
 WebBrowser.maybeCompleteAuthSession();
@@ -168,6 +169,13 @@ export function SessionProvider({ children }: PropsWithChildren) {
         setIsLoading(false);
       } catch (error) {
         console.error("Auth initialization error:", error);
+        
+        // Handle corrupted refresh token
+        const handled = await handleAuthError(error);
+        if (handled) {
+          setSession(null);
+        }
+        
         setIsLoading(false);
       }
     };

@@ -43,3 +43,25 @@ export const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
     flowType: "pkce", // Use PKCE for both platforms for consistency
   },
 });
+
+// Helper function to clear corrupted auth data
+export const clearAuthData = async () => {
+  try {
+    await customStorage.removeItem("supabase.auth.token");
+    await supabase.auth.signOut();
+    console.log("Cleared corrupted auth data");
+  } catch (error) {
+    console.error("Error clearing auth data:", error);
+  }
+};
+
+// Helper function to handle auth errors
+export const handleAuthError = async (error: any) => {
+  if (error?.message?.includes("Invalid Refresh Token") || 
+      error?.message?.includes("Refresh Token Not Found")) {
+    console.log("Detected corrupted refresh token, clearing auth data...");
+    await clearAuthData();
+    return true; // Indicates we handled the error
+  }
+  return false; // Let the calling code handle other errors
+};
