@@ -52,7 +52,7 @@ import {
 const QuestsPage = () => {
   const { t } = useLanguage();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("all"); // all, missions, my
+  const [activeTab, setActiveTab] = useState("all"); // all, missions, events
   const [searchQuery, setSearchQuery] = useState("");
   const [missions, setMissions] = useState<MissionWithStats[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,7 +173,7 @@ const QuestsPage = () => {
     const matchesTab =
       activeTab === "all" ||
       activeTab === "missions" ||
-      (activeTab === "my" &&
+      (activeTab === "events" &&
         (mission.is_bookmarked || mission.submission_status));
 
     return matchesSearch && matchesTab;
@@ -230,25 +230,20 @@ const QuestsPage = () => {
       >
         {/* Header */}
         <VStack space="lg" className="p-6 pb-4">
-          <HStack className="justify-between items-center">
-            <VStack space="xs">
-              <Heading
-                size="xl"
-                className="text-typography-900 dark:text-typography-950"
-              >
-                Climate Quests
-              </Heading>
-              <Text
-                size="sm"
-                className="text-typography-600 dark:text-typography-750"
-              >
-                Complete missions to earn rewards and make an impact
-              </Text>
-            </VStack>
-            <Button variant="outline" size="sm" className="p-3">
-              <Icon as={Filter} size="md" className="text-typography-600" />
-            </Button>
-          </HStack>
+          <VStack space="xs">
+            <Heading
+              size="xl"
+              className="text-typography-900 dark:text-typography-950"
+            >
+              Climate Quests
+            </Heading>
+            <Text
+              size="sm"
+              className="text-typography-600 dark:text-typography-750"
+            >
+              Complete missions to earn rewards and make an impact
+            </Text>
+          </VStack>
 
           {/* User Stats */}
           <Card className="p-6 bg-primary-600">
@@ -308,7 +303,7 @@ const QuestsPage = () => {
             <Icon as={Search} size="md" className="text-gray-500" />
             <TextInput
               className="flex-1 text-typography-900 dark:text-typography-950"
-              placeholder="Search missions..."
+              placeholder="Search quests..."
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholderTextColor="#6B7280"
@@ -348,14 +343,23 @@ const QuestsPage = () => {
             </HStack>
           </Button>
           <Button
-            variant={activeTab === "my" ? "solid" : "outline"}
+            variant={activeTab === "events" ? "solid" : "outline"}
             size="sm"
-            onPress={() => setActiveTab("my")}
+            onPress={() => setActiveTab("events")}
             className="flex-1"
           >
-            <Text className={activeTab === "my" ? "text-white" : ""}>
-              My Quests
-            </Text>
+            <HStack space="xs" className="items-center">
+              <Icon
+                as={Calendar}
+                size="sm"
+                className={
+                  activeTab === "events" ? "text-white" : "text-gray-500"
+                }
+              />
+              <Text className={activeTab === "events" ? "text-white" : ""}>
+                Events
+              </Text>
+            </HStack>
           </Button>
         </HStack>
 

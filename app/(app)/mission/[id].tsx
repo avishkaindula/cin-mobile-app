@@ -217,9 +217,10 @@ const MissionDetailsPage = () => {
           >
             <Icon as={ArrowLeft} size="md" className="text-typography-600" />
           </Button>
-          <Text className="font-semibold text-lg text-typography-900 dark:text-typography-950 flex-1">
+          <Heading size="xl" className="font-bold text-typography-900 dark:text-typography-950 flex-1 text-center">
             Mission Details
-          </Text>
+          </Heading>
+          <Box className="w-10 h-10" />
         </HStack>
 
         <Box className="p-6">
