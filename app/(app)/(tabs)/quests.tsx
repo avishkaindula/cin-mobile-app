@@ -193,7 +193,7 @@ const QuestsPage = () => {
       };
     } else if (mission.is_bookmarked) {
       return {
-        text: "Bookmarked",
+        text: "Saved",
         color: "text-purple-600",
         icon: BookmarkCheck,
       };
@@ -381,7 +381,10 @@ const QuestsPage = () => {
               const statusInfo = getStatusInfo(mission);
 
               return (
-                <Card key={mission.id} className="overflow-hidden border border-gray-200 dark:border-gray-700">
+                <Card
+                  key={mission.id}
+                  className="overflow-hidden border border-gray-200 dark:border-gray-700"
+                >
                   <VStack space="md">
                     {/* Mission Image */}
                     {(mission as any).thumbnailUrl && (
