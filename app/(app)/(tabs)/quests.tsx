@@ -127,8 +127,8 @@ const QuestsPage = () => {
       const { success, error } = await startMission(missionId);
 
       if (success) {
-        // Refresh missions data to get updated submission status
-        await loadMissions();
+        // Redirect to submit page to start providing evidence
+        router.push(`/mission/${missionId}/submit`);
       } else {
         console.error("Start mission error:", error);
       }
