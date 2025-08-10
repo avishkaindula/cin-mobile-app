@@ -122,8 +122,8 @@ const MissionDetailsPage = () => {
       const { success, error } = await startMission(mission.id);
 
       if (success) {
-        // Refresh mission data to get updated submission status
-        await loadMissionDetails(mission.id);
+        // Redirect to submit page to start providing evidence
+        router.push(`/mission/${mission.id}/submit`);
       } else {
         console.error("Start mission error:", error);
       }
