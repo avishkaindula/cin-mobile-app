@@ -377,7 +377,7 @@ const QuestsPage = () => {
               const statusInfo = getStatusInfo(mission);
 
               return (
-                <Card key={mission.id} className="overflow-hidden">
+                <Card key={mission.id} className="overflow-hidden border border-gray-200 dark:border-gray-700">
                   <VStack space="md">
                     {/* Mission Image */}
                     {(mission as any).thumbnailUrl && (
