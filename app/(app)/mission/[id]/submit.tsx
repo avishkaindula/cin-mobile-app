@@ -18,7 +18,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { TextareaInput } from "@/components/ui/textarea";
 import {
   ArrowLeft,
-  Camera,
   Video,
   FileText,
   MapPin,
@@ -98,32 +97,15 @@ const MissionSubmissionPage = () => {
   };
 
   const requestPermissions = async () => {
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
 
-    if (cameraStatus !== "granted" || libraryStatus !== "granted") {
-      Alert.alert("Permission Required", "Camera and photo library access is required to submit evidence.");
+    if (libraryStatus !== "granted") {
+      Alert.alert("Permission Required", "Photo library access is required to submit evidence.");
       return false;
     }
 
     return true;
-  };
-
-  const handleTakePhoto = async () => {
-    const hasPermission = await requestPermissions();
-    if (!hasPermission) return;
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      await uploadFile(result.assets[0], "photo");
-    }
   };
 
   const handleSelectPhoto = async () => {
@@ -142,11 +124,11 @@ const MissionSubmissionPage = () => {
     }
   };
 
-  const handleRecordVideo = async () => {
+  const handleSelectVideo = async () => {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
 
-    const result = await ImagePicker.launchCameraAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       videoMaxDuration: 60, // 1 minute max
@@ -340,7 +322,7 @@ const MissionSubmissionPage = () => {
         <HStack className="items-center justify-between">
           <HStack className="items-center flex-1" space="md">
             <Icon
-              as={item.type === "photo" ? Camera : item.type === "video" ? Video : item.type === "location" ? MapPin : FileText}
+              as={item.type === "photo" ? Upload : item.type === "video" ? Video : item.type === "location" ? MapPin : FileText}
               size="sm"
               className="text-gray-500"
             />
@@ -511,32 +493,18 @@ const MissionSubmissionPage = () => {
                   {currentStep.requiredEvidence.includes("photo") && (
                     <VStack space="xs">
                       <Text size="sm" className="font-medium">Photo Evidence</Text>
-                      <HStack space="md">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onPress={handleTakePhoto}
-                          disabled={submitting}
-                          className="flex-1"
-                        >
-                          <HStack space="xs" className="items-center">
-                            <Icon as={Camera} size="sm" />
-                            <Text>Take Photo</Text>
-                          </HStack>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onPress={handleSelectPhoto}
-                          disabled={submitting}
-                          className="flex-1"
-                        >
-                          <HStack space="xs" className="items-center">
-                            <Icon as={Upload} size="sm" />
-                            <Text>Select Photo</Text>
-                          </HStack>
-                        </Button>
-                      </HStack>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onPress={handleSelectPhoto}
+                        disabled={submitting}
+                        className="w-full"
+                      >
+                        <HStack space="xs" className="items-center">
+                          <Icon as={Upload} size="sm" />
+                          <Text>Select Photo from Gallery</Text>
+                        </HStack>
+                      </Button>
                     </VStack>
                   )}
 
@@ -546,12 +514,13 @@ const MissionSubmissionPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onPress={handleRecordVideo}
+                        onPress={handleSelectVideo}
                         disabled={submitting}
+                        className="w-full"
                       >
                         <HStack space="xs" className="items-center">
                           <Icon as={Video} size="sm" />
-                          <Text>Record Video</Text>
+                          <Text>Select Video from Gallery</Text>
                         </HStack>
                       </Button>
                     </VStack>
