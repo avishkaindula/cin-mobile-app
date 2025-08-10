@@ -140,7 +140,7 @@ const QuestsPage = () => {
   };
 
   const handleViewMission = (missionId: string) => {
-    router.push(`/mission/${missionId}`);
+    router.push(`/mission/${missionId}/`);
   };
 
   // User stats (calculated from real data)
@@ -560,6 +560,13 @@ const QuestsPage = () => {
                             <Button
                               variant="solid"
                               size="sm"
+                              onPress={() => {
+                                if (mission.submission_status === "reviewed") {
+                                  handleViewMission(mission.id);
+                                } else {
+                                  router.push(`/mission/${mission.id}/submit`);
+                                }
+                              }}
                               className="flex-1 bg-blue-600"
                               disabled={
                                 mission.submission_status === "reviewed"
