@@ -41,7 +41,13 @@ import {
   Eye,
   Building,
 } from "lucide-react-native";
-import { getPublishedMissions, toggleMissionBookmark, startMission, getMissionThumbnailUrl, MissionWithStats } from "@/services/missions";
+import {
+  getPublishedMissions,
+  toggleMissionBookmark,
+  startMission,
+  getMissionThumbnailUrl,
+  MissionWithStats,
+} from "@/services/missions";
 
 const QuestsPage = () => {
   const { t } = useLanguage();
@@ -61,7 +67,7 @@ const QuestsPage = () => {
     try {
       setLoading(true);
       const { data, error } = await getPublishedMissions();
-      
+
       if (error) {
         console.error("Error loading missions:", error);
       } else if (data) {
@@ -69,7 +75,9 @@ const QuestsPage = () => {
         const missionsWithThumbnails = await Promise.all(
           data.map(async (mission) => {
             if (mission.thumbnail_path) {
-              const thumbnailUrl = await getMissionThumbnailUrl(mission.thumbnail_path);
+              const thumbnailUrl = await getMissionThumbnailUrl(
+                mission.thumbnail_path
+              );
               return { ...mission, thumbnailUrl };
             }
             return mission;
@@ -93,14 +101,16 @@ const QuestsPage = () => {
   const handleBookmarkToggle = async (missionId: string) => {
     setActionLoading(`bookmark-${missionId}`);
     try {
-      const { success, error, is_bookmarked } = await toggleMissionBookmark(missionId);
-      
+      const { success, error, is_bookmarked } = await toggleMissionBookmark(
+        missionId
+      );
+
       if (success) {
-        setMissions(prev => prev.map(mission => 
-          mission.id === missionId 
-            ? { ...mission, is_bookmarked }
-            : mission
-        ));
+        setMissions((prev) =>
+          prev.map((mission) =>
+            mission.id === missionId ? { ...mission, is_bookmarked } : mission
+          )
+        );
       } else {
         console.error("Bookmark error:", error);
       }
@@ -115,7 +125,7 @@ const QuestsPage = () => {
     setActionLoading(`start-${missionId}`);
     try {
       const { success, error } = await startMission(missionId);
-      
+
       if (success) {
         // Refresh missions data to get updated submission status
         await loadMissions();
@@ -133,13 +143,22 @@ const QuestsPage = () => {
     router.push(`/mission/${missionId}`);
   };
 
-  // User stats (this can be calculated from real data later)
+  // User stats (calculated from real data)
   const userStats = {
-    completed: missions.filter(m => m.submission_status === "reviewed").length,
-    active: missions.filter(m => m.submission_status === "in_progress" || m.submission_status === "started").length,
-    totalPoints: 850, // This would come from user profile
-    totalEnergy: 425, // This would come from user profile
-    rank: 45, // This would come from user profile
+    completed: missions.filter((m) => m.submission_status === "reviewed")
+      .length,
+    active: missions.filter(
+      (m) =>
+        m.submission_status === "in_progress" ||
+        m.submission_status === "started"
+    ).length,
+    totalPoints: missions
+      .filter((m) => m.submission_status === "reviewed")
+      .reduce((sum, m) => sum + (m.points_awarded || 0), 0),
+    totalEnergy: missions
+      .filter((m) => m.submission_status === "reviewed")
+      .reduce((sum, m) => sum + (m.energy_awarded || 0), 0),
+    rank: 45, // This would come from user profile/leaderboard
   };
 
   // Filter missions based on current tab and search
@@ -153,8 +172,9 @@ const QuestsPage = () => {
     // Tab filter
     const matchesTab =
       activeTab === "all" ||
-      (activeTab === "missions") ||
-      (activeTab === "my" && (mission.is_bookmarked || mission.submission_status));
+      activeTab === "missions" ||
+      (activeTab === "my" &&
+        (mission.is_bookmarked || mission.submission_status));
 
     return matchesSearch && matchesTab;
   });
@@ -162,10 +182,21 @@ const QuestsPage = () => {
   const getStatusInfo = (mission: MissionWithStats) => {
     if (mission.submission_status === "reviewed") {
       return { text: "Completed", color: "text-green-600", icon: CheckCircle };
-    } else if (mission.submission_status === "in_progress" || mission.submission_status === "started") {
-      return { text: `${mission.submission_progress || 0}% Complete`, color: "text-blue-600", icon: Play };
+    } else if (
+      mission.submission_status === "in_progress" ||
+      mission.submission_status === "started"
+    ) {
+      return {
+        text: `${mission.submission_progress || 0}% Complete`,
+        color: "text-blue-600",
+        icon: Play,
+      };
     } else if (mission.is_bookmarked) {
-      return { text: "Bookmarked", color: "text-purple-600", icon: BookmarkCheck };
+      return {
+        text: "Bookmarked",
+        color: "text-purple-600",
+        icon: BookmarkCheck,
+      };
     } else {
       return { text: "Available", color: "text-green-600", icon: Target };
     }
@@ -173,16 +204,24 @@ const QuestsPage = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} className="bg-white dark:bg-background-dark">
+      <SafeAreaView
+        style={{ flex: 1 }}
+        className="bg-white dark:bg-background-dark"
+      >
         <Box className="flex-1 justify-center items-center p-6">
-          <Text className="text-typography-600 dark:text-typography-400">Loading missions...</Text>
+          <Text className="text-typography-600 dark:text-typography-400">
+            Loading missions...
+          </Text>
         </Box>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-white dark:bg-background-dark">
+    <SafeAreaView
+      style={{ flex: 1 }}
+      className="bg-white dark:bg-background-dark"
+    >
       <ScrollView
         className="flex-1"
         refreshControl={
@@ -193,10 +232,16 @@ const QuestsPage = () => {
         <VStack space="lg" className="p-6 pb-4">
           <HStack className="justify-between items-center">
             <VStack space="xs">
-              <Heading size="xl" className="text-typography-900 dark:text-typography-950">
+              <Heading
+                size="xl"
+                className="text-typography-900 dark:text-typography-950"
+              >
                 Climate Quests
               </Heading>
-              <Text size="sm" className="text-typography-600 dark:text-typography-750">
+              <Text
+                size="sm"
+                className="text-typography-600 dark:text-typography-750"
+              >
                 Complete missions to earn rewards and make an impact
               </Text>
             </VStack>
@@ -206,35 +251,60 @@ const QuestsPage = () => {
           </HStack>
 
           {/* User Stats */}
-          <Card className="p-4 bg-primary-600">
-            <HStack className="justify-between items-center">
-              <VStack space="xs">
-                <Text size="sm" className="text-white/80">Your Progress</Text>
-                <HStack space="md">
-                  <VStack space="xs" className="items-center">
-                    <Text className="font-bold text-white text-lg">{userStats.completed}</Text>
-                    <Text size="xs" className="text-white/80">Completed</Text>
-                  </VStack>
-                  <VStack space="xs" className="items-center">
-                    <Text className="font-bold text-white text-lg">{userStats.active}</Text>
-                    <Text size="xs" className="text-white/80">Active</Text>
-                  </VStack>
-                  <VStack space="xs" className="items-center">
-                    <Text className="font-bold text-white text-lg">{userStats.totalPoints}</Text>
-                    <Text size="xs" className="text-white/80">Points</Text>
-                  </VStack>
-                </HStack>
-              </VStack>
-              <Box className="bg-white/20 rounded-full p-4">
-                <Icon as={Award} size="lg" className="text-white" />
-              </Box>
-            </HStack>
+          <Card className="p-6 bg-primary-600">
+            <VStack space="md">
+              <HStack className="justify-between items-center">
+                <Text size="xl" className="text-white font-semibold">
+                  Your Progress
+                </Text>
+                <Box className="bg-white/20 rounded-full p-3">
+                  <Icon as={Award} size="lg" className="text-white" />
+                </Box>
+              </HStack>
+              <HStack className="justify-between items-center w-full">
+                <VStack space="xs" className="items-center flex-1">
+                  <Text className="font-bold text-white text-2xl">
+                    {userStats.completed}
+                  </Text>
+                  <Text size="sm" className="text-white/80">
+                    Completed
+                  </Text>
+                </VStack>
+                <VStack space="xs" className="items-center flex-1">
+                  <Text className="font-bold text-white text-2xl">
+                    {userStats.active}
+                  </Text>
+                  <Text size="sm" className="text-white/80">
+                    Active
+                  </Text>
+                </VStack>
+                <VStack space="xs" className="items-center flex-1">
+                  <Text className="font-bold text-white text-2xl">
+                    {userStats.totalPoints}
+                  </Text>
+                  <Text size="sm" className="text-white/80">
+                    Points
+                  </Text>
+                </VStack>
+                <VStack space="xs" className="items-center flex-1">
+                  <Text className="font-bold text-white text-2xl">
+                    {userStats.totalEnergy}
+                  </Text>
+                  <Text size="sm" className="text-white/80">
+                    Energy
+                  </Text>
+                </VStack>
+              </HStack>
+            </VStack>
           </Card>
         </VStack>
 
         {/* Search Bar */}
         <Box className="px-6 mb-4">
-          <HStack space="md" className="items-center bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3">
+          <HStack
+            space="md"
+            className="items-center bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3"
+          >
             <Icon as={Search} size="md" className="text-gray-500" />
             <TextInput
               className="flex-1 text-typography-900 dark:text-typography-950"
@@ -268,7 +338,9 @@ const QuestsPage = () => {
               <Icon
                 as={Target}
                 size="sm"
-                className={activeTab === "missions" ? "text-white" : "text-gray-500"}
+                className={
+                  activeTab === "missions" ? "text-white" : "text-gray-500"
+                }
               />
               <Text className={activeTab === "missions" ? "text-white" : ""}>
                 Missions
@@ -294,14 +366,16 @@ const QuestsPage = () => {
               <VStack space="md" className="items-center">
                 <Icon as={Target} size="xl" className="text-gray-400" />
                 <Text className="text-center text-gray-500">
-                  {searchQuery ? "No missions found matching your search." : "No missions available at the moment."}
+                  {searchQuery
+                    ? "No missions found matching your search."
+                    : "No missions available at the moment."}
                 </Text>
               </VStack>
             </Card>
           ) : (
             filteredMissions.map((mission) => {
               const statusInfo = getStatusInfo(mission);
-              
+
               return (
                 <Card key={mission.id} className="overflow-hidden">
                   <VStack space="md">
@@ -324,7 +398,11 @@ const QuestsPage = () => {
                             <HStack space="xs" className="items-center">
                               <Badge className="bg-green-100 dark:bg-green-900/30">
                                 <HStack space="xs" className="items-center">
-                                  <Icon as={Award} size="xs" className="text-green-600" />
+                                  <Icon
+                                    as={Award}
+                                    size="xs"
+                                    className="text-green-600"
+                                  />
                                   <Text size="xs" className="text-green-600">
                                     +{mission.points_awarded} pts
                                   </Text>
@@ -332,7 +410,11 @@ const QuestsPage = () => {
                               </Badge>
                               <Badge className="bg-orange-100 dark:bg-orange-900/30">
                                 <HStack space="xs" className="items-center">
-                                  <Icon as={Zap} size="xs" className="text-orange-600" />
+                                  <Icon
+                                    as={Zap}
+                                    size="xs"
+                                    className="text-orange-600"
+                                  />
                                   <Text size="xs" className="text-orange-600">
                                     +{mission.energy_awarded} ⚡
                                   </Text>
@@ -340,10 +422,13 @@ const QuestsPage = () => {
                               </Badge>
                             </HStack>
 
-                            <Heading size="md" className="text-typography-900 dark:text-typography-950">
+                            <Heading
+                              size="md"
+                              className="text-typography-900 dark:text-typography-950"
+                            >
                               {mission.title}
                             </Heading>
-                            
+
                             <Text
                               size="sm"
                               className="text-typography-600 dark:text-typography-750"
@@ -354,7 +439,11 @@ const QuestsPage = () => {
                           </VStack>
 
                           <HStack space="xs" className="items-center">
-                            <Icon as={statusInfo.icon} size="sm" className={statusInfo.color} />
+                            <Icon
+                              as={statusInfo.icon}
+                              size="sm"
+                              className={statusInfo.color}
+                            />
                             <Text size="xs" className={statusInfo.color}>
                               {statusInfo.text}
                             </Text>
@@ -364,36 +453,54 @@ const QuestsPage = () => {
                         {/* Mission Info */}
                         <HStack space="md" className="items-center">
                           <HStack space="xs" className="items-center">
-                            <Icon as={Building} size="sm" className="text-gray-500" />
-                            <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                            <Icon
+                              as={Building}
+                              size="sm"
+                              className="text-gray-500"
+                            />
+                            <Text
+                              size="sm"
+                              className="text-typography-600 dark:text-typography-750"
+                            >
                               {mission.organization_name}
                             </Text>
                           </HStack>
                           <HStack space="xs" className="items-center">
-                            <Icon as={Users} size="sm" className="text-blue-500" />
-                            <Text size="sm" className="text-typography-600 dark:text-typography-750">
+                            <Icon
+                              as={Users}
+                              size="sm"
+                              className="text-blue-500"
+                            />
+                            <Text
+                              size="sm"
+                              className="text-typography-600 dark:text-typography-750"
+                            >
                               {mission.participants_count}
                             </Text>
                           </HStack>
                         </HStack>
 
                         {/* Progress Bar for Active Missions */}
-                        {mission.submission_status && mission.submission_status !== "reviewed" && (
-                          <VStack space="xs">
-                            <HStack className="justify-between">
-                              <Text size="sm" className="text-typography-600 dark:text-typography-750">
-                                Progress
-                              </Text>
-                              <Text size="sm" className="text-blue-600">
-                                {mission.submission_progress || 0}%
-                              </Text>
-                            </HStack>
-                            <Progress
-                              value={mission.submission_progress || 0}
-                              className="h-2"
-                            />
-                          </VStack>
-                        )}
+                        {mission.submission_status &&
+                          mission.submission_status !== "reviewed" && (
+                            <VStack space="xs">
+                              <HStack className="justify-between">
+                                <Text
+                                  size="sm"
+                                  className="text-typography-600 dark:text-typography-750"
+                                >
+                                  Progress
+                                </Text>
+                                <Text size="sm" className="text-blue-600">
+                                  {mission.submission_progress || 0}%
+                                </Text>
+                              </HStack>
+                              <Progress
+                                value={mission.submission_progress || 0}
+                                className="h-2"
+                              />
+                            </VStack>
+                          )}
 
                         {/* Action Buttons */}
                         <HStack space="md">
@@ -401,14 +508,24 @@ const QuestsPage = () => {
                             variant="outline"
                             size="sm"
                             onPress={() => handleBookmarkToggle(mission.id)}
-                            disabled={actionLoading === `bookmark-${mission.id}`}
+                            disabled={
+                              actionLoading === `bookmark-${mission.id}`
+                            }
                             className="flex-1"
                           >
                             <HStack space="xs" className="items-center">
                               <Icon
-                                as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
+                                as={
+                                  mission.is_bookmarked
+                                    ? BookmarkCheck
+                                    : Bookmark
+                                }
                                 size="sm"
-                                className={mission.is_bookmarked ? "text-primary-600" : "text-gray-500"}
+                                className={
+                                  mission.is_bookmarked
+                                    ? "text-primary-600"
+                                    : "text-gray-500"
+                                }
                               />
                               <Text size="sm">
                                 {mission.is_bookmarked ? "Saved" : "Save"}
@@ -423,7 +540,11 @@ const QuestsPage = () => {
                             className="flex-1"
                           >
                             <HStack space="xs" className="items-center">
-                              <Icon as={Eye} size="sm" className="text-gray-500" />
+                              <Icon
+                                as={Eye}
+                                size="sm"
+                                className="text-gray-500"
+                              />
                               <Text size="sm">View</Text>
                             </HStack>
                           </Button>
@@ -433,16 +554,24 @@ const QuestsPage = () => {
                               variant="solid"
                               size="sm"
                               className="flex-1 bg-blue-600"
-                              disabled={mission.submission_status === "reviewed"}
+                              disabled={
+                                mission.submission_status === "reviewed"
+                              }
                             >
                               <HStack space="xs" className="items-center">
                                 <Icon
-                                  as={mission.submission_status === "reviewed" ? CheckCircle : Play}
+                                  as={
+                                    mission.submission_status === "reviewed"
+                                      ? CheckCircle
+                                      : Play
+                                  }
                                   size="sm"
                                   className="text-white"
                                 />
                                 <Text size="sm" className="text-white">
-                                  {mission.submission_status === "reviewed" ? "Completed" : "Continue"}
+                                  {mission.submission_status === "reviewed"
+                                    ? "Completed"
+                                    : "Continue"}
                                 </Text>
                               </HStack>
                             </Button>
@@ -455,8 +584,14 @@ const QuestsPage = () => {
                               className="flex-1"
                             >
                               <HStack space="xs" className="items-center">
-                                <Icon as={Target} size="sm" className="text-white" />
-                                <Text size="sm" className="text-white">Start</Text>
+                                <Icon
+                                  as={Target}
+                                  size="sm"
+                                  className="text-white"
+                                />
+                                <Text size="sm" className="text-white">
+                                  Start
+                                </Text>
                               </HStack>
                             </Button>
                           )}
