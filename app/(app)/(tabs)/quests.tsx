@@ -206,7 +206,7 @@ const QuestsPage = () => {
           </HStack>
 
           {/* User Stats */}
-          <Card className="p-4 bg-gradient-to-r from-primary-500 to-primary-600">
+          <Card className="p-4 bg-primary-600">
             <HStack className="justify-between items-center">
               <VStack space="xs">
                 <Text size="sm" className="text-white/80">Your Progress</Text>
