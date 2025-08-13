@@ -22,8 +22,6 @@ import {
   BarChart3,
   Settings,
   Globe,
-  Bell,
-  Shield,
   Moon,
   Sun,
   LogOut,
@@ -482,56 +480,6 @@ const ProfilePage = () => {
                     onPress={() => setShowLanguageModal(true)}
                   >
                     <Text>{getCurrentLanguageName()}</Text>
-                  </Button>
-                </HStack>
-
-                <Divider className="my-2" />
-
-                <HStack className="justify-between items-center">
-                  <HStack space="md" className="items-center">
-                    <Icon as={Bell} size="md" className="text-typography-500" />
-                    <Text className="text-typography-900 dark:text-typography-950">
-                      {t("notifications")}
-                    </Text>
-                  </HStack>
-                  <Button size="sm" variant="outline">
-                    <Text>Manage</Text>
-                  </Button>
-                </HStack>
-
-                <Divider className="my-2" />
-
-                <HStack className="justify-between items-center">
-                  <HStack space="md" className="items-center">
-                    <Icon
-                      as={Shield}
-                      size="md"
-                      className="text-typography-500"
-                    />
-                    <Text className="text-typography-900 dark:text-typography-950">
-                      {t("privacy")}
-                    </Text>
-                  </HStack>
-                  <Button size="sm" variant="outline">
-                    <Text>Settings</Text>
-                  </Button>
-                </HStack>
-
-                <Divider className="my-2" />
-
-                <HStack className="justify-between items-center">
-                  <HStack space="md" className="items-center">
-                    <Icon
-                      as={Settings}
-                      size="md"
-                      className="text-typography-500"
-                    />
-                    <Text className="text-typography-900 dark:text-typography-950">
-                      {t("about")}
-                    </Text>
-                  </HStack>
-                  <Button size="sm" variant="outline">
-                    <Text>Info</Text>
                   </Button>
                 </HStack>
               </VStack>
