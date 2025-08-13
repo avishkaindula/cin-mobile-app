@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Home, Target, Calendar, Users, User } from "lucide-react-native";
+import { Home, Zap, MapPin, Users, User } from "lucide-react-native";
 import { Platform } from "react-native";
 import { useColorScheme } from "nativewind";
 
@@ -52,24 +52,23 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="missions"
+        name="quests"
         options={{
-          title: "Missions",
+          title: "Quests",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon IconComponent={Target} color={color} />
+            <TabBarIcon IconComponent={Zap} color={color} />
           ),
-          tabBarBadge: "3",
+          tabBarBadge: "7",
         }}
       />
 
       <Tabs.Screen
-        name="events"
+        name="map"
         options={{
-          title: "Events",
+          title: "Map",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon IconComponent={Calendar} color={color} />
+            <TabBarIcon IconComponent={MapPin} color={color} />
           ),
-          tabBarBadge: "4",
         }}
       />
 
