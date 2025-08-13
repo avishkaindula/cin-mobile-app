@@ -58,7 +58,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIcon IconComponent={Zap} color={color} />
           ),
-          tabBarBadge: "7",
         }}
       />
 
@@ -79,7 +78,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIcon IconComponent={Users} color={color} />
           ),
-          tabBarBadge: "2",
         }}
       />
 
