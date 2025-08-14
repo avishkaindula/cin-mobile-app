@@ -155,13 +155,13 @@ const HomePage = () => {
                   size="xl"
                   className="text-typography-900 dark:text-typography-950"
                 >
-                  {t("climateIntel")}
+                  Mission 1.5
                 </Heading>
                 <Text
                   size="sm"
                   className="text-typography-600 dark:text-typography-750"
                 >
-                  {t("empoweringClimateAction")}
+                  Empowering climate action
                 </Text>
               </VStack>
             </HStack>

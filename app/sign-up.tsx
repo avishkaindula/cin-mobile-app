@@ -249,7 +249,7 @@ export default function SignUp() {
                       size="lg"
                       className="text-typography-900 dark:text-typography-950"
                     >
-                      Climate Intelligence Network
+                      Mission 1.5
                     </Heading>
                     <Text
                       size="sm"

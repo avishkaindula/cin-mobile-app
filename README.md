@@ -1,6 +1,6 @@
-# Welcome to your Expo app 👋
+# Mission 1.5 - Climate Action Mobile App 🌍
 
-This is an [Expo](https://expo.dev) project created with [`create-gluestack-app`](https://www.npmjs.com/package/create-gluestack).
+This is the mobile application for Mission 1.5, a climate action platform built with [Expo](https://expo.dev) and [`create-gluestack-app`](https://www.npmjs.com/package/create-gluestack).
 
 ## Get started
 
