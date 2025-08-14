@@ -73,9 +73,7 @@
     },
     "extra": {
       "router": {},
-      "eas": {
-        "projectId": "a43b1290-dad4-4131-829e-a16e77a4af97"
-      }
+      "eas": {}
     },
     "owner": "baristatextbook"
   }
