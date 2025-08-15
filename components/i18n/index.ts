@@ -21,12 +21,12 @@ const translations = {
     done: 'Done',
     
     // App specific
-    climateIntel: 'Climate Intel',
-    climateIntelligenceNetwork: 'Climate Intelligence Network',
+    climateIntel: 'Mission 1.5',
+    climateIntelligenceNetwork: 'Mission 1.5',
     empoweringClimateAction: 'Empowering Climate Action Through Data',
     
     // Home page
-    homeWelcome: 'Welcome to Climate Intelligence Network',
+    homeWelcome: 'Welcome to Mission 1.5',
     homeDescription: 'Equipping Global South citizens with tools for climate justice',
     
     // Missions
@@ -150,12 +150,12 @@ const translations = {
     done: 'Hecho',
     
     // App specific
-    climateIntel: 'Climate Intel',
-    climateIntelligenceNetwork: 'Red de Inteligencia Climática',
+    climateIntel: 'Mission 1.5',
+    climateIntelligenceNetwork: 'Mission 1.5',
     empoweringClimateAction: 'Potenciando la Acción Climática a través de Datos',
     
     // Home page
-    homeWelcome: 'Bienvenido a la Red de Inteligencia Climática',
+    homeWelcome: 'Bienvenido a Mission 1.5',
     homeDescription: 'Equipando a los ciudadanos del Sur Global con herramientas para la justicia climática',
     
     // Missions
@@ -279,12 +279,12 @@ const translations = {
     done: 'Concluído',
     
     // App specific
-    climateIntel: 'Climate Intel',
-    climateIntelligenceNetwork: 'Rede de Inteligência Climática',
+    climateIntel: 'Mission 1.5',
+    climateIntelligenceNetwork: 'Mission 1.5',
     empoweringClimateAction: 'Capacitando Ação Climática através de Dados',
     
     // Home page
-    homeWelcome: 'Bem-vindo à Rede de Inteligência Climática',
+    homeWelcome: 'Bem-vindo à Mission 1.5',
     homeDescription: 'Equipando cidadãos do Sul Global com ferramentas para justiça climática',
     
     // Missions
