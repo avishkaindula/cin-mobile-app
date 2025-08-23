@@ -1,6 +1,7 @@
 import { Platform } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { supabase } from "@/lib/supabase";
 import { authService } from "./auth.service";
 import { BASE_URL } from "@/lib/constants";
@@ -49,6 +50,54 @@ export class OAuthService {
       OAuthService.instance = new OAuthService();
     }
     return OAuthService.instance;
+  }
+
+  /**
+   * Sign in with Apple (iOS only)
+   */
+  async signInWithApple(): Promise<OAuthResponse> {
+    try {
+      // Check if Apple Sign In is available
+      if (Platform.OS !== "ios") {
+        return { error: new Error("Apple Sign In is only available on iOS") };
+      }
+
+      const isAvailable = await AppleAuthentication.isAvailableAsync();
+      if (!isAvailable) {
+        return { error: new Error("Apple Sign In is not available on this device") };
+      }
+
+      // Request Apple Sign In
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      // Sign in via Supabase Auth with the identity token
+      if (credential.identityToken) {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: "apple",
+          token: credential.identityToken,
+        });
+
+        if (error) {
+          return { error };
+        }
+
+        return { error: null };
+      } else {
+        return { error: new Error("No identity token received from Apple") };
+      }
+    } catch (error: any) {
+      // Handle specific Apple Sign In errors
+      if (error.code === "ERR_REQUEST_CANCELED") {
+        return { error: new Error("Apple Sign In was cancelled") };
+      }
+      
+      return { error: error as Error };
+    }
   }
 
   /**
@@ -296,7 +345,7 @@ export class OAuthService {
       return window.location.origin;
     }
     // For mobile, you would use your deep link URL
-    return "com.climateintelligencedemo://";
+    return "com.mission15://";
   }
 }
 

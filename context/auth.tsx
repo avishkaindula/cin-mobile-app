@@ -59,6 +59,7 @@ const AuthContext = createContext<{
   ) => Promise<{ error?: any; session?: Session | null }>;
   signInWithGitHub: () => Promise<{ error?: any }>;
   signInWithGoogle: () => Promise<{ error?: any }>;
+  signInWithApple: () => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
   verifyOtp: (
@@ -77,6 +78,7 @@ const AuthContext = createContext<{
   signUp: async () => ({ error: null }),
   signInWithGitHub: async () => ({ error: null }),
   signInWithGoogle: async () => ({ error: null }),
+  signInWithApple: async () => ({ error: null }),
   sendMagicLink: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
@@ -346,6 +348,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }
   };
 
+  const signInWithApple = async () => {
+    try {
+      return await oauthService.signInWithApple();
+    } catch (error) {
+      return { error };
+    }
+  };
+
   const sendMagicLink = async (email: string) => {
     const { error } = await authService.sendMagicLink({ 
       email, 
@@ -389,6 +399,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signUp,
         signInWithGitHub,
         signInWithGoogle,
+        signInWithApple,
         sendMagicLink,
         resetPassword,
         verifyOtp,

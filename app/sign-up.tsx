@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, InteractionManager } from "react-native";
+import { SafeAreaView, InteractionManager, Platform } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -23,6 +23,7 @@ import {
 import { useSession } from "@/context/auth";
 import { useAppToast } from "@/lib/toast-utils";
 import { GoogleIcon } from "@/assets/ico/google-icon";
+import { AppleIcon } from "@/assets/ico/apple-icon";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
@@ -32,11 +33,13 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const {
     signUp,
     signInWithGitHub,
     signInWithGoogle,
+    signInWithApple,
     isGoogleProcessing,
     session,
   } = useSession();
@@ -190,6 +193,41 @@ export default function SignUp() {
       );
     } finally {
       setGoogleLoading(false);
+    }
+  }
+
+  async function handleAppleSignUp() {
+    if (Platform.OS !== "ios") {
+      showError(
+        "Apple Sign Up Error",
+        "Apple Sign In is only available on iOS devices"
+      );
+      return;
+    }
+
+    setAppleLoading(true);
+    try {
+      const { error } = await signInWithApple();
+
+      if (error) {
+        if (error.message === "Apple Sign In was cancelled") {
+          // Don't show error for user cancellation
+          return;
+        }
+        showError(
+          "Apple Sign Up Error",
+          error.message || "Failed to sign up with Apple"
+        );
+      } else {
+        showSuccess("Welcome!", "You have successfully signed up with Apple.");
+      }
+    } catch (error) {
+      showError(
+        "Apple Sign Up Error",
+        "An unexpected error occurred with Apple sign up"
+      );
+    } finally {
+      setAppleLoading(false);
     }
   }
 
@@ -361,6 +399,7 @@ export default function SignUp() {
                       loading ||
                       githubLoading ||
                       googleLoading ||
+                      appleLoading ||
                       isGoogleProcessing ||
                       !email.trim() ||
                       !fullName.trim() ||
@@ -402,6 +441,7 @@ export default function SignUp() {
                       loading ||
                       githubLoading ||
                       googleLoading ||
+                      appleLoading ||
                       isGoogleProcessing
                     }
                     onPress={handleGoogleSignUp}
@@ -421,6 +461,39 @@ export default function SignUp() {
                     </HStack>
                   </Button>
 
+                  {/* Apple OAuth Button (iOS only) */}
+                  {Platform.OS === "ios" && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                      disabled={
+                        loading ||
+                        githubLoading ||
+                        googleLoading ||
+                        appleLoading ||
+                        isGoogleProcessing
+                      }
+                      onPress={handleAppleSignUp}
+                    >
+                      <HStack space="md" className="items-center">
+                        {appleLoading ? (
+                          <Spinner size="small" />
+                        ) : (
+                          <AppleIcon size={20} color="#6B7280" />
+                        )}
+                        <Text
+                          size="lg"
+                          className="text-typography-600 dark:text-typography-400 font-semibold"
+                        >
+                          {appleLoading
+                            ? "Connecting..."
+                            : "Continue with Apple"}
+                        </Text>
+                      </HStack>
+                    </Button>
+                  )}
+
                   {/* GitHub OAuth Button */}
                   <Button
                     variant="outline"
@@ -430,6 +503,7 @@ export default function SignUp() {
                       loading ||
                       githubLoading ||
                       googleLoading ||
+                      appleLoading ||
                       isGoogleProcessing
                     }
                     onPress={handleGitHubSignUp}

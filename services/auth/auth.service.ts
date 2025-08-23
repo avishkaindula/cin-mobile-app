@@ -323,14 +323,14 @@ export class AuthService {
       return window.location.origin;
     }
     // For mobile, you would use your deep link URL
-    return "com.climateintelligencedemo://";
+    return "com.mission15://";
   }
 
   private getResetPasswordUrl(): string {
     if (Platform.OS === "web" && typeof window !== "undefined") {
       return `${window.location.origin}/reset-password`;
     }
-    return "com.climateintelligencedemo://reset-password";
+    return "com.mission15://reset-password";
   }
 }
 
