@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mission15"
+      "bundleIdentifier": "com.mission15",
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
