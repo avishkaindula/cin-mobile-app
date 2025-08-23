@@ -11,7 +11,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mission15",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "appleTeamId": "3674CYRVR2"
     },
     "android": {
       "adaptiveIcon": {
