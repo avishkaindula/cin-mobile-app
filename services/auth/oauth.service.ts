@@ -67,6 +67,8 @@ export class OAuthService {
         return { error: new Error("Apple Sign In is not available on this device") };
       }
 
+      console.log("🍎 Starting Apple Sign In...");
+
       // Request Apple Sign In
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -75,26 +77,58 @@ export class OAuthService {
         ],
       });
 
-      // Sign in via Supabase Auth with the identity token
+      console.log("🍎 Apple credential received:", {
+        hasIdentityToken: !!credential.identityToken,
+        hasUser: !!credential.user,
+        user: credential.user,
+        email: credential.email,
+        fullName: credential.fullName,
+      });
+
       if (credential.identityToken) {
+        console.log("🍎 Attempting to sign in with identity token...");
+        
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "apple",
           token: credential.identityToken,
         });
 
         if (error) {
-          return { error };
+          console.error("🍎 Supabase signInWithIdToken error:", error);
+          console.error("🍎 Error details:", {
+            message: error.message,
+            name: error.name,
+            stack: error.stack,
+          });
+          
+          // Return a more descriptive error
+          return { 
+            error: new Error(`Apple Sign In failed: ${error.message}. Please ensure Apple provider is configured in Supabase dashboard.`) 
+          };
         }
 
+        console.log("🍎 Apple Sign In successful!", data.session?.user?.email);
         return { error: null };
       } else {
+        console.error("🍎 No identity token received from Apple");
         return { error: new Error("No identity token received from Apple") };
       }
     } catch (error: any) {
+      console.error("🍎 Apple Sign In error:", error);
+      
       // Handle specific Apple Sign In errors
       if (error.code === "ERR_REQUEST_CANCELED") {
+        console.log("🍎 Apple Sign In was cancelled by user");
         return { error: new Error("Apple Sign In was cancelled") };
       }
+      
+      // Log full error details for debugging
+      console.error("🍎 Full error details:", {
+        code: error.code,
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+      });
       
       return { error: error as Error };
     }
