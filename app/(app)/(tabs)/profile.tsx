@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, ScrollView, Pressable, RefreshControl } from "react-native";
+import { SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -11,8 +12,6 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Divider } from "@/components/ui/divider";
-import { Pressable as UIPressable } from "@/components/ui/pressable";
-import { useLanguage, availableLanguages } from "@/components/i18n/language-context";
 import { useColorScheme } from "nativewind";
 import { useSession } from "@/context/auth";
 import {
@@ -21,37 +20,40 @@ import {
   Target,
   BarChart3,
   Settings,
-  Globe,
   Moon,
   Sun,
   LogOut,
-  Check,
-  X,
   Calendar,
   CheckCircle,
-  Play,
+  Edit,
 } from "lucide-react-native";
 import {
   getPublishedMissions,
   MissionWithStats,
 } from "@/services/missions";
+import {
+  getCurrentUserProfile,
+  Agent,
+} from "@/services/profile/profile.service";
 
 const ProfilePage = () => {
-  const { t, currentLanguage, setLanguage } = useLanguage();
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const { signOut, user } = useSession();
   const [missions, setMissions] = useState<MissionWithStats[]>([]);
+  const [profile, setProfile] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    loadMissions();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    await Promise.all([loadMissions(), loadProfile()]);
+  };
 
   const loadMissions = async () => {
     try {
-      setLoading(true);
       const { data, error } = await getPublishedMissions();
 
       if (error) {
@@ -61,6 +63,17 @@ const ProfilePage = () => {
       }
     } catch (error) {
       console.error("Error loading missions:", error);
+    }
+  };
+
+  const loadProfile = async () => {
+    try {
+      const response = await getCurrentUserProfile();
+      if (response.success && response.data) {
+        setProfile(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +81,7 @@ const ProfilePage = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadMissions();
+    await loadData();
     setRefreshing(false);
   };
 
@@ -89,7 +102,7 @@ const ProfilePage = () => {
       .reduce((sum, m) => sum + (m.energy_awarded || 0), 0),
     dataPointsContributed: missions
       .filter((m) => m.submission_status === "reviewed")
-      .reduce((sum, m) => sum + (m.participants_count || 1), 0), // Using participants as proxy for data contribution
+      .reduce((sum, m) => sum + (m.participants_count || 1), 0),
   };
 
   // Calculate achievements based on real data
@@ -159,24 +172,10 @@ const ProfilePage = () => {
     .map((mission) => ({
       id: mission.id,
       title: `Completed ${mission.title}`,
-      date: "Recently", // You could calculate this from actual submission dates
+      date: "Recently",
       icon: CheckCircle,
       color: "bg-green-500",
     }));
-
-  const getCurrentLanguageName = () => {
-    const languageNames = {
-      en: "English",
-      es: "Español",
-      pt: "Português",
-    };
-    return languageNames[currentLanguage] || "English";
-  };
-
-  const handleLanguageChange = async (languageCode: "en" | "es" | "pt") => {
-    await setLanguage(languageCode);
-    setShowLanguageModal(false);
-  };
 
   const stats = [
     { label: "Missions Completed", value: userStats.completedMissions.toString(), color: "text-green-600" },
@@ -186,6 +185,16 @@ const ProfilePage = () => {
     { label: "Energy Collected", value: userStats.totalEnergy.toString(), color: "text-yellow-600" },
     { label: "Data Points", value: userStats.dataPointsContributed.toString(), color: "text-blue-500" },
   ];
+
+  // Get display data from profile or auth user
+  const displayName = profile?.full_name || 
+                     user?.user_metadata?.full_name || 
+                     user?.user_metadata?.name || 
+                     user?.email?.split('@')[0] || 
+                     "Climate Advocate";
+
+  const displayEmail = profile?.email || user?.email || "No email";
+  const displayLocation = profile?.address || user?.user_metadata?.location;
 
   return (
     <SafeAreaView
@@ -208,7 +217,7 @@ const ProfilePage = () => {
                   size="xl"
                   className="text-typography-900 dark:text-typography-950"
                 >
-                  {t("profile")}
+                  Profile
                 </Heading>
                 <Text
                   size="sm"
@@ -224,34 +233,37 @@ const ProfilePage = () => {
           <Card className="p-6 mb-6">
             <VStack space="lg">
               <HStack space="lg" className="items-center">
-                <Avatar size="xl">
-                  <AvatarImage
-                    source={{
-                      uri: user?.user_metadata?.avatar_url || 
-                           user?.user_metadata?.picture ||
-                           "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                    }}
-                  />
-                </Avatar>
+                {profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture ? (
+                  <Avatar size="xl">
+                    <AvatarImage
+                      source={{
+                        uri: profile?.avatar_url || 
+                             user?.user_metadata?.avatar_url || 
+                             user?.user_metadata?.picture,
+                      }}
+                    />
+                  </Avatar>
+                ) : (
+                  <Box className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full items-center justify-center">
+                    <Icon as={User} size="xl" className="text-green-600 dark:text-green-400" />
+                  </Box>
+                )}
                 <VStack space="xs" className="flex-1">
                   <Heading
                     size="lg"
                     className="text-typography-900 dark:text-typography-950"
                   >
-                    {user?.user_metadata?.full_name || 
-                     user?.user_metadata?.name || 
-                     user?.email?.split('@')[0] || 
-                     "Climate Advocate"}
+                    {displayName}
                   </Heading>
                   <Text className="text-typography-600 dark:text-typography-750">
-                    {user?.email || "No email"}
+                    {displayEmail}
                   </Text>
-                  {user?.user_metadata?.location && (
+                  {displayLocation && (
                     <Text
                       size="sm"
                       className="text-typography-500 dark:text-typography-300"
                     >
-                      {user.user_metadata.location}
+                      {displayLocation}
                     </Text>
                   )}
                   <HStack space="xs" className="items-center mt-2">
@@ -270,8 +282,14 @@ const ProfilePage = () => {
                   </Text>
                 </VStack>
               </HStack>
-              <Button variant="outline">
-                <Text>{t("editProfile")}</Text>
+              <Button 
+                variant="outline"
+                onPress={() => router.push("/profile/edit")}
+              >
+                <HStack space="xs" className="items-center">
+                  <Icon as={Edit} size="sm" className="text-typography-600 dark:text-typography-400" />
+                  <Text>Edit Profile</Text>
+                </HStack>
               </Button>
               <Button
                 variant="solid"
@@ -294,7 +312,7 @@ const ProfilePage = () => {
                 size="md"
                 className="text-typography-900 dark:text-typography-950"
               >
-                {t("contributions")}
+                Contributions
               </Heading>
               <VStack space="md">
                 {stats.map((stat, index) => (
@@ -322,7 +340,7 @@ const ProfilePage = () => {
                 size="md"
                 className="text-typography-900 dark:text-typography-950"
               >
-                {t("achievements")}
+                Achievements
               </Heading>
               <VStack space="md">
                 {achievements.map((achievement) => (
@@ -426,7 +444,7 @@ const ProfilePage = () => {
                 size="md"
                 className="text-typography-900 dark:text-typography-950"
               >
-                {t("settings")}
+                Settings
               </Heading>
               <VStack space="md">
                 <VStack space="md">
@@ -460,86 +478,11 @@ const ProfilePage = () => {
                     </HStack>
                   </Button>
                 </VStack>
-
-                <Divider className="my-2" />
-
-                <HStack className="justify-between items-center">
-                  <HStack space="md" className="items-center">
-                    <Icon
-                      as={Globe}
-                      size="md"
-                      className="text-typography-500"
-                    />
-                    <Text className="text-typography-900 dark:text-typography-950">
-                      {t("language")}
-                    </Text>
-                  </HStack>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onPress={() => setShowLanguageModal(true)}
-                  >
-                    <Text>{getCurrentLanguageName()}</Text>
-                  </Button>
-                </HStack>
               </VStack>
             </VStack>
           </Card>
         </Box>
       </ScrollView>
-
-      {/* Language Settings Modal */}
-      {showLanguageModal && (
-        <Box className="absolute inset-0 bg-black/50 flex justify-center items-center z-50">
-          <Pressable className="absolute inset-0" onPress={() => setShowLanguageModal(false)} />
-          <Card className="p-6 m-4 max-w-md w-full">
-            <VStack space="lg">
-              <HStack className="justify-between items-center">
-                <Heading
-                  size="md"
-                  className="text-typography-900 dark:text-typography-950"
-                >
-                  Select Language
-                </Heading>
-                <UIPressable onPress={() => setShowLanguageModal(false)}>
-                  <Icon as={X} size="md" className="text-typography-500" />
-                </UIPressable>
-              </HStack>
-
-              <VStack space="md">
-                {availableLanguages.map((language) => (
-                  <UIPressable
-                    key={language.code}
-                    onPress={() => handleLanguageChange(language.code)}
-                    className="p-4 rounded-lg border border-outline-200 dark:border-outline-700"
-                  >
-                    <HStack className="justify-between items-center">
-                      <VStack space="xs">
-                        <Text className="font-semibold text-typography-900 dark:text-typography-950">
-                          {language.nativeName}
-                        </Text>
-                        <Text
-                          size="sm"
-                          className="text-typography-600 dark:text-typography-300"
-                        >
-                          {language.name}
-                        </Text>
-                      </VStack>
-                      {currentLanguage === language.code && (
-                        <Icon
-                          as={Check}
-                          size="md"
-                          className="text-primary-600 dark:text-primary-400"
-                        />
-                      )}
-                    </HStack>
-                  </UIPressable>
-                ))}
-              </VStack>
-            </VStack>
-          </Card>
-        </Box>
-      )}
     </SafeAreaView>
   );
 };
