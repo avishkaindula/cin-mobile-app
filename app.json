@@ -12,7 +12,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.mission15",
       "usesAppleSignIn": true,
-      "appleTeamId": "3674CYRVR2"
+      "appleTeamId": "3674CYRVR2",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
