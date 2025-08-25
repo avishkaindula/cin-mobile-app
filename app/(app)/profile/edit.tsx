@@ -149,8 +149,17 @@ const EditProfilePage = () => {
       const uploadResult = await uploadAvatar(pickResult.data.uri);
       
       if (uploadResult.success && uploadResult.data) {
-        setAvatarUrl(uploadResult.data.avatarUrl);
-        showSuccess("Success", "Avatar uploaded successfully!");
+        // Update the avatar URL in the database
+        const updateResult = await updateUserProfile({ 
+          avatar_url: uploadResult.data.avatarUrl 
+        });
+        
+        if (updateResult.success) {
+          setAvatarUrl(uploadResult.data.avatarUrl);
+          showSuccess("Success", "Avatar uploaded successfully!");
+        } else {
+          showError("Error", "Avatar uploaded but failed to update profile");
+        }
       } else {
         showError("Error", uploadResult.error || "Failed to upload avatar");
       }

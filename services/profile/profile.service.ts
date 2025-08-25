@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { Database } from '@/lib/database.types';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 export type Agent = Database['public']['Tables']['agents']['Row'];
 export type AgentUpdate = Database['public']['Tables']['agents']['Update'];
@@ -124,23 +125,34 @@ export const uploadAvatar = async (
       };
     }
 
-    // Convert image to blob
-    const response = await fetch(imageUri);
-    const blob = await response.blob();
-    
     // Generate unique filename
     const fileExt = imageUri.split('.').pop()?.toLowerCase() || 'jpg';
     const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`;
 
+    // Read file as base64
+    console.log('Reading file:', imageUri);
+    const base64Data = await FileSystem.readAsStringAsync(imageUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    
+    console.log('Base64 data length:', base64Data.length);
+
+    // Convert base64 to binary for upload
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    
+    console.log('Binary data length:', binaryData.length);
+
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(fileName, blob, {
+      .upload(fileName, binaryData, {
         cacheControl: '3600',
         upsert: true,
+        contentType: `image/${fileExt}`,
       });
 
     if (uploadError) {
+      console.error('Upload error details:', uploadError);
       return { 
         success: false, 
         error: `Failed to upload avatar: ${uploadError.message}` 
