@@ -14,6 +14,7 @@ import { LanguageProvider } from "@/components/i18n/language-context";
 
 import "../global.css";
 import { SessionProvider, useSession } from "@/context/auth";
+import { ThemeProvider } from "@/context/theme";
 import { SplashScreenController } from "@/components/splash-controller";
 
 export {
@@ -40,10 +41,12 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <LanguageProvider>
-        <GluestackUIProvider>
-          <SplashScreenController />
-          <RootLayoutNav />
-        </GluestackUIProvider>
+        <ThemeProvider>
+          <GluestackUIProvider>
+            <SplashScreenController />
+            <RootLayoutNav />
+          </GluestackUIProvider>
+        </ThemeProvider>
       </LanguageProvider>
     </SessionProvider>
   );

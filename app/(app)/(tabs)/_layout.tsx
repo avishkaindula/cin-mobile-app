@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Home, Zap, MapPin, Users, User } from "lucide-react-native";
 import { Platform } from "react-native";
-import { useColorScheme } from "nativewind";
+import { useTheme } from "@/context/theme";
 
 function TabBarIcon({
   IconComponent,
@@ -15,7 +15,7 @@ function TabBarIcon({
 }
 
 export default function TabLayout() {
-  const { colorScheme } = useColorScheme();
+  const { colorScheme } = useTheme();
 
   return (
     <Tabs

@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Divider } from "@/components/ui/divider";
-import { useColorScheme } from "nativewind";
+import { useTheme } from "@/context/theme";
 import { useSession } from "@/context/auth";
 import {
   User,
@@ -39,7 +39,7 @@ import {
 } from "@/services/profile/profile.service";
 
 const ProfilePage = () => {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { colorScheme, toggleColorScheme } = useTheme();
   const { signOut, user } = useSession();
   const [missions, setMissions] = useState<MissionWithStats[]>([]);
   const [profile, setProfile] = useState<Agent | null>(null);
