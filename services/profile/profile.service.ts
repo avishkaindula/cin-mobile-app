@@ -61,6 +61,44 @@ export const getCurrentUserProfile = async (): Promise<ProfileServiceResponse<Ag
 };
 
 /**
+ * Get current user profile with signed avatar URL
+ */
+export const getCurrentUserProfileWithAvatar = async (): Promise<ProfileServiceResponse<Agent & { avatarSignedUrl?: string }>> => {
+  try {
+    const profileResult = await getCurrentUserProfile();
+    
+    if (!profileResult.success || !profileResult.data) {
+      return profileResult;
+    }
+
+    const profile = profileResult.data;
+    
+    // If profile has avatar_url (which is now a path), get signed URL
+    if (profile.avatar_url) {
+      const signedUrl = await getAvatarUrl(profile.avatar_url);
+      return {
+        success: true,
+        data: {
+          ...profile,
+          avatarSignedUrl: signedUrl || undefined
+        }
+      };
+    }
+
+    return {
+      success: true,
+      data: profile
+    };
+  } catch (error) {
+    console.error('Error fetching user profile with avatar:', error);
+    return { 
+      success: false, 
+      error: 'Unexpected error occurred while fetching profile with avatar' 
+    };
+  }
+};
+
+/**
  * Update user profile in agents table
  */
 export const updateUserProfile = async (
@@ -110,11 +148,27 @@ export const updateUserProfile = async (
 };
 
 /**
+ * Get avatar URL from storage with signed URL (similar to mission thumbnails)
+ */
+export const getAvatarUrl = async (avatarPath: string): Promise<string | null> => {
+  try {
+    const { data } = await supabase.storage
+      .from('avatars')
+      .createSignedUrl(avatarPath, 3600); // 1 hour expiry
+
+    return data?.signedUrl || null;
+  } catch (error) {
+    console.error('Error getting avatar URL:', error);
+    return null;
+  }
+};
+
+/**
  * Upload avatar image to Supabase Storage
  */
 export const uploadAvatar = async (
   imageUri: string
-): Promise<ProfileServiceResponse<{ avatarUrl: string }>> => {
+): Promise<ProfileServiceResponse<{ avatarUrl: string; avatarPath?: string }>> => {
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
@@ -159,14 +213,33 @@ export const uploadAvatar = async (
       };
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(uploadData.path);
+    // Get signed URL (like mission thumbnails)
+    const signedUrl = await getAvatarUrl(uploadData.path);
+    
+    if (!signedUrl) {
+      return { 
+        success: false, 
+        error: 'Failed to generate avatar URL' 
+      };
+    }
+
+    // Update the profile with the file path (not the signed URL)
+    const { error: updateError } = await supabase
+      .from('agents')
+      .update({ avatar_url: uploadData.path })
+      .eq('id', user.id);
+
+    if (updateError) {
+      console.error('Error updating profile with avatar path:', updateError);
+      return { 
+        success: false, 
+        error: 'Failed to update profile with avatar' 
+      };
+    }
 
     return { 
       success: true, 
-      data: { avatarUrl: publicUrl }
+      data: { avatarUrl: signedUrl, avatarPath: uploadData.path }
     };
   } catch (error) {
     console.error('Error uploading avatar:', error);

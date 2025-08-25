@@ -33,6 +33,7 @@ import {
 import { useSession } from "@/context/auth";
 import {
   getCurrentUserProfile,
+  getCurrentUserProfileWithAvatar,
   updateUserProfile,
   uploadAvatar,
   pickImage,
@@ -60,23 +61,22 @@ const EditProfilePage = () => {
     loadProfile();
   }, []);
 
-  const loadProfile = async () => {
+    const loadProfile = async () => {
     try {
       setLoading(true);
-      const response = await getCurrentUserProfile();
+      const result = await getCurrentUserProfileWithAvatar();
       
-      if (response.success && response.data) {
-        const profileData = response.data;
+      if (result.success && result.data) {
+        const profileData = result.data;
         setProfile(profileData);
-        
-        // Populate form fields
         setFullName(profileData.full_name || "");
         setEmail(profileData.email || user?.email || "");
         setPhone(profileData.phone || "");
         setAddress(profileData.address || "");
-        setAvatarUrl(profileData.avatar_url || "");
+        // Use the signed URL if available, otherwise keep empty
+        setAvatarUrl(profileData.avatarSignedUrl || "");
       } else {
-        showError("Error", response.error || "Failed to load profile");
+        showError("Error", result.error || "Failed to load profile");
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -149,17 +149,10 @@ const EditProfilePage = () => {
       const uploadResult = await uploadAvatar(pickResult.data.uri);
       
       if (uploadResult.success && uploadResult.data) {
-        // Update the avatar URL in the database
-        const updateResult = await updateUserProfile({ 
-          avatar_url: uploadResult.data.avatarUrl 
-        });
-        
-        if (updateResult.success) {
-          setAvatarUrl(uploadResult.data.avatarUrl);
-          showSuccess("Success", "Avatar uploaded successfully!");
-        } else {
-          showError("Error", "Avatar uploaded but failed to update profile");
-        }
+        // Avatar is already updated in the database by uploadAvatar function
+        // Just update the local state with the signed URL
+        setAvatarUrl(uploadResult.data.avatarUrl);
+        showSuccess("Success", "Avatar uploaded successfully!");
       } else {
         showError("Error", uploadResult.error || "Failed to upload avatar");
       }

@@ -29,10 +29,12 @@ import {
 } from "lucide-react-native";
 import {
   getPublishedMissions,
+  getUserMissionStats,
   MissionWithStats,
 } from "@/services/missions";
 import {
   getCurrentUserProfile,
+  getCurrentUserProfileWithAvatar,
   Agent,
 } from "@/services/profile/profile.service";
 
@@ -41,6 +43,7 @@ const ProfilePage = () => {
   const { signOut, user } = useSession();
   const [missions, setMissions] = useState<MissionWithStats[]>([]);
   const [profile, setProfile] = useState<Agent | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -68,9 +71,10 @@ const ProfilePage = () => {
 
   const loadProfile = async () => {
     try {
-      const response = await getCurrentUserProfile();
+      const response = await getCurrentUserProfileWithAvatar();
       if (response.success && response.data) {
         setProfile(response.data);
+        setAvatarUrl(response.data.avatarSignedUrl || "");
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -233,11 +237,11 @@ const ProfilePage = () => {
           <Card className="p-6 mb-6">
             <VStack space="lg">
               <HStack space="lg" className="items-center">
-                {profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture ? (
+                {avatarUrl || user?.user_metadata?.avatar_url || user?.user_metadata?.picture ? (
                   <Avatar size="xl">
                     <AvatarImage
                       source={{
-                        uri: profile?.avatar_url || 
+                        uri: avatarUrl || 
                              user?.user_metadata?.avatar_url || 
                              user?.user_metadata?.picture,
                       }}
