@@ -148,60 +148,61 @@ const HomePage = () => {
         <Box className="p-6">
           {/* Header with League Status */}
           <VStack space="lg" className="mb-8">
-            <HStack space="lg" className="items-center">
-              <Icon as={Globe} size="xl" className="text-primary-500" />
-              <VStack space="xs" className="flex-1">
-                <Heading
-                  size="xl"
-                  className="text-typography-900 dark:text-typography-950"
-                >
-                  Mission 1.5
-                </Heading>
-                <Text
-                  size="sm"
-                  className="text-typography-600 dark:text-typography-750"
-                >
-                  Empowering climate action
-                </Text>
-              </VStack>
-            </HStack>
+            <VStack space="md" className="items-center">
+              <Image
+                source={require("@/assets/icon.png")}
+                style={{ width: 64, height: 64 }}
+                resizeMode="contain"
+              />
+              <Heading
+                size="xl"
+                className="text-[#333333] font-extrabold tracking-wider"
+                retro
+              >
+                Mission 1.5
+              </Heading>
+              <Text
+                size="lg"
+                className="text-[#333333] text-center font-semibold tracking-wide"
+              >
+                Empowering climate action
+              </Text>
+            </VStack>
 
             {/* League Status Card */}
-            <Card className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-gray-200 dark:border-gray-800">
+            <Card className="p-4 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <HStack space="md" className="items-center">
-                <Box
-                  className="p-3 rounded-full"
-                  style={{ backgroundColor: `${userStats.leagueColor}20` }}
-                >
+                <Box className="p-3 rounded-lg bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                   <Icon
                     as={userStats.leagueIcon}
                     size="md"
-                    style={{ color: userStats.leagueColor }}
+                    className="text-[#333333]"
                   />
                 </Box>
                 <VStack space="xs" className="flex-1">
                   <HStack space="xs" className="items-center">
                     <Text
                       size="lg"
-                      className="font-bold text-typography-900 dark:text-typography-950"
+                      className="font-bold text-[#333333] tracking-wide"
+                      retro
                     >
                       Silver League
                     </Text>
-                    <Badge variant="solid" className="bg-primary-500">
-                      <Text size="xs" className="text-white">
+                    <Badge variant="solid" className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
+                      <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                         {userStats.currentPoints} {t("points")}
                       </Text>
                     </Badge>
                   </HStack>
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-semibold tracking-wide"
                   >
                     {pointsToNext > 0 ? `${pointsToNext} ${t("pointsToNext")}` : "Max level reached!"}
                   </Text>
-                  <Box className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-1">
+                  <Box className="w-full h-3 bg-[#333333] border-2 border-[#333333] rounded-lg mt-1">
                     <Box
-                      className="h-full rounded-full"
+                      className="h-full rounded-md border border-[#333333]"
                       style={{
                         width: `${Math.min(
                           (userStats.currentPoints /
@@ -219,32 +220,32 @@ const HomePage = () => {
 
           {/* Quick Stats */}
           <HStack space="md" className="mb-8">
-            <Card className="flex-1 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+            <Card className="flex-1 p-4 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="xs" className="items-center">
-                <Text className="font-bold text-green-600 text-2xl">
+                <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                   {userStats.completedMissions}
                 </Text>
-                <Text size="sm" className="text-green-600">
+                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                   Completed
                 </Text>
               </VStack>
             </Card>
-            <Card className="flex-1 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+            <Card className="flex-1 p-4 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="xs" className="items-center">
-                <Text className="font-bold text-blue-600 text-2xl">
+                <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                   {userStats.activeMissions}
                 </Text>
-                <Text size="sm" className="text-blue-600">
+                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                   Active
                 </Text>
               </VStack>
             </Card>
-            <Card className="flex-1 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+            <Card className="flex-1 p-4 bg-[#FFE4B5] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="xs" className="items-center">
-                <Text className="font-bold text-orange-600 text-2xl">
+                <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                   {userStats.totalEnergy}
                 </Text>
-                <Text size="sm" className="text-orange-600">
+                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                   Energy
                 </Text>
               </VStack>
@@ -257,12 +258,13 @@ const HomePage = () => {
               <HStack className="justify-between items-center">
                 <Heading
                   size="lg"
-                  className="text-typography-900 dark:text-typography-950"
+                  className="text-[#333333] font-extrabold tracking-wider"
+                  retro
                 >
                   Continue Your Quests
                 </Heading>
                 <Button variant="link" size="sm" onPress={() => router.push('/quests')}>
-                  <Text size="sm" className="text-primary-500">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     View All
                   </Text>
                 </Button>
@@ -275,7 +277,7 @@ const HomePage = () => {
                     return (
                       <Card
                         key={mission.id}
-                        className="w-72 overflow-hidden border border-gray-200 dark:border-gray-800"
+                        className="w-72 overflow-hidden border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]"
                       >
                         <VStack space="md">
                           {(mission as any).thumbnailUrl && (
@@ -287,9 +289,9 @@ const HomePage = () => {
                               />
                               <Badge
                                 variant="solid"
-                                className="absolute top-2 right-2 bg-blue-500"
+                                className="absolute top-2 right-2 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               >
-                                <Text size="xs" className="text-white">
+                                <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   {mission.submission_progress || 0}% Complete
                                 </Text>
                               </Badge>
@@ -297,26 +299,26 @@ const HomePage = () => {
                           )}
                           <VStack space="md" className="p-4">
                             <HStack space="xs" className="items-center">
-                              <Badge className="bg-green-100 dark:bg-green-900/30">
+                              <Badge className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                                 <HStack space="xs" className="items-center">
                                   <Icon
                                     as={Award}
                                     size="xs"
-                                    className="text-green-600"
+                                    className="text-[#333333]"
                                   />
-                                  <Text size="xs" className="text-green-600">
+                                  <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                     +{mission.points_awarded} pts
                                   </Text>
                                 </HStack>
                               </Badge>
-                              <Badge className="bg-orange-100 dark:bg-orange-900/30">
+                              <Badge className="bg-[#FFE4B5] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                                 <HStack space="xs" className="items-center">
                                   <Icon
                                     as={Zap}
                                     size="xs"
-                                    className="text-orange-600"
+                                    className="text-[#333333]"
                                   />
-                                  <Text size="xs" className="text-orange-600">
+                                  <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                     +{mission.energy_awarded} ⚡
                                   </Text>
                                 </HStack>
@@ -324,14 +326,15 @@ const HomePage = () => {
                             </HStack>
                             <VStack space="xs">
                               <Text
-                                className="font-semibold text-typography-900 dark:text-typography-950"
+                                className="font-bold text-[#333333] tracking-wide"
                                 numberOfLines={2}
+                                retro
                               >
                                 {mission.title}
                               </Text>
                               <Text
                                 size="sm"
-                                className="text-typography-600 dark:text-typography-750"
+                                className="text-[#333333] font-semibold tracking-wide"
                                 numberOfLines={3}
                               >
                                 {mission.description}
@@ -341,27 +344,31 @@ const HomePage = () => {
                               <HStack className="justify-between">
                                 <Text
                                   size="sm"
-                                  className="text-typography-600 dark:text-typography-750"
+                                  className="text-[#333333] font-bold tracking-wide"
                                 >
                                   Progress
                                 </Text>
-                                <Text size="sm" className="text-blue-600">
+                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                                   {mission.submission_progress || 0}%
                                 </Text>
                               </HStack>
-                              <Progress
-                                value={mission.submission_progress || 0}
-                                className="h-2"
-                              />
+                              <Box className="w-full h-3 bg-[#333333] border-2 border-[#333333] rounded-lg">
+                                <Box
+                                  className="h-full rounded-md bg-[#A2D8FF] border border-[#333333]"
+                                  style={{
+                                    width: `${mission.submission_progress || 0}%`,
+                                  }}
+                                />
+                              </Box>
                             </VStack>
                             <Button 
                               size="sm" 
-                              className="mt-2"
+                              className="mt-2 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                               onPress={() => handleContinueMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
-                                <Icon as={Play} size="sm" className="text-white" />
-                                <Text className="text-white">Continue</Text>
+                                <Icon as={Play} size="sm" className="text-[#333333]" />
+                                <Text className="text-[#333333] font-bold tracking-wide">Continue</Text>
                               </HStack>
                             </Button>
                           </VStack>
@@ -380,12 +387,13 @@ const HomePage = () => {
               <HStack className="justify-between items-center">
                 <Heading
                   size="lg"
-                  className="text-typography-900 dark:text-typography-950"
+                  className="text-[#333333] font-extrabold tracking-wider"
+                  retro
                 >
                   Saved Quests
                 </Heading>
                 <Button variant="link" size="sm" onPress={() => router.push('/quests')}>
-                  <Text size="sm" className="text-primary-500">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     View All
                   </Text>
                 </Button>
@@ -396,7 +404,7 @@ const HomePage = () => {
                   {savedMissions.slice(0, 5).map((mission) => (
                     <Card
                       key={mission.id}
-                      className="w-72 overflow-hidden border border-gray-200 dark:border-gray-800"
+                      className="w-72 overflow-hidden border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]"
                     >
                       <VStack space="md">
                         {(mission as any).thumbnailUrl && (
@@ -408,11 +416,11 @@ const HomePage = () => {
                             />
                             <Badge
                               variant="solid"
-                              className="absolute top-2 right-2 bg-purple-500"
+                              className="absolute top-2 right-2 bg-[#DDA0DD] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                             >
                               <HStack space="xs" className="items-center">
-                                <Icon as={Bookmark} size="xs" className="text-white" />
-                                <Text size="xs" className="text-white">
+                                <Icon as={Bookmark} size="xs" className="text-[#333333]" />
+                                <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   Saved
                                 </Text>
                               </HStack>
@@ -421,26 +429,26 @@ const HomePage = () => {
                         )}
                         <VStack space="md" className="p-4">
                           <HStack space="xs" className="items-center">
-                            <Badge className="bg-green-100 dark:bg-green-900/30">
+                            <Badge className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                               <HStack space="xs" className="items-center">
                                 <Icon
                                   as={Award}
                                   size="xs"
-                                  className="text-green-600"
+                                  className="text-[#333333]"
                                 />
-                                <Text size="xs" className="text-green-600">
+                                <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   +{mission.points_awarded} pts
                                 </Text>
                               </HStack>
                             </Badge>
-                            <Badge className="bg-orange-100 dark:bg-orange-900/30">
+                            <Badge className="bg-[#FFE4B5] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                               <HStack space="xs" className="items-center">
                                 <Icon
                                   as={Zap}
                                   size="xs"
-                                  className="text-orange-600"
+                                  className="text-[#333333]"
                                 />
-                                <Text size="xs" className="text-orange-600">
+                                <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   +{mission.energy_awarded} ⚡
                                 </Text>
                               </HStack>
@@ -448,14 +456,15 @@ const HomePage = () => {
                           </HStack>
                           <VStack space="xs">
                             <Text
-                              className="font-semibold text-typography-900 dark:text-typography-950"
+                              className="font-bold text-[#333333] tracking-wide"
                               numberOfLines={2}
+                              retro
                             >
                               {mission.title}
                             </Text>
                             <Text
                               size="sm"
-                              className="text-typography-600 dark:text-typography-750"
+                              className="text-[#333333] font-semibold tracking-wide"
                               numberOfLines={3}
                             >
                               {mission.description}
@@ -465,11 +474,11 @@ const HomePage = () => {
                             <Icon
                               as={Building}
                               size="sm"
-                              className="text-gray-500"
+                              className="text-[#333333]"
                             />
                             <Text
                               size="sm"
-                              className="text-typography-600 dark:text-typography-750"
+                              className="text-[#333333] font-semibold tracking-wide"
                             >
                               {mission.organization_name}
                             </Text>
@@ -478,22 +487,22 @@ const HomePage = () => {
                             <Button 
                               variant="outline"
                               size="sm" 
-                              className="flex-1"
+                              className="flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                               onPress={() => handleViewMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
-                                <Icon as={Eye} size="sm" className="text-gray-500" />
-                                <Text size="sm">View</Text>
+                                <Icon as={Eye} size="sm" className="text-[#333333]" />
+                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">View</Text>
                               </HStack>
                             </Button>
                             <Button 
                               size="sm" 
-                              className="flex-1"
+                              className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               onPress={() => handleStartMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
-                                <Icon as={Target} size="sm" className="text-white" />
-                                <Text className="text-white">Start</Text>
+                                <Icon as={Target} size="sm" className="text-[#333333]" />
+                                <Text className="text-[#333333] font-bold tracking-wide">Start</Text>
                               </HStack>
                             </Button>
                           </HStack>
@@ -512,12 +521,13 @@ const HomePage = () => {
               <HStack className="justify-between items-center">
                 <Heading
                   size="lg"
-                  className="text-typography-900 dark:text-typography-950"
+                  className="text-[#333333] font-extrabold tracking-wider"
+                  retro
                 >
                   Discover New Quests
                 </Heading>
                 <Button variant="link" size="sm" onPress={() => router.push('/quests')}>
-                  <Text size="sm" className="text-primary-500">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     View All
                   </Text>
                 </Button>
@@ -528,7 +538,7 @@ const HomePage = () => {
                   {availableMissions.map((mission) => (
                     <Card
                       key={mission.id}
-                      className="w-72 overflow-hidden border border-gray-200 dark:border-gray-800"
+                      className="w-72 overflow-hidden border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]"
                     >
                       <VStack space="md">
                         {(mission as any).thumbnailUrl && (
@@ -540,9 +550,9 @@ const HomePage = () => {
                             />
                             <Badge
                               variant="solid"
-                              className="absolute top-2 right-2 bg-primary-500"
+                              className="absolute top-2 right-2 bg-[#FFD700] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                             >
-                              <Text size="xs" className="text-white">
+                              <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                 +{mission.points_awarded} pts
                               </Text>
                             </Badge>
@@ -550,26 +560,26 @@ const HomePage = () => {
                         )}
                         <VStack space="md" className="p-4">
                           <HStack space="xs" className="items-center">
-                            <Badge className="bg-green-100 dark:bg-green-900/30">
+                            <Badge className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                               <HStack space="xs" className="items-center">
                                 <Icon
                                   as={Award}
                                   size="xs"
-                                  className="text-green-600"
+                                  className="text-[#333333]"
                                 />
-                                <Text size="xs" className="text-green-600">
+                                <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   +{mission.points_awarded} pts
                                 </Text>
                               </HStack>
                             </Badge>
-                            <Badge className="bg-orange-100 dark:bg-orange-900/30">
+                            <Badge className="bg-[#FFE4B5] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                               <HStack space="xs" className="items-center">
                                 <Icon
                                   as={Zap}
                                   size="xs"
-                                  className="text-orange-600"
+                                  className="text-[#333333]"
                                 />
-                                <Text size="xs" className="text-orange-600">
+                                <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   +{mission.energy_awarded} ⚡
                                 </Text>
                               </HStack>
@@ -577,14 +587,15 @@ const HomePage = () => {
                           </HStack>
                           <VStack space="xs">
                             <Text
-                              className="font-semibold text-typography-900 dark:text-typography-950"
+                              className="font-bold text-[#333333] tracking-wide"
                               numberOfLines={2}
+                              retro
                             >
                               {mission.title}
                             </Text>
                             <Text
                               size="sm"
-                              className="text-typography-600 dark:text-typography-750"
+                              className="text-[#333333] font-semibold tracking-wide"
                               numberOfLines={3}
                             >
                               {mission.description}
@@ -595,11 +606,11 @@ const HomePage = () => {
                               <Icon
                                 as={Building}
                                 size="sm"
-                                className="text-gray-500"
+                                className="text-[#333333]"
                               />
                               <Text
                                 size="sm"
-                                className="text-typography-600 dark:text-typography-750"
+                                className="text-[#333333] font-semibold tracking-wide"
                               >
                                 {mission.organization_name}
                               </Text>
@@ -608,11 +619,11 @@ const HomePage = () => {
                               <Icon
                                 as={Users}
                                 size="sm"
-                                className="text-blue-500"
+                                className="text-[#333333]"
                               />
                               <Text
                                 size="sm"
-                                className="text-typography-600 dark:text-typography-750"
+                                className="text-[#333333] font-semibold tracking-wide"
                               >
                                 {mission.participants_count}
                               </Text>
@@ -620,12 +631,12 @@ const HomePage = () => {
                           </HStack>
                           <Button 
                             size="sm" 
-                            className="mt-2"
+                            className="mt-2 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                             onPress={() => handleStartMission(mission.id)}
                           >
                             <HStack space="xs" className="items-center">
-                              <Icon as={Target} size="sm" className="text-white" />
-                              <Text className="text-white">Start Quest</Text>
+                              <Icon as={Target} size="sm" className="text-[#333333]" />
+                              <Text className="text-[#333333] font-bold tracking-wide">Start Quest</Text>
                             </HStack>
                           </Button>
                         </VStack>
@@ -639,9 +650,9 @@ const HomePage = () => {
 
           {/* Loading State */}
           {loading && (
-            <Card className="p-8 items-center">
+            <Card className="p-8 items-center border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
               <VStack space="md" className="items-center">
-                <Text className="text-center text-gray-500">
+                <Text className="text-center text-[#333333] font-semibold tracking-wide">
                   Loading your quests...
                 </Text>
               </VStack>
@@ -650,18 +661,19 @@ const HomePage = () => {
 
           {/* No quests message */}
           {!loading && missions.length === 0 && (
-            <Card className="p-8 items-center">
+            <Card className="p-8 items-center border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
               <VStack space="md" className="items-center">
-                <Icon as={Target} size="xl" className="text-gray-400" />
-                <Text className="text-center text-gray-500">
+                <Icon as={Target} size="xl" className="text-[#333333]" />
+                <Text className="text-center text-[#333333] font-semibold tracking-wide">
                   No quests available at the moment.
                 </Text>
                 <Button 
                   size="sm" 
                   variant="outline"
+                  className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                   onPress={() => router.push('/quests')}
                 >
-                  <Text>Explore Quests</Text>
+                  <Text className="text-[#333333] font-bold tracking-wide">Explore Quests</Text>
                 </Button>
               </VStack>
             </Card>
@@ -672,24 +684,26 @@ const HomePage = () => {
             <VStack space="lg" className="mb-8">
               <Heading
                 size="lg"
-                className="text-typography-900 dark:text-typography-950"
+                className="text-[#333333] font-extrabold tracking-wider"
+                retro
               >
                 Get Started
               </Heading>
-              <Card className="p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-gray-200 dark:border-gray-800">
+              <Card className="p-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
                 <VStack space="md" className="items-center">
-                  <Icon as={Target} size="xl" className="text-primary-500" />
-                  <Text className="text-center text-typography-900 dark:text-typography-950 font-semibold">
+                  <Icon as={Target} size="xl" className="text-[#333333]" />
+                  <Text className="text-center text-[#333333] font-bold tracking-wide" retro>
                     Start your climate action journey!
                   </Text>
-                  <Text className="text-center text-typography-600 dark:text-typography-750">
+                  <Text className="text-center text-[#333333] font-semibold tracking-wide">
                     Browse available quests and start making a positive impact on our planet.
                   </Text>
                   <Button 
                     size="sm" 
+                    className="bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                     onPress={() => router.push('/quests')}
                   >
-                    <Text className="text-white">Explore Quests</Text>
+                    <Text className="text-[#333333] font-bold tracking-wide">Explore Quests</Text>
                   </Button>
                 </VStack>
               </Card>
