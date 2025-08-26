@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Divider } from "@/components/ui/divider";
+import { Image } from "@/components/ui/image";
 import { useTheme } from "@/context/theme";
 import { useSession } from "@/context/auth";
 import {
@@ -230,7 +231,7 @@ const ProfilePage = () => {
   return (
     <SafeAreaView
       style={{ flex: 1 }}
-      className="bg-white dark:bg-background-dark"
+      className="bg-[#FCFCFC]"
     >
       <ScrollView
         className="flex-1"
@@ -239,35 +240,31 @@ const ProfilePage = () => {
         }
       >
         <Box className="p-6">
-          {/* Header */}
-          <VStack space="lg" className="mb-8">
-            <HStack space="md" className="items-center">
-              <Icon as={User} size="xl" className="text-primary-500" />
-              <VStack space="xs">
-                <Heading
-                  size="xl"
-                  className="text-typography-900 dark:text-typography-950"
-                >
-                  Profile
-                </Heading>
-                <Text
-                  size="sm"
-                  className="text-typography-600 dark:text-typography-750"
-                >
-                  Your climate action journey
-                </Text>
-              </VStack>
-            </HStack>
-          </VStack>
+          {/* Header with Logo */}
+          <HStack className="items-center justify-between mb-8">
+            <VStack space="lg">
+              <Heading retro size="2xl" className="text-[#333333] tracking-wide font-bold">
+                Profile
+              </Heading>
+              <Text retro className="text-[#333333] text-base">
+                Your climate action journey
+              </Text>
+            </VStack>
+            <Image 
+              source={require('@/assets/icon.png')}
+              style={{ width: 48, height: 48 }}
+              resizeMode="contain"
+            />
+          </HStack>
 
-          {/* Profile Info */}
-          <Card className="p-6 mb-6">
+          {/* Profile Info Card */}
+          <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
               <HStack space="lg" className="items-center">
                 {avatarUrl ||
                 user?.user_metadata?.avatar_url ||
                 user?.user_metadata?.picture ? (
-                  <Avatar size="xl">
+                  <Avatar size="xl" className="border-2 border-[#333333]">
                     <AvatarImage
                       source={{
                         uri:
@@ -278,95 +275,91 @@ const ProfilePage = () => {
                     />
                   </Avatar>
                 ) : (
-                  <Box className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full items-center justify-center">
+                  <Box className="w-16 h-16 bg-[#98FB98] border-2 border-[#333333] rounded-full items-center justify-center">
                     <Icon
                       as={User}
                       size="xl"
-                      className="text-green-600 dark:text-green-400"
+                      className="text-[#333333]"
                     />
                   </Box>
                 )}
-                <VStack space="xs" className="flex-1">
-                  <Heading
+                <VStack space="md" className="flex-1">
+                  <Heading retro
                     size="lg"
-                    className="text-typography-900 dark:text-typography-950"
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     {displayName}
                   </Heading>
-                  <Text className="text-typography-600 dark:text-typography-750">
+                  <Text retro className="text-[#333333]">
                     {displayEmail}
                   </Text>
                   {displayLocation && (
-                    <Text
+                    <Text retro
                       size="sm"
-                      className="text-typography-500 dark:text-typography-300"
+                      className="text-[#333333] opacity-80"
                     >
                       {displayLocation}
                     </Text>
                   )}
                   <HStack space="xs" className="items-center mt-2">
-                    <Badge variant="solid" action="success">
-                      <Text size="xs">Level {currentLevel.level}</Text>
+                    <Badge className="bg-[#98FB98] border border-[#333333] shadow-[2px_2px_0_#333333]">
+                      <Text retro size="xs" className="text-[#333333] font-bold">Level {currentLevel.level}</Text>
                     </Badge>
-                    <Badge variant="outline">
-                      <Text size="xs">{userStats.totalPoints} points</Text>
+                    <Badge className="bg-[#FFD700] border border-[#333333] shadow-[2px_2px_0_#333333]">
+                      <Text retro size="xs" className="text-[#333333] font-bold">{userStats.totalPoints} points</Text>
                     </Badge>
                   </HStack>
-                  <Text
+                  <Text retro
                     size="sm"
-                    className="text-primary-600 dark:text-primary-400 font-medium"
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     {currentLevel.name}
                   </Text>
                 </VStack>
               </HStack>
-              <Button
-                variant="outline"
-                onPress={() => router.push("/profile/edit")}
-              >
-                <HStack space="xs" className="items-center">
-                  <Icon
-                    as={Edit}
-                    size="sm"
-                    className="text-typography-600 dark:text-typography-400"
-                  />
-                  <Text>Edit Profile</Text>
-                </HStack>
-              </Button>
-              <Button
-                variant="solid"
-                action="negative"
-                onPress={signOut}
-                className="w-full"
-              >
-                <HStack space="xs" className="items-center">
-                  <Icon as={LogOut} size="sm" className="text-white" />
-                  <Text className="text-white">Sign Out</Text>
-                </HStack>
-              </Button>
+              <HStack space="md" className="justify-center">
+                <Button
+                  className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333] flex-1"
+                  onPress={() => router.push("/profile/edit")}
+                >
+                  <HStack space="xs" className="items-center justify-center">
+                    <Icon
+                      as={Edit}
+                      size="sm"
+                      className="text-[#333333]"
+                    />
+                    <Text retro className="text-[#333333] font-bold">Edit Profile</Text>
+                  </HStack>
+                </Button>
+                <Button
+                  className="bg-[#DDA0DD] border-2 border-[#333333] shadow-[4px_4px_0_#333333] flex-1"
+                  onPress={signOut}
+                >
+                  <HStack space="xs" className="items-center justify-center">
+                    <Icon as={LogOut} size="sm" className="text-[#333333]" />
+                    <Text retro className="text-[#333333] font-bold">Sign Out</Text>
+                  </HStack>
+                </Button>
+              </HStack>
             </VStack>
           </Card>
 
-          {/* Stats */}
-          <Card className="p-6 mb-6">
+          {/* Stats Card */}
+          <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
-              <Heading
-                size="md"
-                className="text-typography-900 dark:text-typography-950"
+              <Heading retro
+                size="lg"
+                className="text-[#333333] font-bold tracking-wide"
               >
                 Contributions
               </Heading>
               <VStack space="md">
                 {stats.map((stat, index) => (
                   <HStack key={index} className="justify-between items-center">
-                    <Text className="text-typography-600 dark:text-typography-750">
+                    <Text retro className="text-[#333333]">
                       {stat.label}
                     </Text>
-                    <Text
-                      className={`font-bold ${
-                        stat.color
-                      } dark:${stat.color.replace("text-", "text-")}`}
-                    >
+                    <Text retro className="text-[#333333] font-bold">
                       {stat.value}
                     </Text>
                   </HStack>
@@ -375,12 +368,12 @@ const ProfilePage = () => {
             </VStack>
           </Card>
 
-          {/* Achievements */}
-          <Card className="p-6 mb-6">
+          {/* Achievements Card */}
+          <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
-              <Heading
-                size="md"
-                className="text-typography-900 dark:text-typography-950"
+              <Heading retro
+                size="lg"
+                className="text-[#333333] font-bold tracking-wide"
               >
                 Achievements
               </Heading>
@@ -392,42 +385,38 @@ const ProfilePage = () => {
                     className="items-center"
                   >
                     <Box
-                      className={`p-2 rounded-full ${
+                      className={`p-2 rounded-lg border-2 border-[#333333] ${
                         achievement.earned
-                          ? "bg-green-100 dark:bg-green-900/30"
-                          : "bg-gray-100 dark:bg-gray-800"
+                          ? "bg-[#98FB98]"
+                          : "bg-[#E0E0E0]"
                       }`}
                     >
                       <Icon
                         as={achievement.icon}
                         size="md"
-                        className={
-                          achievement.earned
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-gray-400"
-                        }
+                        className="text-[#333333]"
                       />
                     </Box>
                     <VStack space="xs" className="flex-1">
-                      <Text
-                        className={`font-semibold ${
+                      <Text retro
+                        className={`font-bold tracking-wide ${
                           achievement.earned
-                            ? "text-typography-900 dark:text-typography-950"
-                            : "text-typography-500 dark:text-typography-500"
+                            ? "text-[#333333]"
+                            : "text-[#333333] opacity-50"
                         }`}
                       >
                         {achievement.title}
                       </Text>
-                      <Text
+                      <Text retro
                         size="sm"
-                        className="text-typography-600 dark:text-typography-750"
+                        className="text-[#333333] opacity-80"
                       >
                         {achievement.description}
                       </Text>
                     </VStack>
                     {achievement.earned && (
-                      <Badge variant="solid" action="success">
-                        <Text size="xs">Earned</Text>
+                      <Badge className="bg-[#FFD700] border border-[#333333] shadow-[2px_2px_0_#333333]">
+                        <Text retro size="xs" className="text-[#333333] font-bold">Earned</Text>
                       </Badge>
                     )}
                   </HStack>
@@ -436,17 +425,17 @@ const ProfilePage = () => {
             </VStack>
           </Card>
 
-          {/* Recent Activity */}
-          <Card className="p-6 mb-6">
+          {/* Recent Activity Card */}
+          <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
-              <Heading
-                size="md"
-                className="text-typography-900 dark:text-typography-950"
+              <Heading retro
+                size="lg"
+                className="text-[#333333] font-bold tracking-wide"
               >
                 Recent Activity
               </Heading>
               {loading ? (
-                <Text className="text-typography-600 dark:text-typography-400">
+                <Text retro className="text-[#333333] opacity-80">
                   Loading activity...
                 </Text>
               ) : recentActivity.length > 0 ? (
@@ -454,15 +443,15 @@ const ProfilePage = () => {
                   {recentActivity.map((activity, index) => (
                     <HStack key={index} space="md" className="items-center">
                       <Box
-                        className={`w-2 h-2 ${activity.color} rounded-full`}
+                        className="w-3 h-3 bg-[#98FB98] border border-[#333333] rounded-full"
                       />
                       <VStack space="xs" className="flex-1">
-                        <Text className="text-typography-900 dark:text-typography-950">
+                        <Text retro className="text-[#333333] font-bold">
                           {activity.title}
                         </Text>
-                        <Text
+                        <Text retro
                           size="sm"
-                          className="text-typography-600 dark:text-typography-750"
+                          className="text-[#333333] opacity-80"
                         >
                           {activity.date}
                         </Text>
@@ -472,8 +461,10 @@ const ProfilePage = () => {
                 </VStack>
               ) : (
                 <VStack space="md" className="items-center">
-                  <Icon as={Calendar} size="lg" className="text-gray-400" />
-                  <Text className="text-center text-gray-500">
+                  <Box className="p-4 bg-[#E0E0E0] border-2 border-[#333333] rounded-lg">
+                    <Icon as={Calendar} size="lg" className="text-[#333333] opacity-50" />
+                  </Box>
+                  <Text retro className="text-center text-[#333333] opacity-80">
                     Complete missions to see your activity here
                   </Text>
                 </VStack>
