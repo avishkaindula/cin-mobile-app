@@ -21,7 +21,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#16A34A", // darker green for better contrast
-        tabBarInactiveTintColor: "#000000", // plain black for inactive
+        tabBarInactiveTintColor: "#3c3b3b", // plain black for inactive
         headerShown: false,
         tabBarLabelStyle: {
           fontWeight: "bold",
