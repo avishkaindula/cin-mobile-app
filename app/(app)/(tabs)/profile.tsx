@@ -91,7 +91,9 @@ const ProfilePage = () => {
 
   // Calculate real user statistics from missions
   const userStats = {
-    completedMissions: missions.filter((m) => m.submission_status === "reviewed").length,
+    completedMissions: missions.filter(
+      (m) => m.submission_status === "reviewed"
+    ).length,
     ongoingMissions: missions.filter(
       (m) =>
         m.submission_status === "in_progress" ||
@@ -155,7 +157,7 @@ const ProfilePage = () => {
     },
   ];
 
-  const earnedAchievements = achievements.filter(a => a.earned);
+  const earnedAchievements = achievements.filter((a) => a.earned);
 
   // Calculate user level based on points
   const getUserLevel = (points: number) => {
@@ -182,20 +184,45 @@ const ProfilePage = () => {
     }));
 
   const stats = [
-    { label: "Missions Completed", value: userStats.completedMissions.toString(), color: "text-green-600" },
-    { label: "Missions In Progress", value: userStats.ongoingMissions.toString(), color: "text-blue-600" },
-    { label: "Saved Missions", value: userStats.savedMissions.toString(), color: "text-purple-600" },
-    { label: "Points Earned", value: userStats.totalPoints.toString(), color: "text-orange-600" },
-    { label: "Energy Collected", value: userStats.totalEnergy.toString(), color: "text-yellow-600" },
-    { label: "Data Points", value: userStats.dataPointsContributed.toString(), color: "text-blue-500" },
+    {
+      label: "Missions Completed",
+      value: userStats.completedMissions.toString(),
+      color: "text-green-600",
+    },
+    {
+      label: "Missions In Progress",
+      value: userStats.ongoingMissions.toString(),
+      color: "text-blue-600",
+    },
+    {
+      label: "Saved Missions",
+      value: userStats.savedMissions.toString(),
+      color: "text-purple-600",
+    },
+    {
+      label: "Points Earned",
+      value: userStats.totalPoints.toString(),
+      color: "text-orange-600",
+    },
+    {
+      label: "Energy Collected",
+      value: userStats.totalEnergy.toString(),
+      color: "text-yellow-600",
+    },
+    {
+      label: "Data Points",
+      value: userStats.dataPointsContributed.toString(),
+      color: "text-blue-500",
+    },
   ];
 
   // Get display data from profile or auth user
-  const displayName = profile?.full_name || 
-                     user?.user_metadata?.full_name || 
-                     user?.user_metadata?.name || 
-                     user?.email?.split('@')[0] || 
-                     "Climate Advocate";
+  const displayName =
+    profile?.full_name ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Climate Advocate";
 
   const displayEmail = profile?.email || user?.email || "No email";
   const displayLocation = profile?.address || user?.user_metadata?.location;
@@ -205,7 +232,7 @@ const ProfilePage = () => {
       style={{ flex: 1 }}
       className="bg-white dark:bg-background-dark"
     >
-      <ScrollView 
+      <ScrollView
         className="flex-1"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -237,19 +264,26 @@ const ProfilePage = () => {
           <Card className="p-6 mb-6">
             <VStack space="lg">
               <HStack space="lg" className="items-center">
-                {avatarUrl || user?.user_metadata?.avatar_url || user?.user_metadata?.picture ? (
+                {avatarUrl ||
+                user?.user_metadata?.avatar_url ||
+                user?.user_metadata?.picture ? (
                   <Avatar size="xl">
                     <AvatarImage
                       source={{
-                        uri: avatarUrl || 
-                             user?.user_metadata?.avatar_url || 
-                             user?.user_metadata?.picture,
+                        uri:
+                          avatarUrl ||
+                          user?.user_metadata?.avatar_url ||
+                          user?.user_metadata?.picture,
                       }}
                     />
                   </Avatar>
                 ) : (
                   <Box className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full items-center justify-center">
-                    <Icon as={User} size="xl" className="text-green-600 dark:text-green-400" />
+                    <Icon
+                      as={User}
+                      size="xl"
+                      className="text-green-600 dark:text-green-400"
+                    />
                   </Box>
                 )}
                 <VStack space="xs" className="flex-1">
@@ -286,12 +320,16 @@ const ProfilePage = () => {
                   </Text>
                 </VStack>
               </HStack>
-              <Button 
+              <Button
                 variant="outline"
                 onPress={() => router.push("/profile/edit")}
               >
                 <HStack space="xs" className="items-center">
-                  <Icon as={Edit} size="sm" className="text-typography-600 dark:text-typography-400" />
+                  <Icon
+                    as={Edit}
+                    size="sm"
+                    className="text-typography-600 dark:text-typography-400"
+                  />
                   <Text>Edit Profile</Text>
                 </HStack>
               </Button>
@@ -415,7 +453,9 @@ const ProfilePage = () => {
                 <VStack space="md">
                   {recentActivity.map((activity, index) => (
                     <HStack key={index} space="md" className="items-center">
-                      <Box className={`w-2 h-2 ${activity.color} rounded-full`} />
+                      <Box
+                        className={`w-2 h-2 ${activity.color} rounded-full`}
+                      />
                       <VStack space="xs" className="flex-1">
                         <Text className="text-typography-900 dark:text-typography-950">
                           {activity.title}
@@ -438,51 +478,6 @@ const ProfilePage = () => {
                   </Text>
                 </VStack>
               )}
-            </VStack>
-          </Card>
-
-          {/* Settings */}
-          <Card className="p-6">
-            <VStack space="lg">
-              <Heading
-                size="md"
-                className="text-typography-900 dark:text-typography-950"
-              >
-                Settings
-              </Heading>
-              <VStack space="md">
-                <VStack space="md">
-                  <HStack space="md" className="items-center">
-                    <Icon
-                      as={Settings}
-                      size="md"
-                      className="text-typography-500"
-                    />
-                    <Text className="text-typography-900 dark:text-typography-950">
-                      Theme
-                    </Text>
-                  </HStack>
-                  <Button
-                    variant="outline"
-                    onPress={toggleColorScheme}
-                    className="w-full"
-                  >
-                    <HStack space="xs" className="items-center">
-                      <Icon
-                        as={colorScheme === "dark" ? Sun : Moon}
-                        size="sm"
-                        className="text-typography-600 dark:text-typography-400"
-                      />
-                      <Text
-                        size="sm"
-                        className="text-typography-600 dark:text-typography-750"
-                      >
-                        {colorScheme === "dark" ? "Light Mode" : "Dark Mode"}
-                      </Text>
-                    </HStack>
-                  </Button>
-                </VStack>
-              </VStack>
             </VStack>
           </Card>
         </Box>
