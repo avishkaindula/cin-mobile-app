@@ -442,7 +442,7 @@ const MissionSubmissionPage = () => {
               </Text>
               <Button 
                 onPress={() => router.back()} 
-                className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                className="bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
               >
                 <Text retro className="text-[#333333] font-bold">Return to Missions</Text>
               </Button>

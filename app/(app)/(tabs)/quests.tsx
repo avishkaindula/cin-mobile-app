@@ -267,7 +267,7 @@ const QuestsPage = () => {
                 <Text size="xl" className="text-[#333333] font-bold tracking-wide" retro>
                   Your Progress
                 </Text>
-                <Box className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg p-3">
+                <Box className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg p-3">
                   <Icon as={Award} size="lg" className="text-[#333333]" />
                 </Box>
               </HStack>
@@ -345,7 +345,7 @@ const QuestsPage = () => {
             size="sm"
             onPress={() => setActiveTab("missions")}
             className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
-              activeTab === "missions" ? "bg-[#A2D8FF]" : "bg-[#FCFCFC]"
+              activeTab === "missions" ? "bg-[#98FB98]" : "bg-[#FCFCFC]"
             }`}
           >
             <HStack space="xs" className="items-center">
@@ -526,7 +526,7 @@ const QuestsPage = () => {
                               </HStack>
                               <Box className="w-full h-3 bg-[#333333] border-2 border-[#333333] rounded-lg">
                                 <Box
-                                  className="h-full rounded-md bg-[#A2D8FF] border border-[#333333]"
+                                  className="h-full rounded-md bg-[#98FB98] border border-[#333333]"
                                   style={{
                                     width: `${mission.submission_progress || 0}%`,
                                   }}
@@ -589,7 +589,7 @@ const QuestsPage = () => {
                                   router.push(`/mission/${mission.id}/submit`);
                                 }
                               }}
-                              className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               disabled={
                                 mission.submission_status === "reviewed"
                               }

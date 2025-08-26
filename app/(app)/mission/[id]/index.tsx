@@ -357,7 +357,7 @@ const MissionDetailsPage = () => {
                     variant="solid"
                     size="sm"
                     onPress={() => router.push(`/mission/${mission.id}/submit`)}
-                    className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                    className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                   >
                     <VStack className="items-center justify-center">
                       <HStack space="xs" className="items-center">
@@ -406,7 +406,7 @@ const MissionDetailsPage = () => {
                       className="p-4 bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                     >
                       <HStack space="md" className="items-start">
-                        <Box className="w-8 h-8 bg-[#A2D8FF] border-2 border-[#333333] rounded-full items-center justify-center">
+                        <Box className="w-8 h-8 bg-[#98FB98] border-2 border-[#333333] rounded-full items-center justify-center">
                           <Text retro
                             size="sm"
                             className="font-bold text-[#333333]"
@@ -507,7 +507,7 @@ const MissionDetailsPage = () => {
           )}
 
           {/* Additional Info */}
-          <Card className="p-6 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+          <Card className="p-6 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="md" className="items-center">
               <Text retro className="font-bold text-[#333333] text-center text-lg">
                 � Ready to make an impact?
