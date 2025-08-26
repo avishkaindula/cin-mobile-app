@@ -230,7 +230,7 @@ const HomePage = () => {
                 </Text>
               </VStack>
             </Card>
-            <Card className="flex-1 p-4 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+            <Card className="flex-1 p-4 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="xs" className="items-center">
                 <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                   {userStats.activeMissions}
