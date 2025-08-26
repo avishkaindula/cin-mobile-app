@@ -165,12 +165,21 @@ const MissionDetailsPage = () => {
     return (
       <SafeAreaView
         style={{ flex: 1 }}
-        className="bg-[#FCFCFC]"
+        className="bg-white dark:bg-background-dark"
       >
         <Box className="flex-1 justify-center items-center p-6">
-          <Text retro className="text-[#333333]">
-            Loading mission details...
-          </Text>
+          <Card className="p-8 border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
+            <VStack space="md" className="items-center">
+              <Image
+                source={require("@/assets/icon.png")}
+                style={{ width: 48, height: 48 }}
+                resizeMode="contain"
+              />
+              <Text className="text-[#333333] font-semibold tracking-wide">
+                Loading mission details...
+              </Text>
+            </VStack>
+          </Card>
         </Box>
       </SafeAreaView>
     );

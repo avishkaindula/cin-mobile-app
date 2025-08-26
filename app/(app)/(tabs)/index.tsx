@@ -652,6 +652,11 @@ const HomePage = () => {
           {loading && (
             <Card className="p-8 items-center border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
               <VStack space="md" className="items-center">
+                <Image
+                  source={require("@/assets/icon.png")}
+                  style={{ width: 48, height: 48 }}
+                  resizeMode="contain"
+                />
                 <Text className="text-center text-[#333333] font-semibold tracking-wide">
                   Loading your quests...
                 </Text>
