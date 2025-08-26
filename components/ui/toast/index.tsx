@@ -27,14 +27,14 @@ const SCOPE = 'TOAST';
 cssInterop(MotionView, { className: 'style' });
 
 const toastStyle = tva({
-  base: 'p-6 mx-4 mt-12 mb-4 rounded-xl web:pointer-events-auto shadow-hard-5 border-outline-100 min-w-80 max-w-md flex-row gap-3',
+  base: 'p-4 px-5 mx-4 mt-12 mb-4 rounded-lg web:pointer-events-auto border-2 border-[#333333] shadow-retro-sharp min-w-80 max-w-md flex-row gap-4 relative',
   variants: {
     action: {
-      error: 'bg-error-800 border-error-700',
-      warning: 'bg-warning-700 border-warning-600',
-      success: 'bg-success-700 border-success-600',
-      info: 'bg-info-700 border-info-600',
-      muted: 'bg-background-800 border-background-700',
+      error: 'bg-[#D9534F] border-[#4B4B4B]',
+      warning: 'bg-[#FFD966] border-[#4B4B4B]',
+      success: 'bg-[#98D19F] border-[#4B4B4B]',
+      info: 'bg-[#A2D8FF] border-[#4B4B4B]', // Primary blue from alert.css
+      muted: 'bg-[#ECECEC] border-[#4B4B4B]', // Secondary grey from alert.css
     },
 
     variant: {
@@ -46,33 +46,33 @@ const toastStyle = tva({
     {
       variant: 'outline',
       action: 'error',
-      class: 'border-error-500 bg-error-50',
+      class: 'border-[#4B4B4B] bg-[#D9534F]',
     },
     {
       variant: 'outline',
       action: 'warning',
-      class: 'border-warning-500 bg-warning-50',
+      class: 'border-[#4B4B4B] bg-[#FFD966]',
     },
     {
       variant: 'outline',
       action: 'success',
-      class: 'border-success-500 bg-success-50',
+      class: 'border-[#4B4B4B] bg-[#98D19F]',
     },
     {
       variant: 'outline',
       action: 'info',
-      class: 'border-info-500 bg-info-50',
+      class: 'border-[#4B4B4B] bg-[#A2D8FF]',
     },
     {
       variant: 'outline',
       action: 'muted',
-      class: 'border-background-300 bg-background-50',
+      class: 'border-[#4B4B4B] bg-[#ECECEC]',
     },
   ],
 });
 
 const toastTitleStyle = tva({
-  base: 'text-typography-0 font-medium font-body tracking-md text-left flex-wrap',
+  base: 'text-[#333333] font-bold text-left flex-wrap text-base mb-1',
   variants: {
     isTruncated: {
       true: '',
@@ -106,44 +106,44 @@ const toastTitleStyle = tva({
       outline: '',
     },
     action: {
-      error: '',
-      warning: '',
-      success: '',
-      info: '',
-      muted: '',
+      error: 'text-white', // White text for error (red background)
+      warning: 'text-[#333333]', // Dark text for warning (yellow background)
+      success: 'text-[#333333]', // Dark text for success (green background)
+      info: 'text-[#333333]', // Dark text for info (blue background)
+      muted: 'text-[#333333]', // Dark text for muted (grey background)
     },
   },
   parentCompoundVariants: [
     {
       variant: 'outline',
       action: 'error',
-      class: 'text-error-900 font-semibold',
+      class: 'text-white font-bold',
     },
     {
       variant: 'outline',
       action: 'warning',
-      class: 'text-warning-900 font-semibold',
+      class: 'text-[#333333] font-bold',
     },
     {
       variant: 'outline',
       action: 'success',
-      class: 'text-success-900 font-semibold',
+      class: 'text-[#333333] font-bold',
     },
     {
       variant: 'outline',
       action: 'info',
-      class: 'text-info-900 font-semibold',
+      class: 'text-[#333333] font-bold',
     },
     {
       variant: 'outline',
       action: 'muted',
-      class: 'text-background-900 font-semibold',
+      class: 'text-[#333333] font-bold',
     },
   ],
 });
 
 const toastDescriptionStyle = tva({
-  base: 'font-normal font-body tracking-md text-left flex-wrap',
+  base: 'font-normal text-left flex-wrap text-sm',
   variants: {
     isTruncated: {
       true: '',
@@ -173,10 +173,24 @@ const toastDescriptionStyle = tva({
   },
   parentVariants: {
     variant: {
-      solid: 'text-typography-50',
-      outline: 'text-typography-900',
+      solid: 'text-[#333333]',
+      outline: 'text-[#333333]',
+    },
+    action: {
+      error: 'text-white', // White text for error (red background)
+      warning: 'text-[#333333]', // Dark text for warning (yellow background)
+      success: 'text-[#333333]', // Dark text for success (green background)
+      info: 'text-[#333333]', // Dark text for info (blue background)
+      muted: 'text-[#333333]', // Dark text for muted (grey background)
     },
   },
+  parentCompoundVariants: [
+    {
+      variant: 'outline',
+      action: 'error',
+      class: 'text-white',
+    },
+  ],
 });
 
 const Root = withStyleContext(View, SCOPE);
@@ -200,18 +214,15 @@ const Toast = React.forwardRef<React.ComponentRef<typeof Root>, IToastProps>(
 
     const IconComponent = iconMap[action];
 
-    // Icon color mapping based on variant
+    // Icon color mapping based on variant - matching react-retro alert colors
     const getIconColor = () => {
-      if (variant === 'outline') {
-        switch (action) {
-          case 'error': return '#dc2626'; // red-600
-          case 'success': return '#059669'; // green-600
-          case 'warning': return '#d97706'; // yellow-600
-          case 'info': return '#2563eb'; // blue-600
-          default: return '#6b7280'; // gray-500
-        }
+      switch (action) {
+        case 'error': return '#ffffff'; // White for error (red background)
+        case 'success': return '#333333'; // Dark grey for success (green background)
+        case 'warning': return '#333333'; // Dark grey for warning (yellow background)
+        case 'info': return '#333333'; // Dark grey for info (blue background)
+        default: return '#333333'; // Dark grey for muted (grey background)
       }
-      return '#ffffff'; // white for solid variant
     };
 
     return (

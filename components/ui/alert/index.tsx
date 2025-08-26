@@ -1,6 +1,6 @@
 "use client";
 import { createAlert } from "@gluestack-ui/alert";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { tva } from "@gluestack-ui/nativewind-utils/tva";
 import {
   withStyleContext,
@@ -14,15 +14,15 @@ import { PrimitiveIcon, UIIcon } from "@gluestack-ui/icon";
 const SCOPE = "ALERT";
 
 const alertStyle = tva({
-  base: "items-center py-3 px-4 rounded-md flex-row gap-2 border-outline-100",
+  base: "flex-row items-center py-4 px-5 border-2 border-[#333333] rounded-lg my-2 relative",
 
   variants: {
     action: {
-      error: "bg-background-error",
-      warning: "bg-background-warning",
-      success: "bg-background-success",
-      info: "bg-background-info",
-      muted: "bg-background-muted",
+      primary: "bg-[#A2D8FF] border-[#4B4B4B] shadow-[4px_4px_0_#333333]",
+      secondary: "bg-[#ECECEC] border-[#4B4B4B] shadow-[4px_4px_0_#333333]",
+      success: "bg-[#98D19F] border-[#4B4B4B] shadow-[4px_4px_0_#333333]",
+      warning: "bg-[#FFD966] border-[#4B4B4B] shadow-[4px_4px_0_#333333]",
+      error: "bg-[#D9534F] border-[#4B4B4B] shadow-[4px_4px_0_#333333]",
     },
 
     variant: {
@@ -33,7 +33,7 @@ const alertStyle = tva({
 });
 
 const alertTextStyle = tva({
-  base: "font-normal font-body",
+  base: "font-normal text-[#333333] flex-1",
 
   variants: {
     isTruncated: {
@@ -52,7 +52,7 @@ const alertTextStyle = tva({
       "2xs": "text-2xs",
       xs: "text-xs",
       sm: "text-sm",
-      md: "text-base",
+      md: "text-sm", // Changed to match alert.css 14px
       lg: "text-lg",
       xl: "text-xl",
       "2xl": "text-2xl",
@@ -70,37 +70,53 @@ const alertTextStyle = tva({
     highlight: {
       true: "bg-yellow-500",
     },
+    isTitle: {
+      true: "font-bold text-base mb-1", // Matches alert-title in CSS
+    },
   },
   parentVariants: {
     action: {
-      error: "text-error-800",
-      warning: "text-warning-800",
-      success: "text-success-800",
-      info: "text-info-800",
-      muted: "text-background-800",
+      primary: "text-[#333333]",
+      secondary: "text-[#333333]",
+      success: "text-[#333333]",
+      warning: "text-[#333333]",
+      error: "text-white", // White text for error variant
     },
   },
 });
 
 const alertIconStyle = tva({
-  base: "fill-none",
+  base: "fill-none mr-4 text-2xl leading-4",
   variants: {
     size: {
       "2xs": "h-3 w-3",
       xs: "h-3.5 w-3.5",
       sm: "h-4 w-4",
-      md: "h-[18px] w-[18px]",
+      md: "h-6 w-6", // Matches 24px from alert.css
       lg: "h-5 w-5",
       xl: "h-6 w-6",
     },
   },
   parentVariants: {
     action: {
-      error: "text-error-800",
-      warning: "text-warning-800",
-      success: "text-success-800",
-      info: "text-info-800",
-      muted: "text-background-800",
+      primary: "text-[#333333]",
+      secondary: "text-[#333333]",
+      success: "text-[#333333]",
+      warning: "text-[#333333]",
+      error: "text-white",
+    },
+  },
+});
+
+const alertCloseButtonStyle = tva({
+  base: "absolute top-2 right-4 p-0 text-xl leading-4",
+  parentVariants: {
+    action: {
+      primary: "text-[#333333]",
+      secondary: "text-[#333333]",
+      success: "text-[#333333]",
+      warning: "text-[#333333]",
+      error: "text-white",
     },
   },
 });
@@ -132,7 +148,7 @@ type IAlertProps = Omit<
 
 const Alert = React.forwardRef<React.ComponentRef<typeof UIAlert>, IAlertProps>(
   function Alert(
-    { className, variant = "solid", action = "muted", ...props },
+    { className, variant = "solid", action = "primary", ...props },
     ref
   ) {
     return (
@@ -163,6 +179,7 @@ const AlertText = React.forwardRef<
     sub,
     italic,
     highlight,
+    isTitle,
     ...props
   },
   ref
@@ -179,6 +196,7 @@ const AlertText = React.forwardRef<
         sub,
         italic,
         highlight,
+        isTitle,
         class: className,
         parentVariants: {
           action: parentAction,
@@ -238,8 +256,34 @@ const AlertIcon = React.forwardRef<
   );
 });
 
+type IAlertCloseButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
+  VariantProps<typeof alertCloseButtonStyle>;
+
+const AlertCloseButton = React.forwardRef<
+  React.ComponentRef<typeof Pressable>,
+  IAlertCloseButtonProps
+>(function AlertCloseButton({ className, children, ...props }, ref) {
+  const { action: parentAction } = useStyleContext(SCOPE);
+  
+  return (
+    <Pressable
+      className={alertCloseButtonStyle({
+        parentVariants: {
+          action: parentAction,
+        },
+        class: className,
+      })}
+      {...props}
+      ref={ref}
+    >
+      {children}
+    </Pressable>
+  );
+});
+
 Alert.displayName = "Alert";
 AlertText.displayName = "AlertText";
 AlertIcon.displayName = "AlertIcon";
+AlertCloseButton.displayName = "AlertCloseButton";
 
-export { Alert, AlertText, AlertIcon };
+export { Alert, AlertText, AlertIcon, AlertCloseButton };

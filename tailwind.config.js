@@ -187,6 +187,7 @@ module.exports = {
         "hard-3": "2px 2px 8px 0px rgba(38, 38, 38, 0.20)",
         "hard-4": "0px -3px 10px 0px rgba(38, 38, 38, 0.20)",
         "hard-5": "0px 2px 10px 0px rgba(38, 38, 38, 0.10)",
+        "retro-sharp": "4px 4px 0 #333333", // Sharp shadow from react-retro alert
         "soft-1": "0px 0px 10px rgba(38, 38, 38, 0.1)",
         "soft-2": "0px 0px 20px rgba(38, 38, 38, 0.2)",
         "soft-3": "0px 0px 30px rgba(38, 38, 38, 0.1)",
