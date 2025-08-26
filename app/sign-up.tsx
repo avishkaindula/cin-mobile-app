@@ -291,7 +291,7 @@ export default function SignUp() {
 
               {/* Sign Up Card */}
               <Card className="w-full max-w-sm p-8">
-                <VStack space="lg">
+                <VStack space="lg" className="items-center">
                   <VStack space="md" className="items-center">
                     <Heading
                       size="lg"
