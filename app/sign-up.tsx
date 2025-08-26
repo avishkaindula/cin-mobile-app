@@ -419,7 +419,7 @@ export default function SignUp() {
                     }
                     onPress={handleSignUp}
                   >
-                    <HStack space="md" className="items-center">
+                    <HStack space="md" className="items-center justify-center">
                       {loading ? (
                         <Spinner size="small" color="white" />
                       ) : (
@@ -461,7 +461,7 @@ export default function SignUp() {
                     }
                     onPress={handleGoogleSignUp}
                   >
-                    <HStack space="md" className="items-center">
+                    <HStack space="md" className="items-center justify-center">
                       <GoogleIcon size={20} />
                       <Text
                         size="lg"
@@ -491,7 +491,7 @@ export default function SignUp() {
                       }
                       onPress={handleAppleSignUp}
                     >
-                      <HStack space="md" className="items-center">
+                      <HStack space="md" className="items-center justify-center">
                         {appleLoading ? (
                           <Spinner size="small" />
                         ) : (
@@ -523,7 +523,7 @@ export default function SignUp() {
                     }
                     onPress={handleGitHubSignUp}
                   >
-                    <HStack space="md" className="items-center">
+                    <HStack space="md" className="items-center justify-center">
                       <Icon
                         as={Github}
                         size="md"

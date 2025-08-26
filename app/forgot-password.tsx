@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Image } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -198,11 +198,13 @@ export default function ForgotPassword() {
           <Box className="flex-1 justify-center">
             <VStack space="xl" className="items-center">
               {/* Header */}
-              <VStack space="lg" className="items-center mb-8">
-                <Box className="p-4 bg-[#FFB347] rounded-full">
-                  <Icon as={KeyRound} size="xl" className="text-[#333333]" />
-                </Box>
-                <VStack space="xs" className="items-center">
+              <VStack space="md" className="items-center mb-4">
+                <Image
+                  source={require("@/assets/icon.png")}
+                  style={{ width: 64, height: 64 }}
+                  resizeMode="contain"
+                />
+                <VStack space="md" className="items-center">
                   <Heading
                     size="2xl"
                     className="text-[#333333] text-center font-extrabold tracking-wider"
@@ -267,7 +269,7 @@ export default function ForgotPassword() {
                     disabled={loading}
                     onPress={handleResetPassword}
                   >
-                    <HStack space="md" className="items-center">
+                    <HStack space="md" className="items-center justify-center">
                       <Icon as={KeyRound} size="md" className="text-[#333333]" />
                       <Text size="lg" className="text-[#333333] font-semibold">
                         {loading ? "Sending Reset Link..." : "Send Reset Link"}
