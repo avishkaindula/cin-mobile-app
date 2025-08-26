@@ -1,6 +1,11 @@
 import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, InteractionManager, Platform, Image } from "react-native";
+import {
+  SafeAreaView,
+  InteractionManager,
+  Platform,
+  Image,
+} from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -241,19 +246,21 @@ export default function SignUp() {
           {/* Back Button */}
           <HStack className="items-center mb-6">
             <Button
-              variant="link"
+              variant="outline"
               size="sm"
               onPress={() => router.back()}
-              className="p-2 -ml-2"
+              className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC] px-4 py-2"
             >
-              <Icon as={ArrowLeft} size="md" className="text-[#333333]" />
+              <HStack space="xs" className="items-center">
+                <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
+                <Text
+                  size="md"
+                  className="text-[#333333] font-bold tracking-wide"
+                >
+                  Go Back
+                </Text>
+              </HStack>
             </Button>
-            <Text
-              size="lg"
-              className="text-[#333333] font-semibold ml-2"
-            >
-              Go Back
-            </Text>
           </HStack>
 
           <Box className="flex-1 justify-center">
@@ -416,7 +423,11 @@ export default function SignUp() {
                       {loading ? (
                         <Spinner size="small" color="white" />
                       ) : (
-                        <Icon as={UserPlus} size="md" className="text-[#333333]" />
+                        <Icon
+                          as={UserPlus}
+                          size="md"
+                          className="text-[#333333]"
+                        />
                       )}
                       <Text size="lg" className="text-[#333333] font-semibold">
                         {loading ? "Creating Account..." : "Create Account"}
@@ -518,10 +529,7 @@ export default function SignUp() {
                         size="md"
                         className="text-typography-600 dark:text-typography-400"
                       />
-                      <Text
-                        size="lg"
-                        className="text-[#333333] font-semibold"
-                      >
+                      <Text size="lg" className="text-[#333333] font-semibold">
                         {githubLoading
                           ? "Connecting..."
                           : "Continue with GitHub"}
@@ -531,10 +539,7 @@ export default function SignUp() {
 
                   {/* Sign In Link */}
                   <VStack space="xs" className="items-center">
-                    <Text
-                      size="lg"
-                      className="text-[#333333]"
-                    >
+                    <Text size="lg" className="text-[#333333]">
                       Already have an account?
                     </Text>
                     <Button
@@ -544,7 +549,7 @@ export default function SignUp() {
                     >
                       <Text
                         size="lg"
-                        className="text-[#A2D8FF] font-semibold"
+                        className="text-primary-500 font-bold tracking-wide"
                       >
                         Sign In
                       </Text>
@@ -552,10 +557,7 @@ export default function SignUp() {
                   </VStack>
 
                   <VStack space="xs" className="items-center">
-                    <Text
-                      size="md"
-                      className="text-[#666666] text-center"
-                    >
+                    <Text size="md" className="text-[#666666] text-center">
                       By creating an account, you agree to our Terms of Service
                       and Privacy Policy
                     </Text>
@@ -569,33 +571,24 @@ export default function SignUp() {
                   size="lg"
                   className="text-[#333333] text-center font-semibold"
                 >
-                  Join thousands of climate scientists:
+                  Join thousands of climate enthusiasts:
                 </Text>
                 <VStack space="xs">
                   <HStack space="md" className="items-center">
                     <Box className="w-2 h-2 bg-green-500 rounded-full" />
-                    <Text
-                      size="md"
-                      className="text-[#333333]"
-                    >
+                    <Text size="md" className="text-[#333333]">
                       Contribute to real climate research
                     </Text>
                   </HStack>
                   <HStack space="md" className="items-center">
                     <Box className="w-2 h-2 bg-blue-500 rounded-full" />
-                    <Text
-                      size="md"
-                      className="text-[#333333]"
-                    >
+                    <Text size="md" className="text-[#333333]">
                       Access exclusive missions and data
                     </Text>
                   </HStack>
                   <HStack space="md" className="items-center">
                     <Box className="w-2 h-2 bg-purple-500 rounded-full" />
-                    <Text
-                      size="md"
-                      className="text-[#333333]"
-                    >
+                    <Text size="md" className="text-[#333333]">
                       Earn recognition for your contributions
                     </Text>
                   </HStack>
@@ -613,17 +606,10 @@ export default function SignUp() {
             <VStack space="lg" className="items-center">
               <Spinner size="large" />
               <VStack space="xs" className="items-center">
-                <Heading
-                  size="md"
-                  className="text-[#333333]"
-                  retro={true}
-                >
+                <Heading size="md" className="text-[#333333]" retro={true}>
                   Completing Sign Up
                 </Heading>
-                <Text
-                  size="md"
-                  className="text-[#666666] text-center"
-                >
+                <Text size="md" className="text-[#666666] text-center">
                   Securely connecting your Google account...
                 </Text>
               </VStack>
