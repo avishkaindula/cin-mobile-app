@@ -11,7 +11,7 @@ function TabBarIcon({
   IconComponent: any;
   color: string;
 }) {
-  return <IconComponent size={20} color={color} />;
+  return <IconComponent size={20} color={color} strokeWidth={2.5} />;
 }
 
 export default function TabLayout() {
@@ -21,8 +21,12 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#059669", // green-600
-        tabBarInactiveTintColor: colorScheme === "dark" ? "#9CA3AF" : "#6B7280", // gray-400 for dark, gray-500 for light
+        tabBarInactiveTintColor: "#000000", // plain black for inactive
         headerShown: false,
+        tabBarLabelStyle: {
+          fontWeight: "bold",
+          fontSize: 11,
+        },
         tabBarStyle: {
           backgroundColor: colorScheme === "dark" ? "#181719" : "#FFFFFF", // match background-dark and white
           borderTopColor: colorScheme === "dark" ? "#2D2D2D" : "#E5E7EB", // darker border for dark mode
