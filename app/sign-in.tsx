@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Platform } from "react-native";
+import { SafeAreaView, Platform, Image } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -13,7 +13,7 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Spinner } from "@/components/ui/spinner";
 import { useAppToast } from "@/lib/toast-utils";
-import { LogIn, Shield, Mail, Lock, Github } from "lucide-react-native";
+import { LogIn, Mail, Lock, Github } from "lucide-react-native";
 import { useSession } from "@/context/auth";
 import { GoogleIcon } from "@/assets/ico/google-icon";
 import { AppleIcon } from "@/assets/ico/apple-icon";
@@ -173,7 +173,10 @@ export default function SignIn() {
           error.message || "Failed to sign in with Apple"
         );
       } else {
-        showSuccess("Welcome Back!", "You have successfully signed in with Apple.");
+        showSuccess(
+          "Welcome Back!",
+          "You have successfully signed in with Apple."
+        );
       }
     } catch (error) {
       showError(
@@ -194,9 +197,11 @@ export default function SignIn() {
         <Box className="flex-1 justify-center p-6">
           <VStack space="xl" className="items-center">
             <VStack space="lg" className="items-center mb-8">
-              <Box className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full">
-                <Icon as={Shield} size="xl" className="text-primary-500" />
-              </Box>
+              <Image
+                source={require("@/assets/icon.png")}
+                style={{ width: 48, height: 48 }}
+                resizeMode="contain"
+              />
               <VStack space="xs" className="items-center">
                 <Heading
                   size="2xl"
@@ -207,7 +212,8 @@ export default function SignIn() {
                 </Heading>
                 <Text
                   size="lg"
-                  className="text-[#333333] text-center font-semibold tracking-wide"
+                  className="text-[#333333] text-center font-bold tracking-wider uppercase"
+                  retro
                 >
                   Sign in to continue your climate action journey
                 </Text>
@@ -227,7 +233,8 @@ export default function SignIn() {
                   </Heading>
                   <Text
                     size="sm"
-                    className="text-[#333333] text-center font-semibold tracking-wide"
+                    className="text-[#333333] text-center font-bold tracking-wider uppercase"
+                    retro
                   >
                     Join thousands of climate scientists and environmental
                     enthusiasts making a difference
@@ -296,7 +303,7 @@ export default function SignIn() {
                     {loading ? (
                       <Spinner size="small" color="white" />
                     ) : (
-                      <Icon as={LogIn} size="md" className="text-white" />
+                      <Icon as={LogIn} size="md" className="text-[#333333]" />
                     )}
                     <Text size="lg" className="text-[#333333] font-semibold">
                       {loading ? "Signing In..." : "Sign In"}
@@ -370,9 +377,7 @@ export default function SignIn() {
                         size="lg"
                         className="text-[#333333] font-semibold tracking-wide"
                       >
-                        {appleLoading
-                          ? "Connecting..."
-                          : "Continue with Apple"}
+                        {appleLoading ? "Connecting..." : "Continue with Apple"}
                       </Text>
                     </HStack>
                   </Button>
@@ -383,7 +388,9 @@ export default function SignIn() {
                   variant="outline"
                   size="lg"
                   className="w-full"
-                  disabled={loading || githubLoading || googleLoading || appleLoading}
+                  disabled={
+                    loading || githubLoading || googleLoading || appleLoading
+                  }
                   onPress={handleGitHubSignIn}
                 >
                   <HStack space="md" className="items-center">
@@ -407,7 +414,10 @@ export default function SignIn() {
                   size="sm"
                   onPress={() => router.push("/forgot-password")}
                 >
-                  <Text size="sm" className="text-primary-500 font-semibold tracking-wide">
+                  <Text
+                    size="sm"
+                    className="text-primary-500 font-bold tracking-wider uppercase"
+                  >
                     Forgot Password?
                   </Text>
                 </Button>
@@ -425,7 +435,10 @@ export default function SignIn() {
                     size="sm"
                     onPress={() => router.push("/sign-up")}
                   >
-                    <Text size="sm" className="text-primary-500 font-semibold tracking-wide">
+                    <Text
+                      size="sm"
+                      className="text-primary-500 font-bold tracking-wider uppercase"
+                    >
                       Create Account
                     </Text>
                   </Button>
