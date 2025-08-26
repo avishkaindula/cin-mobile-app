@@ -402,14 +402,18 @@ const ProfilePage = () => {
                         className={`font-bold tracking-wide ${
                           achievement.earned
                             ? "text-[#333333]"
-                            : "text-[#333333] opacity-50"
+                            : "text-[#333333]"
                         }`}
                       >
                         {achievement.title}
                       </Text>
                       <Text retro
                         size="sm"
-                        className="text-[#333333] opacity-80"
+                        className={`${
+                          achievement.earned
+                            ? "text-[#333333]"
+                            : "text-[#333333] opacity-75"
+                        }`}
                       >
                         {achievement.description}
                       </Text>
@@ -461,10 +465,10 @@ const ProfilePage = () => {
                 </VStack>
               ) : (
                 <VStack space="md" className="items-center">
-                  <Box className="p-4 bg-[#E0E0E0] border-2 border-[#333333] rounded-lg">
-                    <Icon as={Calendar} size="lg" className="text-[#333333] opacity-50" />
+                  <Box className="p-4 bg-[#E0E0E0] border-2 border-[#333333] rounded-lg shadow-[2px_2px_0_#333333]">
+                    <Icon as={Calendar} size="lg" className="text-[#333333]" />
                   </Box>
-                  <Text retro className="text-center text-[#333333] opacity-80">
+                  <Text retro className="text-center text-[#333333]">
                     Complete missions to see your activity here
                   </Text>
                 </VStack>
