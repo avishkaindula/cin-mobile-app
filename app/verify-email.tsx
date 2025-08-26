@@ -226,8 +226,8 @@ export default function VerifyEmail() {
                 <VStack space="lg" className="items-center">
                   <VStack space="md" className="items-center">
                     <Heading
-                      size="lg"
-                      className="text-[#333333] font-extrabold tracking-wider"
+                      size="md"
+                      className="text-[#333333] font-extrabold tracking-wider text-center"
                       retro
                     >
                       Enter Verification Code
