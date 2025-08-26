@@ -195,25 +195,24 @@ export default function SignIn() {
     >
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
         <Box className="flex-1 justify-center p-6">
-          <VStack space="xl" className="items-center">
-            <VStack space="lg" className="items-center mb-8">
+          <VStack space="lg" className="items-center">
+            <VStack space="lg" className="items-center mb-4">
               <Image
                 source={require("@/assets/icon.png")}
-                style={{ width: 48, height: 48 }}
+                style={{ width: 64, height: 64 }}
                 resizeMode="contain"
               />
-              <VStack space="xs" className="items-center">
+              <VStack space="md" className="items-center">
                 <Heading
                   size="2xl"
-                  className="text-[#333333] text-center font-extrabold tracking-wider uppercase"
+                  className="text-[#333333] text-center font-extrabold tracking-wider"
                   retro
                 >
                   Welcome Back
                 </Heading>
                 <Text
                   size="lg"
-                  className="text-[#333333] text-center font-bold tracking-wider uppercase"
-                  retro
+                  className="text-[#333333] text-center font-semibold tracking-wide"
                 >
                   Sign in to continue your climate action journey
                 </Text>
@@ -226,15 +225,14 @@ export default function SignIn() {
                 <VStack space="md" className="items-center">
                   <Heading
                     size="lg"
-                    className="text-[#333333] font-extrabold tracking-wider uppercase"
+                    className="text-[#333333] font-extrabold tracking-wider"
                     retro
                   >
                     Mission 1.5
                   </Heading>
                   <Text
                     size="sm"
-                    className="text-[#333333] text-center font-bold tracking-wider uppercase"
-                    retro
+                    className="text-[#333333] text-center font-semibold tracking-wide"
                   >
                     Join thousands of climate scientists and environmental
                     enthusiasts making a difference
@@ -245,8 +243,7 @@ export default function SignIn() {
                 <VStack space="xs" className="w-full">
                   <Text
                     size="sm"
-                    className="text-[#333333] font-bold tracking-wider uppercase"
-                    retro
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     Email
                   </Text>
@@ -266,8 +263,7 @@ export default function SignIn() {
                 <VStack space="xs" className="w-full">
                   <Text
                     size="sm"
-                    className="text-[#333333] font-bold tracking-wider uppercase"
-                    retro
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     Password
                   </Text>
@@ -415,8 +411,8 @@ export default function SignIn() {
                   onPress={() => router.push("/forgot-password")}
                 >
                   <Text
-                    size="sm"
-                    className="text-primary-500 font-bold tracking-wider uppercase"
+                    size="md"
+                    className="text-primary-500 font-bold tracking-wide"
                   >
                     Forgot Password?
                   </Text>
@@ -425,7 +421,7 @@ export default function SignIn() {
                 {/* Sign Up Link */}
                 <VStack space="xs" className="items-center">
                   <Text
-                    size="sm"
+                    size="md"
                     className="text-[#333333] font-semibold tracking-wide"
                   >
                     Don't have an account?
@@ -436,8 +432,8 @@ export default function SignIn() {
                     onPress={() => router.push("/sign-up")}
                   >
                     <Text
-                      size="sm"
-                      className="text-primary-500 font-bold tracking-wider uppercase"
+                      size="md"
+                      className="text-primary-500 font-bold tracking-wide"
                     >
                       Create Account
                     </Text>
@@ -446,7 +442,7 @@ export default function SignIn() {
 
                 <VStack space="xs" className="items-center">
                   <Text
-                    size="xs"
+                    size="sm"
                     className="text-[#333333] text-center font-medium tracking-wide"
                   >
                     By signing in, you agree to our Terms of Service and Privacy
@@ -460,8 +456,7 @@ export default function SignIn() {
             <VStack space="md" className="w-full max-w-sm">
               <Text
                 size="sm"
-                className="text-[#333333] text-center font-bold tracking-wider uppercase"
-                retro
+                className="text-[#333333] text-center font-bold tracking-wide"
               >
                 What you'll get:
               </Text>
@@ -508,7 +503,7 @@ export default function SignIn() {
               <VStack space="xs" className="items-center">
                 <Heading
                   size="md"
-                  className="text-[#333333] font-extrabold tracking-wider uppercase"
+                  className="text-[#333333] font-extrabold tracking-wider"
                   retro
                 >
                   Completing Sign In

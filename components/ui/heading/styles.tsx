@@ -5,7 +5,7 @@ const baseStyle = isWeb
   : '';
 
 export const headingStyle = tva({
-  base: `text-[#333333] font-extrabold tracking-wider uppercase web:text-shadow-none ios:shadow-opacity-0 android:text-shadow-radius-0 my-0 ${baseStyle}`,
+  base: `text-[#333333] font-extrabold tracking-wider web:text-shadow-none ios:shadow-opacity-0 android:text-shadow-radius-0 my-0 ${baseStyle}`,
   variants: {
     isTruncated: {
       true: 'truncate',
