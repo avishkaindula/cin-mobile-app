@@ -392,7 +392,7 @@ const EditProfilePage = () => {
 
               {/* Cancel Button */}
               <Button
-                variant="outline"
+                variant="solid"
                 size="lg"
                 className="w-full bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                 disabled={saving || uploadingAvatar}

@@ -54,7 +54,7 @@ export default function ForgotPassword() {
             {/* Back Button */}
             <HStack className="items-center mb-6">
               <Button
-                variant="outline"
+                variant="solid"
                 size="sm"
                 onPress={() => router.back()}
                 className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC] px-4 py-2"
@@ -178,7 +178,7 @@ export default function ForgotPassword() {
           {/* Back Button */}
           <HStack className="items-center mb-6">
             <Button
-              variant="outline"
+              variant="solid"
               size="sm"
               onPress={() => router.back()}
               className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC] px-4 py-2"
