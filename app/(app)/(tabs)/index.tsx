@@ -497,7 +497,7 @@ const HomePage = () => {
                             </Button>
                             <Button 
                               size="sm" 
-                              className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               onPress={() => handleStartMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">

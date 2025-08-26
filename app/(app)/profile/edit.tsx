@@ -250,12 +250,12 @@ const EditProfilePage = () => {
                           />
                         </Avatar>
                       ) : (
-                        <Box className="w-24 h-24 bg-[#98FB98] border-2 border-[#333333] rounded-full items-center justify-center">
+                        <Box className="w-24 h-24 bg-[#A2D8FF] border-2 border-[#333333] rounded-full items-center justify-center">
                           <Icon as={User} size="xl" className="text-[#333333]" />
                         </Box>
                       )}
                       
-                      <Box className="absolute -bottom-2 -right-2 bg-[#98FB98] border-2 border-[#333333] rounded-full p-2 shadow-[2px_2px_0_#333333]">
+                      <Box className="absolute -bottom-2 -right-2 bg-[#A2D8FF] border-2 border-[#333333] rounded-full p-2 shadow-[2px_2px_0_#333333]">
                         {uploadingAvatar ? (
                           <Spinner size="small" />
                         ) : (

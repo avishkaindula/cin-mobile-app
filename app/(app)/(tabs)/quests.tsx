@@ -264,43 +264,71 @@ const QuestsPage = () => {
           <Card className="p-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="md">
               <HStack className="justify-between items-center">
-                <Text size="xl" className="text-[#333333] font-bold tracking-wide" retro>
+                <Text
+                  size="xl"
+                  className="text-[#333333] font-bold tracking-wide"
+                  retro
+                >
                   Your Progress
                 </Text>
-                <Box className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg p-3">
+                <Box className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg p-3">
                   <Icon as={Award} size="lg" className="text-[#333333]" />
                 </Box>
               </HStack>
               <HStack className="justify-between items-center w-full">
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
+                  <Text
+                    className="font-bold text-[#333333] text-2xl tracking-wider"
+                    retro
+                  >
                     {userStats.completed}
                   </Text>
-                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                  <Text
+                    size="sm"
+                    className="text-[#333333] font-bold tracking-wide"
+                  >
                     Completed
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
+                  <Text
+                    className="font-bold text-[#333333] text-2xl tracking-wider"
+                    retro
+                  >
                     {userStats.active}
                   </Text>
-                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                  <Text
+                    size="sm"
+                    className="text-[#333333] font-bold tracking-wide"
+                  >
                     Active
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
+                  <Text
+                    className="font-bold text-[#333333] text-2xl tracking-wider"
+                    retro
+                  >
                     {userStats.totalPoints}
                   </Text>
-                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                  <Text
+                    size="sm"
+                    className="text-[#333333] font-bold tracking-wide"
+                  >
                     Points
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
+                  <Text
+                    className="font-bold text-[#333333] text-2xl tracking-wider"
+                    retro
+                  >
                     {userStats.totalEnergy}
                   </Text>
-                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                  <Text
+                    size="sm"
+                    className="text-[#333333] font-bold tracking-wide"
+                  >
                     Energy
                   </Text>
                 </VStack>
@@ -329,19 +357,23 @@ const QuestsPage = () => {
         {/* Tab Navigation */}
         <HStack space="md" className="px-6 mb-6">
           <Button
-            variant={activeTab === "all" ? "solid" : "outline"}
+            variant={"solid"}
             size="sm"
             onPress={() => setActiveTab("all")}
             className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
-              activeTab === "all" ? "bg-[#98FB98]" : "bg-[#FCFCFC]"
+              activeTab === "all" ? "bg-[#A2D8FF]" : "bg-[#FCFCFC]"
             }`}
           >
-            <Text className={`font-bold tracking-wide ${activeTab === "all" ? "text-[#333333]" : "text-[#333333]"}`}>
+            <Text
+              className={`font-bold tracking-wide ${
+                activeTab === "all" ? "text-[#333333]" : "text-[#333333]"
+              }`}
+            >
               All ({missions.length})
             </Text>
           </Button>
           <Button
-            variant={activeTab === "missions" ? "solid" : "outline"}
+            variant={"solid"}
             size="sm"
             onPress={() => setActiveTab("missions")}
             className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
@@ -349,18 +381,14 @@ const QuestsPage = () => {
             }`}
           >
             <HStack space="xs" className="items-center">
-              <Icon
-                as={Target}
-                size="sm"
-                className="text-[#333333]"
-              />
+              <Icon as={Target} size="sm" className="text-[#333333]" />
               <Text className="text-[#333333] font-bold tracking-wide">
                 Missions
               </Text>
             </HStack>
           </Button>
           <Button
-            variant={activeTab === "events" ? "solid" : "outline"}
+            variant={"solid"}
             size="sm"
             onPress={() => setActiveTab("events")}
             className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
@@ -368,11 +396,7 @@ const QuestsPage = () => {
             }`}
           >
             <HStack space="xs" className="items-center">
-              <Icon
-                as={Calendar}
-                size="sm"
-                className="text-[#333333]"
-              />
+              <Icon as={Calendar} size="sm" className="text-[#333333]" />
               <Text className="text-[#333333] font-bold tracking-wide">
                 Events
               </Text>
@@ -431,7 +455,10 @@ const QuestsPage = () => {
                                     size="xs"
                                     className="text-[#333333]"
                                   />
-                                  <Text size="xs" className="text-[#333333] font-bold tracking-wide">
+                                  <Text
+                                    size="xs"
+                                    className="text-[#333333] font-bold tracking-wide"
+                                  >
                                     +{mission.points_awarded} pts
                                   </Text>
                                 </HStack>
@@ -443,7 +470,10 @@ const QuestsPage = () => {
                                     size="xs"
                                     className="text-[#333333]"
                                   />
-                                  <Text size="xs" className="text-[#333333] font-bold tracking-wide">
+                                  <Text
+                                    size="xs"
+                                    className="text-[#333333] font-bold tracking-wide"
+                                  >
                                     +{mission.energy_awarded} ⚡
                                   </Text>
                                 </HStack>
@@ -520,7 +550,10 @@ const QuestsPage = () => {
                                 >
                                   Progress
                                 </Text>
-                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                                <Text
+                                  size="sm"
+                                  className="text-[#333333] font-bold tracking-wide"
+                                >
                                   {mission.submission_progress || 0}%
                                 </Text>
                               </HStack>
@@ -528,7 +561,9 @@ const QuestsPage = () => {
                                 <Box
                                   className="h-full rounded-md bg-[#A2D8FF] border border-[#333333]"
                                   style={{
-                                    width: `${mission.submission_progress || 0}%`,
+                                    width: `${
+                                      mission.submission_progress || 0
+                                    }%`,
                                   }}
                                 />
                               </Box>
@@ -556,7 +591,10 @@ const QuestsPage = () => {
                                 size="sm"
                                 className="text-[#333333]"
                               />
-                              <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                              <Text
+                                size="sm"
+                                className="text-[#333333] font-bold tracking-wide"
+                              >
                                 {mission.is_bookmarked ? "Saved" : "Save"}
                               </Text>
                             </HStack>
@@ -574,7 +612,9 @@ const QuestsPage = () => {
                                 size="sm"
                                 className="text-[#333333]"
                               />
-                              <Text className="text-[#333333] font-bold tracking-wide">View</Text>
+                              <Text className="text-[#333333] font-bold tracking-wide">
+                                View
+                              </Text>
                             </HStack>
                           </Button>
 
@@ -589,7 +629,7 @@ const QuestsPage = () => {
                                   router.push(`/mission/${mission.id}/submit`);
                                 }
                               }}
-                              className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               disabled={
                                 mission.submission_status === "reviewed"
                               }
@@ -604,7 +644,10 @@ const QuestsPage = () => {
                                   size="sm"
                                   className="text-[#333333]"
                                 />
-                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                                <Text
+                                  size="sm"
+                                  className="text-[#333333] font-bold tracking-wide"
+                                >
                                   {mission.submission_status === "reviewed"
                                     ? "Completed"
                                     : "Continue"}
@@ -617,7 +660,7 @@ const QuestsPage = () => {
                               size="sm"
                               onPress={() => handleStartMission(mission.id)}
                               disabled={actionLoading === `start-${mission.id}`}
-                              className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                             >
                               <HStack space="xs" className="items-center">
                                 <Icon
@@ -625,7 +668,10 @@ const QuestsPage = () => {
                                   size="sm"
                                   className="text-[#333333]"
                                 />
-                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
+                                <Text
+                                  size="sm"
+                                  className="text-[#333333] font-bold tracking-wide"
+                                >
                                   Start
                                 </Text>
                               </HStack>

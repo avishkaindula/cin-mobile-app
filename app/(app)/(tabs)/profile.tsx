@@ -275,7 +275,7 @@ const ProfilePage = () => {
                     />
                   </Avatar>
                 ) : (
-                  <Box className="w-16 h-16 bg-[#98FB98] border-2 border-[#333333] rounded-full items-center justify-center">
+                  <Box className="w-16 h-16 bg-[#A2D8FF] border-2 border-[#333333] rounded-full items-center justify-center">
                     <Icon
                       as={User}
                       size="xl"
@@ -319,7 +319,7 @@ const ProfilePage = () => {
               </HStack>
               <HStack space="md" className="justify-center">
                 <Button
-                  className="bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333] flex-1"
+                  className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333] flex-1"
                   onPress={() => router.push("/profile/edit")}
                 >
                   <HStack space="sm" className="items-center">
