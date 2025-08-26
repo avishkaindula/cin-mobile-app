@@ -37,33 +37,35 @@ cssInterop(PrimitiveIcon, {
 });
 
 const buttonStyle = tva({
-  base: "group/button rounded bg-primary-500 flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2",
+  base: "group/button rounded-lg flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[focus-visible=true]:web:ring-blue-300/70 data-[disabled=true]:opacity-60 gap-2.5 border-2 border-[#333333] transition-all duration-200 relative m-1.5 web:shadow-[2px_2px_0_#333333] ios:shadow-color-gray-800 ios:shadow-offset-2/2 ios:shadow-opacity-100 ios:shadow-radius-0 android:elevation-3 android:shadow-color-gray-800 bg-transparent",
   variants: {
     action: {
       primary:
-        "bg-primary-500 data-[hover=true]:bg-primary-600 data-[active=true]:bg-primary-700 border-primary-300 data-[hover=true]:border-primary-400 data-[active=true]:border-primary-500 data-[focus-visible=true]:web:ring-indicator-info",
+        "bg-[#A2D8FF] border-[#333333] data-[hover=true]:bg-[#D6F0FF] data-[active=true]:bg-[#A2D8FF] web:data-[hover=true]:shadow-[4px_4px_0_#333333] data-[hover=true]:translate-x-[-1px] data-[hover=true]:translate-y-[-1px] web:data-[active=true]:shadow-[1.5px_1.5px_0_#333333_inset] data-[active=true]:translate-x-[2px] data-[active=true]:translate-y-[2px] ios:data-[hover=true]:shadow-offset-4/4 android:data-[hover=true]:elevation-5 ios:data-[active=true]:shadow-opacity-50 android:data-[active=true]:elevation-1",
       secondary:
-        "bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info",
+        "bg-[#ECECEC] border-[#333333] data-[hover=true]:bg-white data-[active=true]:bg-[#ECECEC] web:data-[hover=true]:shadow-[4px_4px_0_#333333] data-[hover=true]:translate-x-[-1px] data-[hover=true]:translate-y-[-1px] web:data-[active=true]:shadow-[1.5px_1.5px_0_#333333_inset] data-[active=true]:translate-x-[2px] data-[active=true]:translate-y-[2px] ios:data-[hover=true]:shadow-offset-4/4 android:data-[hover=true]:elevation-5 ios:data-[active=true]:shadow-opacity-50 android:data-[active=true]:elevation-1",
       positive:
-        "bg-success-500 border-success-300 data-[hover=true]:bg-success-600 data-[hover=true]:border-success-400 data-[active=true]:bg-success-700 data-[active=true]:border-success-500 data-[focus-visible=true]:web:ring-indicator-info",
+        "bg-[#98D19F] border-[#333333] data-[hover=true]:bg-[#C0EAC4] data-[active=true]:bg-[#98D19F] web:data-[hover=true]:shadow-[4px_4px_0_#333333] data-[hover=true]:translate-x-[-1px] data-[hover=true]:translate-y-[-1px] web:data-[active=true]:shadow-[1.5px_1.5px_0_#333333_inset] data-[active=true]:translate-x-[2px] data-[active=true]:translate-y-[2px] ios:data-[hover=true]:shadow-offset-4/4 android:data-[hover=true]:elevation-5 ios:data-[active=true]:shadow-opacity-50 android:data-[active=true]:elevation-1",
       negative:
-        "bg-error-500 border-error-300 data-[hover=true]:bg-error-600 data-[hover=true]:border-error-400 data-[active=true]:bg-error-700 data-[active=true]:border-error-500 data-[focus-visible=true]:web:ring-indicator-info",
+        "bg-[#D9534F] border-[#333333] data-[hover=true]:bg-[#E57373] data-[active=true]:bg-[#D9534F] web:data-[hover=true]:shadow-[4px_4px_0_#333333] data-[hover=true]:translate-x-[-1px] data-[hover=true]:translate-y-[-1px] web:data-[active=true]:shadow-[1.5px_1.5px_0_#333333_inset] data-[active=true]:translate-x-[2px] data-[active=true]:translate-y-[2px] ios:data-[hover=true]:shadow-offset-4/4 android:data-[hover=true]:elevation-5 ios:data-[active=true]:shadow-opacity-50 android:data-[active=true]:elevation-1",
+      warning:
+        "bg-[#FFD966] border-[#333333] data-[hover=true]:bg-[#FFEB99] data-[active=true]:bg-[#FFD966] web:data-[hover=true]:shadow-[4px_4px_0_#333333] data-[hover=true]:translate-x-[-1px] data-[hover=true]:translate-y-[-1px] web:data-[active=true]:shadow-[1.5px_1.5px_0_#333333_inset] data-[active=true]:translate-x-[2px] data-[active=true]:translate-y-[2px] ios:data-[hover=true]:shadow-offset-4/4 android:data-[hover=true]:elevation-5 ios:data-[active=true]:shadow-opacity-50 android:data-[active=true]:elevation-1",
       default:
-        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
+        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent web:data-[hover=true]:shadow-[4px_4px_0_#333333] data-[hover=true]:translate-x-[-1px] data-[hover=true]:translate-y-[-1px] web:data-[active=true]:shadow-[1.5px_1.5px_0_#333333_inset] data-[active=true]:translate-x-[2px] data-[active=true]:translate-y-[2px] ios:data-[hover=true]:shadow-offset-4/4 android:data-[hover=true]:elevation-5 ios:data-[active=true]:shadow-opacity-50 android:data-[active=true]:elevation-1",
     },
     variant: {
-      link: "px-0",
+      link: "px-0 border-0",
       outline:
-        "bg-transparent border data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
+        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
       solid: "",
     },
 
     size: {
-      xs: "px-3.5 h-8",
-      sm: "px-4 h-9",
-      md: "px-5 h-10",
-      lg: "px-6 h-11",
-      xl: "px-7 h-12",
+      xs: "px-3.5 py-2 min-h-[32px]",
+      sm: "px-4 py-2.5 min-h-[36px]",
+      md: "px-5 py-2.5 min-h-[40px]",
+      lg: "px-5 py-2.5 min-h-[40px]",
+      xl: "px-5 py-2.5 min-h-[40px]",
     },
   },
   compoundVariants: [
@@ -71,25 +73,31 @@ const buttonStyle = tva({
       action: "primary",
       variant: "link",
       class:
-        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent",
+        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent border-0",
     },
     {
       action: "secondary",
       variant: "link",
       class:
-        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent",
+        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent border-0",
     },
     {
       action: "positive",
       variant: "link",
       class:
-        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent",
+        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent border-0",
     },
     {
       action: "negative",
       variant: "link",
       class:
-        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent",
+        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent border-0",
+    },
+    {
+      action: "warning",
+      variant: "link",
+      class:
+        "px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent border-0",
     },
     {
       action: "primary",
@@ -115,34 +123,46 @@ const buttonStyle = tva({
       class:
         "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
     },
+    {
+      action: "warning",
+      variant: "outline",
+      class:
+        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
+    },
+    // Disabled state overrides
+    {
+      disabled: true,
+      class: "data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60 data-[disabled=true]:web:shadow-none data-[disabled=true]:ios:shadow-opacity-0 data-[disabled=true]:android:elevation-0 data-[disabled=true]:translate-x-0 data-[disabled=true]:translate-y-0 data-[hover=true]:data-[disabled=true]:web:shadow-none data-[hover=true]:data-[disabled=true]:ios:shadow-opacity-0 data-[hover=true]:data-[disabled=true]:android:elevation-0 data-[hover=true]:data-[disabled=true]:translate-x-0 data-[hover=true]:data-[disabled=true]:translate-y-0 data-[active=true]:data-[disabled=true]:web:shadow-none data-[active=true]:data-[disabled=true]:ios:shadow-opacity-0 data-[active=true]:data-[disabled=true]:android:elevation-0 data-[active=true]:data-[disabled=true]:translate-x-0 data-[active=true]:data-[disabled=true]:translate-y-0 data-[disabled=true]:web:transform-none data-[hover=true]:data-[disabled=true]:web:transform-none data-[active=true]:data-[disabled=true]:web:transform-none",
+    },
   ],
 });
 
 const buttonTextStyle = tva({
-  base: "text-typography-0 font-semibold web:select-none",
+  base: "font-semibold web:select-none uppercase tracking-wide text-[#333333] web:text-shadow-none ios:shadow-opacity-0 android:text-shadow-radius-0",
   parentVariants: {
     action: {
       primary:
-        "text-primary-600 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700",
+        "text-[rgb(51,51,51)] data-[hover=true]:text-[rgb(51,51,51)] data-[active=true]:text-[rgb(51,51,51)]",
       secondary:
-        "text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700",
+        "text-[rgb(51,51,51)] data-[hover=true]:text-[rgb(51,51,51)] data-[active=true]:text-[rgb(51,51,51)]",
       positive:
-        "text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700",
+        "text-[rgb(51,51,51)] data-[hover=true]:text-[rgb(51,51,51)] data-[active=true]:text-[rgb(51,51,51)]",
       negative:
-        "text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700",
+        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+      warning:
+        "text-[rgb(51,51,51)] data-[hover=true]:text-[rgb(51,51,51)] data-[active=true]:text-[rgb(51,51,51)]",
     },
     variant: {
-      link: "data-[hover=true]:underline data-[active=true]:underline",
-      outline: "",
-      solid:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+      link: "data-[hover=true]:underline data-[active=true]:underline normal-case",
+      outline: "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+      solid: "",
     },
     size: {
       xs: "text-xs",
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-      xl: "text-xl",
+      sm: "text-sm", 
+      md: "text-[14px]",
+      lg: "text-[14px]",
+      xl: "text-[14px]",
     },
   },
   parentCompoundVariants: [
@@ -150,49 +170,91 @@ const buttonTextStyle = tva({
       variant: "solid",
       action: "primary",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "solid",
       action: "secondary",
       class:
-        "text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "solid",
       action: "positive",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "solid",
       action: "negative",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+    },
+    {
+      variant: "solid",
+      action: "warning",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "outline",
       action: "primary",
       class:
-        "text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "outline",
       action: "secondary",
       class:
-        "text-typography-500 data-[hover=true]:text-primary-600 data-[active=true]:text-typography-700",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "outline",
       action: "positive",
       class:
-        "text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "outline",
       action: "negative",
       class:
-        "text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "outline",
+      action: "warning",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "link",
+      action: "primary",
+      class:
+        "text-sky-600 data-[hover=true]:text-sky-700 data-[active=true]:text-sky-800 normal-case",
+    },
+    {
+      variant: "link",
+      action: "secondary",
+      class:
+        "text-gray-600 data-[hover=true]:text-gray-700 data-[active=true]:text-gray-800 normal-case",
+    },
+    {
+      variant: "link",
+      action: "positive",
+      class:
+        "text-green-600 data-[hover=true]:text-green-700 data-[active=true]:text-green-800 normal-case",
+    },
+    {
+      variant: "link",
+      action: "negative",
+      class:
+        "text-red-600 data-[hover=true]:text-red-700 data-[active=true]:text-red-800 normal-case",
+    },
+    {
+      variant: "link",
+      action: "warning",
+      class:
+        "text-yellow-600 data-[hover=true]:text-yellow-700 data-[active=true]:text-yellow-800 normal-case",
     },
   ],
 });
@@ -201,10 +263,9 @@ const buttonIconStyle = tva({
   base: "fill-none",
   parentVariants: {
     variant: {
-      link: "data-[hover=true]:underline data-[active=true]:underline",
+      link: "",
       outline: "",
-      solid:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+      solid: "",
     },
     size: {
       xs: "h-3.5 w-3.5",
@@ -215,14 +276,15 @@ const buttonIconStyle = tva({
     },
     action: {
       primary:
-        "text-primary-600 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
       secondary:
-        "text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
       positive:
-        "text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700",
-
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
       negative:
-        "text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700",
+        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+      warning:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
   },
   parentCompoundVariants: [
@@ -230,25 +292,91 @@ const buttonIconStyle = tva({
       variant: "solid",
       action: "primary",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "solid",
       action: "secondary",
       class:
-        "text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "solid",
       action: "positive",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
     },
     {
       variant: "solid",
       action: "negative",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+    },
+    {
+      variant: "solid",
+      action: "warning",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "outline",
+      action: "primary",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "outline",
+      action: "secondary",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "outline",
+      action: "positive",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "outline",
+      action: "negative",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "outline",
+      action: "warning",
+      class:
+        "text-gray-800 data-[hover=true]:text-gray-800 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "link",
+      action: "primary",
+      class:
+        "text-sky-600 data-[hover=true]:text-sky-700 data-[active=true]:text-sky-800",
+    },
+    {
+      variant: "link",
+      action: "secondary",
+      class:
+        "text-gray-600 data-[hover=true]:text-gray-700 data-[active=true]:text-gray-800",
+    },
+    {
+      variant: "link",
+      action: "positive",
+      class:
+        "text-green-600 data-[hover=true]:text-green-700 data-[active=true]:text-green-800",
+    },
+    {
+      variant: "link",
+      action: "negative",
+      class:
+        "text-red-600 data-[hover=true]:text-red-700 data-[active=true]:text-red-800",
+    },
+    {
+      variant: "link",
+      action: "warning",
+      class:
+        "text-yellow-600 data-[hover=true]:text-yellow-700 data-[active=true]:text-yellow-800",
     },
   ],
 });
