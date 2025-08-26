@@ -165,10 +165,10 @@ const MissionDetailsPage = () => {
     return (
       <SafeAreaView
         style={{ flex: 1 }}
-        className="bg-white dark:bg-background-dark"
+        className="bg-[#FCFCFC]"
       >
         <Box className="flex-1 justify-center items-center p-6">
-          <Text className="text-typography-600 dark:text-typography-400">
+          <Text retro className="text-[#333333]">
             Loading mission details...
           </Text>
         </Box>
@@ -180,15 +180,18 @@ const MissionDetailsPage = () => {
     return (
       <SafeAreaView
         style={{ flex: 1 }}
-        className="bg-white dark:bg-background-dark"
+        className="bg-[#FCFCFC]"
       >
         <Box className="flex-1 justify-center items-center p-6">
           <VStack space="md" className="items-center">
-            <Text className="text-red-600 dark:text-red-400">
+            <Text retro className="text-[#333333]">
               {error || "Mission not found"}
             </Text>
-            <Button onPress={() => router.back()}>
-              <Text className="text-white">Go Back</Text>
+            <Button 
+              onPress={() => router.back()}
+              className="bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+            >
+              <Text retro className="text-[#333333] font-bold">Go Back</Text>
             </Button>
           </VStack>
         </Box>
@@ -201,295 +204,289 @@ const MissionDetailsPage = () => {
   return (
     <SafeAreaView
       style={{ flex: 1 }}
-      className="bg-white dark:bg-background-dark"
+      className="bg-[#FCFCFC]"
     >
       <ScrollView className="flex-1">
         {/* Header */}
-        <HStack
-          space="md"
-          className="items-center p-4 border-b border-gray-200 dark:border-gray-800"
-        >
-          <Button
-            variant="outline"
-            size="sm"
-            onPress={() => router.back()}
-            className="p-2"
-          >
-            <Icon as={ArrowLeft} size="md" className="text-typography-600" />
-          </Button>
-          <Heading size="xl" className="font-bold text-typography-900 dark:text-typography-950 flex-1 text-center">
+        <VStack space="lg" className="items-center p-6 border-b-2 border-[#333333]">
+          <Image
+            source={require("@/assets/icon.png")}
+            style={{ width: 48, height: 48 }}
+            resizeMode="contain"
+          />
+          <Heading retro size="xl" className="text-[#333333] font-bold tracking-wide text-center">
             Mission Details
           </Heading>
-          <Box className="w-10 h-10" />
-        </HStack>
+        </VStack>
 
         <Box className="p-6">
           {/* Mission Header */}
-          <VStack space="lg" className="mb-8">
-            {/* Thumbnail */}
-            {thumbnailUrl && (
-              <Box className="w-full h-48 rounded-lg overflow-hidden">
-                <Image
-                  source={{ uri: thumbnailUrl }}
-                  className="w-full h-full"
-                  style={{ resizeMode: "cover" }}
-                />
-              </Box>
-            )}
-
-            {/* Title and Status */}
-            <VStack space="md">
-              <HStack className="justify-between items-start">
-                <Heading
-                  size="xl"
-                  className="text-typography-900 dark:text-typography-950 flex-1"
-                >
-                  {mission.title}
-                </Heading>
-                <HStack space="xs" className="items-center">
-                  <Icon
-                    as={statusInfo.icon}
-                    size="sm"
-                    className={statusInfo.color}
+          <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+            <VStack space="lg">
+              {/* Thumbnail */}
+              {thumbnailUrl && (
+                <Box className="w-full h-48 rounded-lg overflow-hidden border-2 border-[#333333]">
+                  <Image
+                    source={{ uri: thumbnailUrl }}
+                    className="w-full h-full"
+                    style={{ resizeMode: "cover" }}
                   />
-                  <Text size="sm" className={statusInfo.color}>
-                    {statusInfo.text}
-                  </Text>
-                </HStack>
-              </HStack>
-
-              <Text
-                size="md"
-                className="text-typography-600 dark:text-typography-750"
-              >
-                {mission.description}
-              </Text>
-
-              {/* Mission Info */}
-              <VStack space="xs">
-                <HStack space="md" className="items-center">
-                  <HStack space="xs" className="items-center">
-                    <Icon as={Building} size="sm" className="text-gray-500" />
-                    <Text
-                      size="sm"
-                      className="text-typography-600 dark:text-typography-750"
-                    >
-                      {mission.organization_name}
-                    </Text>
-                  </HStack>
-                  <HStack space="xs" className="items-center">
-                    <Icon as={Users} size="sm" className="text-blue-500" />
-                    <Text
-                      size="sm"
-                      className="text-typography-600 dark:text-typography-750"
-                    >
-                      {mission.participants_count} participants
-                    </Text>
-                  </HStack>
-                </HStack>
-
-                <HStack space="md" className="items-center">
-                  <HStack space="xs" className="items-center">
-                    <Icon as={Award} size="sm" className="text-green-500" />
-                    <Text
-                      size="sm"
-                      className="text-typography-600 dark:text-typography-750"
-                    >
-                      {mission.points_awarded} points
-                    </Text>
-                  </HStack>
-                  <HStack space="xs" className="items-center">
-                    <Icon as={Zap} size="sm" className="text-orange-500" />
-                    <Text
-                      size="sm"
-                      className="text-typography-600 dark:text-typography-750"
-                    >
-                      {mission.energy_awarded} energy
-                    </Text>
-                  </HStack>
-                </HStack>
-              </VStack>
-            </VStack>
-
-            {/* Action Buttons */}
-            <HStack space="md">
-              <Button
-                variant="outline"
-                size="sm"
-                onPress={handleBookmarkToggle}
-                disabled={actionLoading === "bookmark"}
-                className="flex-1"
-              >
-                <HStack space="xs" className="items-center">
-                  <Icon
-                    as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
-                    size="sm"
-                    className={
-                      mission.is_bookmarked
-                        ? "text-primary-600"
-                        : "text-gray-500"
-                    }
-                  />
-                  <Text>{mission.is_bookmarked ? "Saved" : "Save"}</Text>
-                </HStack>
-              </Button>
-
-              {mission.submission_status === "reviewed" ? (
-                <Button
-                  variant="solid"
-                  size="sm"
-                  className="flex-1 bg-green-600"
-                  disabled
-                >
-                  <HStack space="xs" className="items-center">
-                    <Icon as={CheckCircle} size="sm" className="text-white" />
-                    <Text className="text-white">Completed</Text>
-                  </HStack>
-                </Button>
-              ) : mission.submission_status && ["started", "in_progress", "completed"].includes(mission.submission_status) ? (
-                <Button
-                  variant="solid"
-                  size="sm"
-                  onPress={() => router.push(`/mission/${mission.id}/submit`)}
-                  className="flex-1 bg-blue-600"
-                >
-                  <HStack space="xs" className="items-center">
-                    <Icon as={Play} size="sm" className="text-white" />
-                    <Text className="text-white">
-                      {mission.submission_status === "completed" ? "Review Submission" : "Continue Mission"}
-                    </Text>
-                  </HStack>
-                </Button>
-              ) : (
-                <Button
-                  variant="solid"
-                  size="sm"
-                  onPress={handleStartMission}
-                  disabled={actionLoading === "start"}
-                  className="flex-1"
-                >
-                  <HStack space="xs" className="items-center">
-                    <Icon as={Target} size="sm" className="text-white" />
-                    <Text className="text-white">Start Mission</Text>
-                  </HStack>
-                </Button>
+                </Box>
               )}
-            </HStack>
-          </VStack>
+
+              {/* Title and Status */}
+              <VStack space="md">
+                <HStack className="justify-between items-start">
+                  <Heading retro
+                    size="xl"
+                    className="text-[#333333] flex-1 font-bold tracking-wide"
+                  >
+                    {mission.title}
+                  </Heading>
+                  <HStack space="xs" className="items-center">
+                    <Icon
+                      as={statusInfo.icon}
+                      size="sm"
+                      className="text-[#333333]"
+                    />
+                    <Text retro size="sm" className="text-[#333333]">
+                      {statusInfo.text}
+                    </Text>
+                  </HStack>
+                </HStack>
+
+                <Text retro
+                  size="md"
+                  className="text-[#333333]"
+                >
+                  {mission.description}
+                </Text>
+
+                {/* Mission Info */}
+                <VStack space="xs">
+                  <HStack space="md" className="items-center">
+                    <HStack space="xs" className="items-center">
+                      <Icon as={Building} size="sm" className="text-[#333333]" />
+                      <Text retro
+                        size="sm"
+                        className="text-[#333333]"
+                      >
+                        {mission.organization_name}
+                      </Text>
+                    </HStack>
+                    <HStack space="xs" className="items-center">
+                      <Icon as={Users} size="sm" className="text-[#333333]" />
+                      <Text retro
+                        size="sm"
+                        className="text-[#333333]"
+                      >
+                        {mission.participants_count} participants
+                      </Text>
+                    </HStack>
+                  </HStack>
+
+                  <HStack space="md" className="items-center">
+                    <HStack space="xs" className="items-center">
+                      <Icon as={Award} size="sm" className="text-[#333333]" />
+                      <Text retro
+                        size="sm"
+                        className="text-[#333333]"
+                      >
+                        {mission.points_awarded} points
+                      </Text>
+                    </HStack>
+                    <HStack space="xs" className="items-center">
+                      <Icon as={Zap} size="sm" className="text-[#333333]" />
+                      <Text retro
+                        size="sm"
+                        className="text-[#333333]"
+                      >
+                        {mission.energy_awarded} energy
+                      </Text>
+                    </HStack>
+                  </HStack>
+                </VStack>
+              </VStack>
+
+              {/* Action Buttons */}
+              <HStack space="md">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onPress={handleBookmarkToggle}
+                  disabled={actionLoading === "bookmark"}
+                  className="flex-1 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                >
+                  <HStack space="xs" className="items-center justify-center">
+                    <Icon
+                      as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
+                      size="sm"
+                      className="text-[#333333]"
+                    />
+                    <Text retro className="text-[#333333] font-bold">{mission.is_bookmarked ? "Saved" : "Save"}</Text>
+                  </HStack>
+                </Button>
+
+                {mission.submission_status === "reviewed" ? (
+                  <Button
+                    variant="solid"
+                    size="sm"
+                    className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                    disabled
+                  >
+                    <HStack space="xs" className="items-center justify-center">
+                      <Icon as={CheckCircle} size="sm" className="text-[#333333]" />
+                      <Text retro className="text-[#333333] font-bold">Completed</Text>
+                    </HStack>
+                  </Button>
+                ) : mission.submission_status && ["started", "in_progress", "completed"].includes(mission.submission_status) ? (
+                  <Button
+                    variant="solid"
+                    size="sm"
+                    onPress={() => router.push(`/mission/${mission.id}/submit`)}
+                    className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                  >
+                    <HStack space="xs" className="items-center justify-center">
+                      <Icon as={Play} size="sm" className="text-[#333333]" />
+                      <Text retro className="text-[#333333] font-bold">
+                        {mission.submission_status === "completed" ? "Review Submission" : "Continue Mission"}
+                      </Text>
+                    </HStack>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="solid"
+                    size="sm"
+                    onPress={handleStartMission}
+                    disabled={actionLoading === "start"}
+                    className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                  >
+                    <HStack space="xs" className="items-center justify-center">
+                      <Icon as={Target} size="sm" className="text-[#333333]" />
+                      <Text retro className="text-[#333333] font-bold">Start Mission</Text>
+                    </HStack>
+                  </Button>
+                )}
+              </HStack>
+            </VStack>
+          </Card>
 
           {/* Instructions */}
           {instructions.length > 0 && (
-            <VStack space="lg" className="mb-8">
-              <Heading
-                size="lg"
-                className="text-typography-900 dark:text-typography-950"
-              >
-                📋 Instructions
-              </Heading>
+            <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+              <VStack space="lg">
+                <Heading retro
+                  size="lg"
+                  className="text-[#333333] font-bold tracking-wide"
+                >
+                  📋 Instructions
+                </Heading>
 
-              <VStack space="md">
-                {instructions.map((instruction, index) => (
-                  <Card
-                    key={instruction.id}
-                    className="p-4 border border-gray-200 dark:border-gray-800"
-                  >
-                    <HStack space="md" className="items-start">
-                      <Box className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full items-center justify-center">
-                        <Text
-                          size="sm"
-                          className="font-bold text-primary-600 dark:text-primary-400"
-                        >
-                          {index + 1}
-                        </Text>
-                      </Box>
-                      <VStack space="xs" className="flex-1">
-                        <Text className="font-semibold text-typography-900 dark:text-typography-950">
-                          {instruction.title}
-                        </Text>
-                        <Text
-                          size="sm"
-                          className="text-typography-600 dark:text-typography-750"
-                        >
-                          {instruction.description}
-                        </Text>
-                      </VStack>
-                    </HStack>
-                  </Card>
-                ))}
-              </VStack>
-            </VStack>
-          )}
-
-          {/* Guidance Steps */}
-          {guidanceSteps.length > 0 && (
-            <VStack space="lg" className="mb-8">
-              <Heading
-                size="lg"
-                className="text-typography-900 dark:text-typography-950"
-              >
-                🎯 Evidence Requirements
-              </Heading>
-
-              <VStack space="md">
-                {guidanceSteps.map((step, index) => (
-                  <Card
-                    key={step.id}
-                    className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
-                  >
-                    <VStack space="md">
+                <VStack space="md">
+                  {instructions.map((instruction, index) => (
+                    <Card
+                      key={instruction.id}
+                      className="p-4 bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                    >
                       <HStack space="md" className="items-start">
-                        <Box className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full items-center justify-center">
-                          <Text
+                        <Box className="w-8 h-8 bg-[#A2D8FF] border-2 border-[#333333] rounded-full items-center justify-center">
+                          <Text retro
                             size="sm"
-                            className="font-bold text-blue-600 dark:text-blue-400"
+                            className="font-bold text-[#333333]"
                           >
                             {index + 1}
                           </Text>
                         </Box>
                         <VStack space="xs" className="flex-1">
-                          <Text className="font-semibold text-blue-900 dark:text-blue-100">
-                            {step.title}
+                          <Text retro className="font-bold text-[#333333]">
+                            {instruction.title}
                           </Text>
-                          <Text
+                          <Text retro
                             size="sm"
-                            className="text-blue-800 dark:text-blue-200"
+                            className="text-[#333333]"
                           >
-                            {step.description}
+                            {instruction.description}
                           </Text>
                         </VStack>
                       </HStack>
-
-                      {step.requiredEvidence.length > 0 && (
-                        <VStack space="xs">
-                          <Text
-                            size="sm"
-                            className="font-medium text-blue-900 dark:text-blue-100"
-                          >
-                            Required Evidence:
-                          </Text>
-                          <HStack space="xs" className="flex-wrap">
-                            {step.requiredEvidence.map((evidence, idx) => (
-                              <Badge
-                                key={idx}
-                                variant="outline"
-                                className="border-blue-300 dark:border-blue-700"
-                              >
-                                <Text
-                                  size="xs"
-                                  className="text-blue-700 dark:text-blue-300"
-                                >
-                                  {evidence}
-                                </Text>
-                              </Badge>
-                            ))}
-                          </HStack>
-                        </VStack>
-                      )}
-                    </VStack>
-                  </Card>
-                ))}
+                    </Card>
+                  ))}
+                </VStack>
               </VStack>
-            </VStack>
+            </Card>
+          )}
+
+          {/* Guidance Steps */}
+          {guidanceSteps.length > 0 && (
+            <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+              <VStack space="lg">
+                <Heading retro
+                  size="lg"
+                  className="text-[#333333] font-bold tracking-wide"
+                >
+                  🎯 Evidence Requirements
+                </Heading>
+
+                <VStack space="md">
+                  {guidanceSteps.map((step, index) => (
+                    <Card
+                      key={step.id}
+                      className="p-4 bg-[#FFE4B5] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                    >
+                      <VStack space="md">
+                        <HStack space="md" className="items-start">
+                          <Box className="w-8 h-8 bg-[#DDA0DD] border-2 border-[#333333] rounded-full items-center justify-center">
+                            <Text retro
+                              size="sm"
+                              className="font-bold text-[#333333]"
+                            >
+                              {index + 1}
+                            </Text>
+                          </Box>
+                          <VStack space="xs" className="flex-1">
+                            <Text retro className="font-bold text-[#333333]">
+                              {step.title}
+                            </Text>
+                            <Text retro
+                              size="sm"
+                              className="text-[#333333]"
+                            >
+                              {step.description}
+                            </Text>
+                          </VStack>
+                        </HStack>
+
+                        {step.requiredEvidence.length > 0 && (
+                          <VStack space="xs">
+                            <Text retro
+                              size="sm"
+                              className="font-bold text-[#333333]"
+                            >
+                              Required Evidence:
+                            </Text>
+                            <HStack space="xs" className="flex-wrap">
+                              {step.requiredEvidence.map((evidence, idx) => (
+                                <Badge
+                                  key={idx}
+                                  className="bg-[#98FB98] border border-[#333333] shadow-[1px_1px_0_#333333]"
+                                >
+                                  <Text retro
+                                    size="xs"
+                                    className="text-[#333333] font-bold"
+                                  >
+                                    {evidence}
+                                  </Text>
+                                </Badge>
+                              ))}
+                            </HStack>
+                          </VStack>
+                        )}
+                      </VStack>
+                    </Card>
+                  ))}
+                </VStack>
+              </VStack>
+            </Card>
           )}
 
           {/* Additional Info */}

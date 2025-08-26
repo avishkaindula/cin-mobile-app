@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
 } from "react-native";
 import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
@@ -168,11 +169,11 @@ const EditProfilePage = () => {
     return (
       <SafeAreaView
         style={{ flex: 1 }}
-        className="bg-white dark:bg-background-dark"
+        className="bg-[#FCFCFC]"
       >
         <Box className="flex-1 justify-center items-center">
           <Spinner size="large" />
-          <Text className="mt-4 text-typography-600">Loading profile...</Text>
+          <Text retro className="mt-4 text-[#333333]">Loading profile...</Text>
         </Box>
       </SafeAreaView>
     );
@@ -181,7 +182,7 @@ const EditProfilePage = () => {
   return (
     <SafeAreaView
       style={{ flex: 1 }}
-      className="bg-white dark:bg-background-dark"
+      className="bg-[#FCFCFC]"
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -190,38 +191,35 @@ const EditProfilePage = () => {
         <ScrollView className="flex-1">
           <Box className="p-6">
             {/* Header */}
-            <HStack className="items-center mb-6">
-              <Button
-                variant="link"
-                size="sm"
-                onPress={() => router.back()}
-                className="p-2 -ml-2"
-              >
-                <Icon as={ArrowLeft} size="md" className="text-typography-600" />
-              </Button>
-              <VStack space="xs" className="ml-2">
-                <Heading
+            <VStack space="lg" className="items-center mb-6">
+              <Image
+                source={require("@/assets/icon.png")}
+                style={{ width: 48, height: 48 }}
+                resizeMode="contain"
+              />
+              <VStack space="xs" className="items-center">
+                <Heading retro
                   size="xl"
-                  className="text-typography-900 dark:text-typography-950"
+                  className="text-[#333333] font-bold tracking-wide"
                 >
                   Edit Profile
                 </Heading>
-                <Text
+                <Text retro
                   size="sm"
-                  className="text-typography-600 dark:text-typography-750"
+                  className="text-center text-[#333333]"
                 >
                   Update your personal information
                 </Text>
               </VStack>
-            </HStack>
+            </VStack>
 
             <VStack space="lg">
               {/* Avatar Section */}
-              <Card className="p-6">
+              <Card className="p-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
                 <VStack space="lg" className="items-center">
-                  <Text
+                  <Text retro
                     size="lg"
-                    className="text-typography-900 dark:text-typography-950 font-semibold"
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     Profile Picture
                   </Text>
@@ -239,24 +237,24 @@ const EditProfilePage = () => {
                           />
                         </Avatar>
                       ) : (
-                        <Box className="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full items-center justify-center">
-                          <Icon as={User} size="xl" className="text-green-600 dark:text-green-400" />
+                        <Box className="w-24 h-24 bg-[#98FB98] border-2 border-[#333333] rounded-full items-center justify-center">
+                          <Icon as={User} size="xl" className="text-[#333333]" />
                         </Box>
                       )}
                       
-                      <Box className="absolute -bottom-2 -right-2 bg-primary-500 rounded-full p-2">
+                      <Box className="absolute -bottom-2 -right-2 bg-[#A2D8FF] border-2 border-[#333333] rounded-full p-2 shadow-[2px_2px_0_#333333]">
                         {uploadingAvatar ? (
-                          <Spinner size="small" color="white" />
+                          <Spinner size="small" />
                         ) : (
-                          <Icon as={Camera} size="sm" className="text-white" />
+                          <Icon as={Camera} size="sm" className="text-[#333333]" />
                         )}
                       </Box>
                     </Box>
                   </Pressable>
                   
-                  <Text
+                  <Text retro
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750 text-center"
+                    className="text-[#333333] text-center"
                   >
                     Tap to change your profile picture
                   </Text>
@@ -264,50 +262,51 @@ const EditProfilePage = () => {
               </Card>
 
               {/* Personal Information */}
-              <Card className="p-6">
+              <Card className="p-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
                 <VStack space="lg">
-                  <Text
+                  <Text retro
                     size="lg"
-                    className="text-typography-900 dark:text-typography-950 font-semibold"
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     Personal Information
                   </Text>
 
                   {/* Full Name */}
                   <VStack space="xs">
-                    <Text
+                    <Text retro
                       size="sm"
-                      className="text-typography-600 dark:text-typography-750 font-medium"
+                      className="text-[#333333] font-bold"
                     >
                       Full Name *
                     </Text>
-                    <Input>
+                    <Input className="border-2 border-[#333333] bg-[#FCFCFC]">
                       <InputField
                         placeholder="Enter your full name"
                         value={fullName}
                         onChangeText={setFullName}
                         autoCapitalize="words"
                         textContentType="name"
+                        className="text-[#333333]"
                       />
                     </Input>
                   </VStack>
 
                   {/* Email (Read-only) */}
                   <VStack space="xs">
-                    <Text
+                    <Text retro
                       size="sm"
-                      className="text-typography-600 dark:text-typography-750 font-medium"
+                      className="text-[#333333] font-bold"
                     >
                       Email
                     </Text>
-                    <Box className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-outline-200 dark:border-outline-700">
-                      <Text className="text-typography-600 dark:text-typography-400">
+                    <Box className="p-3 bg-[#E0E0E0] border-2 border-[#333333] rounded-lg">
+                      <Text retro className="text-[#333333]">
                         {email}
                       </Text>
                     </Box>
-                    <Text
+                    <Text retro
                       size="xs"
-                      className="text-typography-500 dark:text-typography-400"
+                      className="text-[#333333] opacity-75"
                     >
                       Email cannot be changed
                     </Text>
@@ -315,32 +314,33 @@ const EditProfilePage = () => {
 
                   {/* Phone */}
                   <VStack space="xs">
-                    <Text
+                    <Text retro
                       size="sm"
-                      className="text-typography-600 dark:text-typography-750 font-medium"
+                      className="text-[#333333] font-bold"
                     >
                       Phone Number
                     </Text>
-                    <Input>
+                    <Input className="border-2 border-[#333333] bg-[#FCFCFC]">
                       <InputField
                         placeholder="Enter your phone number"
                         value={phone}
                         onChangeText={setPhone}
                         keyboardType="phone-pad"
                         textContentType="telephoneNumber"
+                        className="text-[#333333]"
                       />
                     </Input>
                   </VStack>
 
                   {/* Address */}
                   <VStack space="xs">
-                    <Text
+                    <Text retro
                       size="sm"
-                      className="text-typography-600 dark:text-typography-750 font-medium"
+                      className="text-[#333333] font-bold"
                     >
                       Address
                     </Text>
-                    <Textarea>
+                    <Textarea className="border-2 border-[#333333] bg-[#FCFCFC]">
                       <TextareaInput
                         placeholder="Enter your full address"
                         value={address}
@@ -349,6 +349,7 @@ const EditProfilePage = () => {
                         textContentType="fullStreetAddress"
                         numberOfLines={3}
                         multiline={true}
+                        className="text-[#333333]"
                       />
                     </Textarea>
                   </VStack>
@@ -360,17 +361,17 @@ const EditProfilePage = () => {
                 variant="solid"
                 action="primary"
                 size="lg"
-                className="w-full"
+                className="w-full bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                 disabled={saving || uploadingAvatar}
                 onPress={handleSubmit}
               >
-                <HStack space="md" className="items-center">
+                <HStack space="md" className="items-center justify-center">
                   {saving ? (
-                    <Spinner size="small" color="white" />
+                    <Spinner size="small" />
                   ) : (
-                    <Icon as={Save} size="md" className="text-white" />
+                    <Icon as={Save} size="md" className="text-[#333333]" />
                   )}
-                  <Text size="lg" className="text-white font-semibold">
+                  <Text retro size="lg" className="text-[#333333] font-bold">
                     {saving ? "Saving..." : "Save Changes"}
                   </Text>
                 </HStack>
@@ -380,13 +381,15 @@ const EditProfilePage = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full"
+                className="w-full bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                 disabled={saving || uploadingAvatar}
                 onPress={() => router.back()}
               >
-                <Text size="lg" className="text-typography-600 dark:text-typography-400 font-semibold">
-                  Cancel
-                </Text>
+                <HStack className="justify-center">
+                  <Text retro size="lg" className="text-[#333333] font-bold">
+                    Cancel
+                  </Text>
+                </HStack>
               </Button>
             </VStack>
           </Box>
