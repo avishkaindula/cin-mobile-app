@@ -372,7 +372,7 @@ const MissionSubmissionPage = () => {
             onPress={() => router.back()} 
             className="mt-4 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
           >
-            <Text retro className="text-[#333333] font-bold">Go Back</Text>
+            <Text className="text-[#333333] font-bold tracking-wide">Go Back</Text>
           </Button>
         </Box>
       </SafeAreaView>
@@ -403,9 +403,9 @@ const MissionSubmissionPage = () => {
           onPress={() => router.back()}
           className="bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
         >
-          <HStack space="xs" className="items-center justify-center">
+          <HStack space="sm" className="items-center">
             <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
-            <Text retro size="sm" className="text-[#333333] font-bold">Go Back</Text>
+            <Text className="text-[#333333] font-bold tracking-wide">Go Back</Text>
           </HStack>
         </Button>
       </VStack>
@@ -596,9 +596,9 @@ const MissionSubmissionPage = () => {
                 <Button
                   onPress={handleSubmitStep}
                   disabled={evidenceItems.length === 0 || submitting}
-                  className="mt-4"
+                  className="mt-4 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                 >
-                  <Text className="text-white">
+                  <Text retro className="text-[#333333] font-bold">
                     {submitting ? "Submitting..." : isLastStep ? "Complete Mission" : "Submit Step"}
                   </Text>
                 </Button>

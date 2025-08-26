@@ -322,22 +322,22 @@ const ProfilePage = () => {
                   className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333] flex-1"
                   onPress={() => router.push("/profile/edit")}
                 >
-                  <HStack space="xs" className="items-center justify-center">
+                  <HStack space="sm" className="items-center">
                     <Icon
                       as={Edit}
                       size="sm"
                       className="text-[#333333]"
                     />
-                    <Text retro className="text-[#333333] font-bold">Edit Profile</Text>
+                    <Text className="text-[#333333] font-bold tracking-wide">Edit Profile</Text>
                   </HStack>
                 </Button>
                 <Button
                   className="bg-[#DDA0DD] border-2 border-[#333333] shadow-[4px_4px_0_#333333] flex-1"
                   onPress={signOut}
                 >
-                  <HStack space="xs" className="items-center justify-center">
+                  <HStack space="sm" className="items-center">
                     <Icon as={LogOut} size="sm" className="text-[#333333]" />
-                    <Text retro className="text-[#333333] font-bold">Sign Out</Text>
+                    <Text className="text-[#333333] font-bold tracking-wide">Sign Out</Text>
                   </HStack>
                 </Button>
               </HStack>

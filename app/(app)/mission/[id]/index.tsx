@@ -191,7 +191,7 @@ const MissionDetailsPage = () => {
               onPress={() => router.back()}
               className="bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
             >
-              <Text retro className="text-[#333333] font-bold">Go Back</Text>
+              <Text className="text-[#333333] font-bold tracking-wide">Go Back</Text>
             </Button>
           </VStack>
         </Box>
@@ -217,6 +217,19 @@ const MissionDetailsPage = () => {
           <Heading retro size="xl" className="text-[#333333] font-bold tracking-wide text-center">
             Mission Details
           </Heading>
+          
+          {/* Back Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onPress={() => router.back()}
+            className="bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+          >
+            <HStack space="sm" className="items-center">
+              <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
+              <Text className="text-[#333333] font-bold tracking-wide">Go Back</Text>
+            </HStack>
+          </Button>
         </VStack>
 
         <Box className="p-6">
@@ -496,17 +509,22 @@ const MissionDetailsPage = () => {
           )}
 
           {/* Additional Info */}
-          <Card className="p-4 bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
-            <VStack space="xs">
-              <Text className="font-semibold text-typography-900 dark:text-typography-950">
-                💡 Ready to make an impact?
+          <Card className="p-6 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+            <VStack space="md" className="items-center">
+              <Text retro className="font-bold text-[#333333] text-center text-lg">
+                � Ready to make an impact?
               </Text>
-              <Text
+              <Text retro
                 size="sm"
-                className="text-typography-600 dark:text-typography-750"
+                className="text-[#333333] text-center"
               >
-                Follow the instructions above and submit your evidence to
-                complete this mission and earn rewards!
+                Follow the instructions above and submit your evidence to complete this mission and earn awesome rewards! 
+              </Text>
+              <Text retro
+                size="xs"
+                className="text-[#333333] text-center opacity-80"
+              >
+                Every action counts in our fight against climate change! 🌍
               </Text>
             </VStack>
           </Card>

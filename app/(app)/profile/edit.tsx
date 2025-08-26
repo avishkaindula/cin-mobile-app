@@ -219,9 +219,9 @@ const EditProfilePage = () => {
                 onPress={() => router.back()}
                 className="bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
               >
-                <HStack space="xs" className="items-center justify-center">
+                <HStack space="sm" className="items-center">
                   <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
-                  <Text retro size="sm" className="text-[#333333] font-bold">Go Back</Text>
+                  <Text className="text-[#333333] font-bold tracking-wide">Go Back</Text>
                 </HStack>
               </Button>
             </VStack>
@@ -378,7 +378,7 @@ const EditProfilePage = () => {
                 disabled={saving || uploadingAvatar}
                 onPress={handleSubmit}
               >
-                <HStack space="md" className="items-center justify-center">
+                <HStack space="sm" className="items-center">
                   {saving ? (
                     <Spinner size="small" />
                   ) : (
@@ -398,11 +398,9 @@ const EditProfilePage = () => {
                 disabled={saving || uploadingAvatar}
                 onPress={() => router.back()}
               >
-                <VStack className="items-center justify-center">
-                  <Text retro size="lg" className="text-[#333333] font-bold">
-                    Cancel
-                  </Text>
-                </VStack>
+                <Text className="text-[#333333] font-bold tracking-wide">
+                  Cancel
+                </Text>
               </Button>
             </VStack>
           </Box>
