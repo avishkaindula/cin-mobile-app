@@ -538,7 +538,7 @@ const QuestsPage = () => {
                         {/* Action Buttons */}
                         <HStack space="md">
                           <Button
-                            variant="outline"
+                            variant="solid"
                             size="sm"
                             onPress={() => handleBookmarkToggle(mission.id)}
                             disabled={

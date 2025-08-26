@@ -485,7 +485,7 @@ const HomePage = () => {
                           </HStack>
                           <HStack space="md">
                             <Button 
-                              variant="outline"
+                              variant="solid"
                               size="sm" 
                               className="flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                               onPress={() => handleViewMission(mission.id)}
@@ -669,7 +669,7 @@ const HomePage = () => {
                 </Text>
                 <Button 
                   size="sm" 
-                  variant="outline"
+                  variant="solid"
                   className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                   onPress={() => router.push('/quests')}
                 >

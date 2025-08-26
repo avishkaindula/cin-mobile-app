@@ -214,7 +214,7 @@ const EditProfilePage = () => {
               
               {/* Back Button */}
               <Button
-                variant="outline"
+                variant="solid"
                 size="sm"
                 onPress={() => router.back()}
                 className="bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"

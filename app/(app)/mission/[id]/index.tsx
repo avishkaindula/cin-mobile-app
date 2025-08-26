@@ -322,22 +322,20 @@ const MissionDetailsPage = () => {
               {/* Action Buttons */}
               <HStack space="md">
                 <Button
-                  variant="outline"
+                  variant="solid"
                   size="sm"
                   onPress={handleBookmarkToggle}
                   disabled={actionLoading === "bookmark"}
                   className="flex-1 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                 >
-                  <VStack className="items-center justify-center">
-                    <HStack space="xs" className="items-center">
-                      <Icon
-                        as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
-                        size="sm"
-                        className="text-[#333333]"
-                      />
-                      <Text retro className="text-[#333333] font-bold">{mission.is_bookmarked ? "Saved" : "Save"}</Text>
-                    </HStack>
-                  </VStack>
+                  <HStack space="sm" className="items-center">
+                    <Icon
+                      as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
+                      size="sm"
+                      className="text-[#333333]"
+                    />
+                    <Text className="text-[#333333] font-bold tracking-wide">{mission.is_bookmarked ? "Saved" : "Save"}</Text>
+                  </HStack>
                 </Button>
 
                 {mission.submission_status === "reviewed" ? (
