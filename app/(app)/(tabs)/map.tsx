@@ -26,13 +26,11 @@ export default function MapScreen() {
         <Card className="p-8 w-full max-w-sm border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
           <VStack space="lg" className="items-center">
             {/* Logo */}
-            <Box className="w-20 h-20 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg items-center justify-center">
-              <Image
-                source={require("@/assets/icon.png")}
-                style={{ width: 40, height: 40 }}
-                resizeMode="contain"
-              />
-            </Box>
+            <Image
+              source={require("@/assets/icon.png")}
+              style={{ width: 64, height: 64 }}
+              resizeMode="contain"
+            />
 
             {/* Title */}
             <Heading

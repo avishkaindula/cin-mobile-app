@@ -268,11 +268,7 @@ const QuestsPage = () => {
                   Your Progress
                 </Text>
                 <Box className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg p-3">
-                  <Image
-                    source={require("@/assets/icon.png")}
-                    style={{ width: 24, height: 24 }}
-                    resizeMode="contain"
-                  />
+                  <Icon as={Award} size="lg" className="text-[#333333]" />
                 </Box>
               </HStack>
               <HStack className="justify-between items-center w-full">
