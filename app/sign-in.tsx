@@ -200,13 +200,14 @@ export default function SignIn() {
               <VStack space="xs" className="items-center">
                 <Heading
                   size="2xl"
-                  className="text-typography-900 dark:text-typography-950 text-center"
+                  className="text-[#333333] text-center font-extrabold tracking-wider uppercase"
+                  retro
                 >
                   Welcome Back
                 </Heading>
                 <Text
                   size="lg"
-                  className="text-typography-600 dark:text-typography-750 text-center"
+                  className="text-[#333333] text-center font-semibold tracking-wide"
                 >
                   Sign in to continue your climate action journey
                 </Text>
@@ -219,13 +220,14 @@ export default function SignIn() {
                 <VStack space="md" className="items-center">
                   <Heading
                     size="lg"
-                    className="text-typography-900 dark:text-typography-950"
+                    className="text-[#333333] font-extrabold tracking-wider uppercase"
+                    retro
                   >
                     Mission 1.5
                   </Heading>
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750 text-center"
+                    className="text-[#333333] text-center font-semibold tracking-wide"
                   >
                     Join thousands of climate scientists and environmental
                     enthusiasts making a difference
@@ -236,7 +238,8 @@ export default function SignIn() {
                 <VStack space="xs" className="w-full">
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-bold tracking-wider uppercase"
+                    retro
                   >
                     Email
                   </Text>
@@ -256,7 +259,8 @@ export default function SignIn() {
                 <VStack space="xs" className="w-full">
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-bold tracking-wider uppercase"
+                    retro
                   >
                     Password
                   </Text>
@@ -294,7 +298,7 @@ export default function SignIn() {
                     ) : (
                       <Icon as={LogIn} size="md" className="text-white" />
                     )}
-                    <Text size="lg" className="text-white font-semibold">
+                    <Text size="lg" className="text-[#333333] font-semibold">
                       {loading ? "Signing In..." : "Sign In"}
                     </Text>
                   </HStack>
@@ -305,7 +309,7 @@ export default function SignIn() {
                   <Box className="flex-1 h-px bg-outline-300 dark:bg-outline-600" />
                   <Text
                     size="sm"
-                    className="px-4 text-typography-500 dark:text-typography-400"
+                    className="px-4 text-[#333333] font-semibold tracking-wide"
                   >
                     or
                   </Text>
@@ -330,7 +334,7 @@ export default function SignIn() {
                     <GoogleIcon size={20} />
                     <Text
                       size="lg"
-                      className="text-typography-600 dark:text-typography-400 font-semibold"
+                      className="text-[#333333] font-semibold tracking-wide"
                     >
                       {googleLoading || isGoogleProcessing
                         ? isGoogleProcessing
@@ -364,7 +368,7 @@ export default function SignIn() {
                       )}
                       <Text
                         size="lg"
-                        className="text-typography-600 dark:text-typography-400 font-semibold"
+                        className="text-[#333333] font-semibold tracking-wide"
                       >
                         {appleLoading
                           ? "Connecting..."
@@ -390,7 +394,7 @@ export default function SignIn() {
                     />
                     <Text
                       size="lg"
-                      className="text-typography-600 dark:text-typography-400 font-semibold"
+                      className="text-[#333333] font-semibold tracking-wide"
                     >
                       {githubLoading ? "Connecting..." : "Continue with GitHub"}
                     </Text>
@@ -403,7 +407,7 @@ export default function SignIn() {
                   size="sm"
                   onPress={() => router.push("/forgot-password")}
                 >
-                  <Text size="sm" className="text-primary-500 font-semibold">
+                  <Text size="sm" className="text-primary-500 font-semibold tracking-wide">
                     Forgot Password?
                   </Text>
                 </Button>
@@ -412,7 +416,7 @@ export default function SignIn() {
                 <VStack space="xs" className="items-center">
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-semibold tracking-wide"
                   >
                     Don't have an account?
                   </Text>
@@ -421,7 +425,7 @@ export default function SignIn() {
                     size="sm"
                     onPress={() => router.push("/sign-up")}
                   >
-                    <Text size="sm" className="text-primary-500 font-semibold">
+                    <Text size="sm" className="text-primary-500 font-semibold tracking-wide">
                       Create Account
                     </Text>
                   </Button>
@@ -430,7 +434,7 @@ export default function SignIn() {
                 <VStack space="xs" className="items-center">
                   <Text
                     size="xs"
-                    className="text-typography-500 dark:text-typography-300 text-center"
+                    className="text-[#333333] text-center font-medium tracking-wide"
                   >
                     By signing in, you agree to our Terms of Service and Privacy
                     Policy
@@ -443,7 +447,8 @@ export default function SignIn() {
             <VStack space="md" className="w-full max-w-sm">
               <Text
                 size="sm"
-                className="text-typography-600 dark:text-typography-750 text-center font-semibold"
+                className="text-[#333333] text-center font-bold tracking-wider uppercase"
+                retro
               >
                 What you'll get:
               </Text>
@@ -452,7 +457,7 @@ export default function SignIn() {
                   <Box className="w-2 h-2 bg-green-500 rounded-full" />
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-semibold tracking-wide"
                   >
                     Access to climate missions and data collection
                   </Text>
@@ -461,7 +466,7 @@ export default function SignIn() {
                   <Box className="w-2 h-2 bg-blue-500 rounded-full" />
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-semibold tracking-wide"
                   >
                     Connect with a global community of researchers
                   </Text>
@@ -470,7 +475,7 @@ export default function SignIn() {
                   <Box className="w-2 h-2 bg-purple-500 rounded-full" />
                   <Text
                     size="sm"
-                    className="text-typography-600 dark:text-typography-750"
+                    className="text-[#333333] font-semibold tracking-wide"
                   >
                     Track your environmental impact and achievements
                   </Text>
@@ -490,13 +495,14 @@ export default function SignIn() {
               <VStack space="xs" className="items-center">
                 <Heading
                   size="md"
-                  className="text-typography-900 dark:text-typography-950"
+                  className="text-[#333333] font-extrabold tracking-wider uppercase"
+                  retro
                 >
                   Completing Sign In
                 </Heading>
                 <Text
                   size="sm"
-                  className="text-typography-600 dark:text-typography-750 text-center"
+                  className="text-[#333333] text-center font-semibold tracking-wide"
                 >
                   Securely connecting your Google account...
                 </Text>

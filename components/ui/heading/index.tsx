@@ -29,6 +29,7 @@ const MappedHeading = memo(
         sub,
         italic,
         highlight,
+        retro,
         ...props
       },
       ref
@@ -48,6 +49,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -67,6 +69,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -86,6 +89,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -105,6 +109,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -124,6 +129,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -144,6 +150,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -163,6 +170,7 @@ const MappedHeading = memo(
                 sub,
                 italic,
                 highlight,
+                retro,
                 class: className,
               })}
               {...props}
@@ -188,6 +196,7 @@ const Heading = memo(
       sub,
       italic,
       highlight,
+      retro,
     } = props;
 
     if (AsComp) {
@@ -202,6 +211,7 @@ const Heading = memo(
             sub,
             italic,
             highlight,
+            retro,
             class: className,
           })}
           {...props}
