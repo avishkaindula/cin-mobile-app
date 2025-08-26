@@ -209,9 +209,18 @@ const QuestsPage = () => {
         className="bg-white dark:bg-background-dark"
       >
         <Box className="flex-1 justify-center items-center p-6">
-          <Text className="text-typography-600 dark:text-typography-400">
-            Loading missions...
-          </Text>
+          <Card className="p-8 border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
+            <VStack space="md" className="items-center">
+              <Image
+                source={require("@/assets/icon.png")}
+                style={{ width: 48, height: 48 }}
+                resizeMode="contain"
+              />
+              <Text className="text-[#333333] font-semibold tracking-wide">
+                Loading missions...
+              </Text>
+            </VStack>
+          </Card>
         </Box>
       </SafeAreaView>
     );
@@ -230,62 +239,72 @@ const QuestsPage = () => {
       >
         {/* Header */}
         <VStack space="lg" className="p-6 pb-4">
-          <VStack space="xs">
+          <VStack space="md" className="items-center">
+            <Image
+              source={require("@/assets/icon.png")}
+              style={{ width: 64, height: 64 }}
+              resizeMode="contain"
+            />
             <Heading
               size="xl"
-              className="text-typography-900 dark:text-typography-950"
+              className="text-[#333333] font-extrabold tracking-wider"
+              retro
             >
               Climate Quests
             </Heading>
             <Text
-              size="sm"
-              className="text-typography-600 dark:text-typography-750"
+              size="lg"
+              className="text-[#333333] text-center font-semibold tracking-wide"
             >
               Complete missions to earn rewards and make an impact
             </Text>
           </VStack>
 
           {/* User Stats */}
-          <Card className="p-6 bg-primary-600">
+          <Card className="p-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="md">
               <HStack className="justify-between items-center">
-                <Text size="xl" className="text-white font-semibold">
+                <Text size="xl" className="text-[#333333] font-bold tracking-wide" retro>
                   Your Progress
                 </Text>
-                <Box className="bg-white/20 rounded-full p-3">
-                  <Icon as={Award} size="lg" className="text-white" />
+                <Box className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg p-3">
+                  <Image
+                    source={require("@/assets/icon.png")}
+                    style={{ width: 24, height: 24 }}
+                    resizeMode="contain"
+                  />
                 </Box>
               </HStack>
               <HStack className="justify-between items-center w-full">
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-white text-2xl">
+                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                     {userStats.completed}
                   </Text>
-                  <Text size="sm" className="text-white/80">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     Completed
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-white text-2xl">
+                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                     {userStats.active}
                   </Text>
-                  <Text size="sm" className="text-white/80">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     Active
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-white text-2xl">
+                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                     {userStats.totalPoints}
                   </Text>
-                  <Text size="sm" className="text-white/80">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     Points
                   </Text>
                 </VStack>
                 <VStack space="xs" className="items-center flex-1">
-                  <Text className="font-bold text-white text-2xl">
+                  <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                     {userStats.totalEnergy}
                   </Text>
-                  <Text size="sm" className="text-white/80">
+                  <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                     Energy
                   </Text>
                 </VStack>
@@ -298,15 +317,15 @@ const QuestsPage = () => {
         <Box className="px-6 mb-4">
           <HStack
             space="md"
-            className="items-center bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3"
+            className="items-center bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333] rounded-lg px-4 py-3"
           >
-            <Icon as={Search} size="md" className="text-gray-500" />
+            <Icon as={Search} size="md" className="text-[#333333]" />
             <TextInput
-              className="flex-1 text-typography-900 dark:text-typography-950"
+              className="flex-1 text-[#333333] font-semibold tracking-wide"
               placeholder="Search quests..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#333333"
             />
           </HStack>
         </Box>
@@ -317,9 +336,11 @@ const QuestsPage = () => {
             variant={activeTab === "all" ? "solid" : "outline"}
             size="sm"
             onPress={() => setActiveTab("all")}
-            className="flex-1"
+            className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
+              activeTab === "all" ? "bg-[#98FB98]" : "bg-[#FCFCFC]"
+            }`}
           >
-            <Text className={activeTab === "all" ? "text-white" : ""}>
+            <Text className={`font-bold tracking-wide ${activeTab === "all" ? "text-[#333333]" : "text-[#333333]"}`}>
               All ({missions.length})
             </Text>
           </Button>
@@ -327,17 +348,17 @@ const QuestsPage = () => {
             variant={activeTab === "missions" ? "solid" : "outline"}
             size="sm"
             onPress={() => setActiveTab("missions")}
-            className="flex-1"
+            className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
+              activeTab === "missions" ? "bg-[#A2D8FF]" : "bg-[#FCFCFC]"
+            }`}
           >
             <HStack space="xs" className="items-center">
               <Icon
                 as={Target}
                 size="sm"
-                className={
-                  activeTab === "missions" ? "text-white" : "text-gray-500"
-                }
+                className="text-[#333333]"
               />
-              <Text className={activeTab === "missions" ? "text-white" : ""}>
+              <Text className="text-[#333333] font-bold tracking-wide">
                 Missions
               </Text>
             </HStack>
@@ -346,17 +367,17 @@ const QuestsPage = () => {
             variant={activeTab === "events" ? "solid" : "outline"}
             size="sm"
             onPress={() => setActiveTab("events")}
-            className="flex-1"
+            className={`flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${
+              activeTab === "events" ? "bg-[#FFE4B5]" : "bg-[#FCFCFC]"
+            }`}
           >
             <HStack space="xs" className="items-center">
               <Icon
                 as={Calendar}
                 size="sm"
-                className={
-                  activeTab === "events" ? "text-white" : "text-gray-500"
-                }
+                className="text-[#333333]"
               />
-              <Text className={activeTab === "events" ? "text-white" : ""}>
+              <Text className="text-[#333333] font-bold tracking-wide">
                 Events
               </Text>
             </HStack>
@@ -366,10 +387,14 @@ const QuestsPage = () => {
         {/* Missions List */}
         <VStack space="md" className="px-6 pb-6">
           {filteredMissions.length === 0 ? (
-            <Card className="p-8 items-center">
+            <Card className="p-8 items-center border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]">
               <VStack space="md" className="items-center">
-                <Icon as={Target} size="xl" className="text-gray-400" />
-                <Text className="text-center text-gray-500">
+                <Image
+                  source={require("@/assets/icon.png")}
+                  style={{ width: 48, height: 48 }}
+                  resizeMode="contain"
+                />
+                <Text className="text-center text-[#333333] font-semibold tracking-wide">
                   {searchQuery
                     ? "No missions found matching your search."
                     : "No missions available at the moment."}
@@ -383,7 +408,7 @@ const QuestsPage = () => {
               return (
                 <Card
                   key={mission.id}
-                  className="overflow-hidden border border-gray-200 dark:border-gray-700"
+                  className="overflow-hidden border-2 border-[#333333] shadow-[4px_4px_0_#333333] bg-[#FCFCFC]"
                 >
                   <VStack space="md">
                     {/* Mission Image */}
@@ -403,26 +428,26 @@ const QuestsPage = () => {
                         <HStack className="justify-between items-start">
                           <VStack space="xs" className="flex-1">
                             <HStack space="xs" className="items-center">
-                              <Badge className="bg-green-100 dark:bg-green-900/30">
+                              <Badge className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                                 <HStack space="xs" className="items-center">
                                   <Icon
                                     as={Award}
                                     size="xs"
-                                    className="text-green-600"
+                                    className="text-[#333333]"
                                   />
-                                  <Text size="xs" className="text-green-600">
+                                  <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                     +{mission.points_awarded} pts
                                   </Text>
                                 </HStack>
                               </Badge>
-                              <Badge className="bg-orange-100 dark:bg-orange-900/30">
+                              <Badge className="bg-[#FFE4B5] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                                 <HStack space="xs" className="items-center">
                                   <Icon
                                     as={Zap}
                                     size="xs"
-                                    className="text-orange-600"
+                                    className="text-[#333333]"
                                   />
-                                  <Text size="xs" className="text-orange-600">
+                                  <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                     +{mission.energy_awarded} ⚡
                                   </Text>
                                 </HStack>
@@ -431,14 +456,15 @@ const QuestsPage = () => {
 
                             <Heading
                               size="md"
-                              className="text-typography-900 dark:text-typography-950"
+                              className="text-[#333333] font-extrabold tracking-wider"
+                              retro
                             >
                               {mission.title}
                             </Heading>
 
                             <Text
                               size="sm"
-                              className="text-typography-600 dark:text-typography-750"
+                              className="text-[#333333] font-semibold tracking-wide"
                               numberOfLines={2}
                             >
                               {mission.description}
@@ -463,11 +489,11 @@ const QuestsPage = () => {
                             <Icon
                               as={Building}
                               size="sm"
-                              className="text-gray-500"
+                              className="text-[#333333]"
                             />
                             <Text
                               size="sm"
-                              className="text-typography-600 dark:text-typography-750"
+                              className="text-[#333333] font-semibold tracking-wide"
                             >
                               {mission.organization_name}
                             </Text>
@@ -476,11 +502,11 @@ const QuestsPage = () => {
                             <Icon
                               as={Users}
                               size="sm"
-                              className="text-blue-500"
+                              className="text-[#333333]"
                             />
                             <Text
                               size="sm"
-                              className="text-typography-600 dark:text-typography-750"
+                              className="text-[#333333] font-semibold tracking-wide"
                             >
                               {mission.participants_count}
                             </Text>
@@ -494,18 +520,22 @@ const QuestsPage = () => {
                               <HStack className="justify-between">
                                 <Text
                                   size="sm"
-                                  className="text-typography-600 dark:text-typography-750"
+                                  className="text-[#333333] font-bold tracking-wide"
                                 >
                                   Progress
                                 </Text>
-                                <Text size="sm" className="text-blue-600">
+                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                                   {mission.submission_progress || 0}%
                                 </Text>
                               </HStack>
-                              <Progress
-                                value={mission.submission_progress || 0}
-                                className="h-2"
-                              />
+                              <Box className="w-full h-3 bg-[#333333] border-2 border-[#333333] rounded-lg">
+                                <Box
+                                  className="h-full rounded-md bg-[#A2D8FF] border border-[#333333]"
+                                  style={{
+                                    width: `${mission.submission_progress || 0}%`,
+                                  }}
+                                />
+                              </Box>
                             </VStack>
                           )}
 
@@ -518,7 +548,7 @@ const QuestsPage = () => {
                             disabled={
                               actionLoading === `bookmark-${mission.id}`
                             }
-                            className="flex-1"
+                            className="flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                           >
                             <HStack space="xs" className="items-center">
                               <Icon
@@ -528,13 +558,9 @@ const QuestsPage = () => {
                                     : Bookmark
                                 }
                                 size="sm"
-                                className={
-                                  mission.is_bookmarked
-                                    ? "text-primary-600"
-                                    : "text-gray-500"
-                                }
+                                className="text-[#333333]"
                               />
-                              <Text size="sm">
+                              <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                                 {mission.is_bookmarked ? "Saved" : "Save"}
                               </Text>
                             </HStack>
@@ -544,15 +570,15 @@ const QuestsPage = () => {
                             variant="outline"
                             size="sm"
                             onPress={() => handleViewMission(mission.id)}
-                            className="flex-1"
+                            className="flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                           >
                             <HStack space="xs" className="items-center">
                               <Icon
                                 as={Eye}
                                 size="sm"
-                                className="text-gray-500"
+                                className="text-[#333333]"
                               />
-                              <Text size="sm">View</Text>
+                              <Text size="sm" className="text-[#333333] font-bold tracking-wide">View</Text>
                             </HStack>
                           </Button>
 
@@ -567,7 +593,7 @@ const QuestsPage = () => {
                                   router.push(`/mission/${mission.id}/submit`);
                                 }
                               }}
-                              className="flex-1 bg-blue-600"
+                              className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               disabled={
                                 mission.submission_status === "reviewed"
                               }
@@ -580,9 +606,9 @@ const QuestsPage = () => {
                                       : Play
                                   }
                                   size="sm"
-                                  className="text-white"
+                                  className="text-[#333333]"
                                 />
-                                <Text size="sm" className="text-white">
+                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                                   {mission.submission_status === "reviewed"
                                     ? "Completed"
                                     : "Continue"}
@@ -595,15 +621,15 @@ const QuestsPage = () => {
                               size="sm"
                               onPress={() => handleStartMission(mission.id)}
                               disabled={actionLoading === `start-${mission.id}`}
-                              className="flex-1"
+                              className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                             >
                               <HStack space="xs" className="items-center">
                                 <Icon
                                   as={Target}
                                   size="sm"
-                                  className="text-white"
+                                  className="text-[#333333]"
                                 />
-                                <Text size="sm" className="text-white">
+                                <Text size="sm" className="text-[#333333] font-bold tracking-wide">
                                   Start
                                 </Text>
                               </HStack>
