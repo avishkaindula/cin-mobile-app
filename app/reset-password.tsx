@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Image } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -68,11 +68,13 @@ export default function ResetPassword() {
         <Box className="flex-1 justify-center p-6">
           <VStack space="xl" className="items-center">
             {/* Header */}
-            <VStack space="lg" className="items-center mb-8">
-              <Box className="p-4 bg-[#98FB98] rounded-full">
-                <Icon as={KeyRound} size="xl" className="text-[#333333]" />
-              </Box>
-              <VStack space="xs" className="items-center">
+            <VStack space="md" className="items-center mb-4">
+              <Image
+                source={require("@/assets/icon.png")}
+                style={{ width: 64, height: 64 }}
+                resizeMode="contain"
+              />
+              <VStack space="md" className="items-center">
                 <Heading
                   size="2xl"
                   className="text-[#333333] text-center font-extrabold tracking-wider"
@@ -91,7 +93,7 @@ export default function ResetPassword() {
 
             {/* Reset Password Card */}
             <Card className="w-full max-w-sm p-8">
-              <VStack space="lg">
+              <VStack space="lg" className="items-center">
                 {/* New Password Input */}
                 <VStack space="xs" className="w-full">
                   <Text

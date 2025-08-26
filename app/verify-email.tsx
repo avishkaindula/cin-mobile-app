@@ -5,6 +5,7 @@ import {
   TextInput,
   Keyboard,
   InteractionManager,
+  Image,
 } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -191,11 +192,13 @@ export default function VerifyEmail() {
           <Box className="flex-1 justify-center">
             <VStack space="xl" className="items-center">
               {/* Header */}
-              <VStack space="lg" className="items-center mb-8">
-                <Box className="p-4 bg-[#A2D8FF] rounded-full">
-                  <Icon as={Mail} size="xl" className="text-[#333333]" />
-                </Box>
-                <VStack space="xs" className="items-center">
+              <VStack space="md" className="items-center mb-4">
+                <Image
+                  source={require("@/assets/icon.png")}
+                  style={{ width: 64, height: 64 }}
+                  resizeMode="contain"
+                />
+                <VStack space="md" className="items-center">
                   <Heading
                     size="2xl"
                     className="text-[#333333] text-center font-extrabold tracking-wider"
@@ -220,7 +223,7 @@ export default function VerifyEmail() {
 
               {/* Verification Card */}
               <Card className="w-full max-w-sm p-8">
-                <VStack space="lg">
+                <VStack space="lg" className="items-center">
                   <VStack space="md" className="items-center">
                     <Heading
                       size="lg"
