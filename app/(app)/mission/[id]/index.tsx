@@ -256,7 +256,7 @@ const MissionDetailsPage = () => {
                   >
                     {mission.title}
                   </Heading>
-                  <HStack space="xs" className="items-center">
+                  <HStack space="xs" className="items-center mt-3">
                     <Icon
                       as={statusInfo.icon}
                       size="sm"
@@ -357,16 +357,14 @@ const MissionDetailsPage = () => {
                     variant="solid"
                     size="sm"
                     onPress={() => router.push(`/mission/${mission.id}/submit`)}
-                    className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                    className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                   >
-                    <VStack className="items-center justify-center">
-                      <HStack space="xs" className="items-center">
-                        <Icon as={Play} size="sm" className="text-[#333333]" />
-                        <Text retro className="text-[#333333] font-bold">
-                          {mission.submission_status === "completed" ? "Review" : "Continue"}
-                        </Text>
-                      </HStack>
-                    </VStack>
+                    <HStack space="sm" className="items-center">
+                      <Icon as={Play} size="sm" className="text-[#333333]" />
+                      <Text className="text-[#333333] font-bold tracking-wide">
+                        {mission.submission_status === "completed" ? "Review" : "Continue"}
+                      </Text>
+                    </HStack>
                   </Button>
                 ) : (
                   <Button

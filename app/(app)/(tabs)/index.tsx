@@ -363,7 +363,7 @@ const HomePage = () => {
                             </VStack>
                             <Button 
                               size="sm" 
-                              className="mt-2 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                              className="mt-2 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                               onPress={() => handleContinueMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
