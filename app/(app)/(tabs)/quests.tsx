@@ -568,14 +568,16 @@ const QuestsPage = () => {
                             onPress={() => handleViewMission(mission.id)}
                             className="flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                           >
-                            <HStack space="xs" className="items-center">
-                              <Icon
-                                as={Eye}
-                                size="sm"
-                                className="text-[#333333]"
-                              />
-                              <Text size="sm" className="text-[#333333] font-bold tracking-wide">View</Text>
-                            </HStack>
+                            <VStack className="items-center justify-center">
+                              <HStack space="xs" className="items-center">
+                                <Icon
+                                  as={Eye}
+                                  size="sm"
+                                  className="text-[#333333]"
+                                />
+                                <Text retro size="sm" className="text-[#333333] font-bold tracking-wide">View</Text>
+                              </HStack>
+                            </VStack>
                           </Button>
 
                           {mission.submission_status ? (

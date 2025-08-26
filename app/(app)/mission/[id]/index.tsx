@@ -208,7 +208,7 @@ const MissionDetailsPage = () => {
     >
       <ScrollView className="flex-1">
         {/* Header */}
-        <VStack space="lg" className="items-center p-6 border-b-2 border-[#333333]">
+        <VStack space="lg" className="items-center p-6">
           <Image
             source={require("@/assets/icon.png")}
             style={{ width: 48, height: 48 }}
@@ -236,10 +236,10 @@ const MissionDetailsPage = () => {
 
               {/* Title and Status */}
               <VStack space="md">
-                <HStack className="justify-between items-start">
+                <VStack space="xs">
                   <Heading retro
                     size="xl"
-                    className="text-[#333333] flex-1 font-bold tracking-wide"
+                    className="text-[#333333] font-bold tracking-wide"
                   >
                     {mission.title}
                   </Heading>
@@ -253,7 +253,7 @@ const MissionDetailsPage = () => {
                       {statusInfo.text}
                     </Text>
                   </HStack>
-                </HStack>
+                </VStack>
 
                 <Text retro
                   size="md"
@@ -264,25 +264,23 @@ const MissionDetailsPage = () => {
 
                 {/* Mission Info */}
                 <VStack space="xs">
-                  <HStack space="md" className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <Icon as={Building} size="sm" className="text-[#333333]" />
-                      <Text retro
-                        size="sm"
-                        className="text-[#333333]"
-                      >
-                        {mission.organization_name}
-                      </Text>
-                    </HStack>
-                    <HStack space="xs" className="items-center">
-                      <Icon as={Users} size="sm" className="text-[#333333]" />
-                      <Text retro
-                        size="sm"
-                        className="text-[#333333]"
-                      >
-                        {mission.participants_count} participants
-                      </Text>
-                    </HStack>
+                  <HStack space="xs" className="items-center">
+                    <Icon as={Building} size="sm" className="text-[#333333]" />
+                    <Text retro
+                      size="sm"
+                      className="text-[#333333]"
+                    >
+                      {mission.organization_name}
+                    </Text>
+                  </HStack>
+                  <HStack space="xs" className="items-center">
+                    <Icon as={Users} size="sm" className="text-[#333333]" />
+                    <Text retro
+                      size="sm"
+                      className="text-[#333333]"
+                    >
+                      {mission.participants_count} participants
+                    </Text>
                   </HStack>
 
                   <HStack space="md" className="items-center">
@@ -317,14 +315,16 @@ const MissionDetailsPage = () => {
                   disabled={actionLoading === "bookmark"}
                   className="flex-1 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                 >
-                  <HStack space="xs" className="items-center justify-center">
-                    <Icon
-                      as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
-                      size="sm"
-                      className="text-[#333333]"
-                    />
-                    <Text retro className="text-[#333333] font-bold">{mission.is_bookmarked ? "Saved" : "Save"}</Text>
-                  </HStack>
+                  <VStack className="items-center justify-center">
+                    <HStack space="xs" className="items-center">
+                      <Icon
+                        as={mission.is_bookmarked ? BookmarkCheck : Bookmark}
+                        size="sm"
+                        className="text-[#333333]"
+                      />
+                      <Text retro className="text-[#333333] font-bold">{mission.is_bookmarked ? "Saved" : "Save"}</Text>
+                    </HStack>
+                  </VStack>
                 </Button>
 
                 {mission.submission_status === "reviewed" ? (
@@ -334,10 +334,12 @@ const MissionDetailsPage = () => {
                     className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                     disabled
                   >
-                    <HStack space="xs" className="items-center justify-center">
-                      <Icon as={CheckCircle} size="sm" className="text-[#333333]" />
-                      <Text retro className="text-[#333333] font-bold">Completed</Text>
-                    </HStack>
+                    <VStack className="items-center justify-center">
+                      <HStack space="xs" className="items-center">
+                        <Icon as={CheckCircle} size="sm" className="text-[#333333]" />
+                        <Text retro className="text-[#333333] font-bold">Completed</Text>
+                      </HStack>
+                    </VStack>
                   </Button>
                 ) : mission.submission_status && ["started", "in_progress", "completed"].includes(mission.submission_status) ? (
                   <Button
@@ -346,12 +348,14 @@ const MissionDetailsPage = () => {
                     onPress={() => router.push(`/mission/${mission.id}/submit`)}
                     className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                   >
-                    <HStack space="xs" className="items-center justify-center">
-                      <Icon as={Play} size="sm" className="text-[#333333]" />
-                      <Text retro className="text-[#333333] font-bold">
-                        {mission.submission_status === "completed" ? "Review Submission" : "Continue Mission"}
-                      </Text>
-                    </HStack>
+                    <VStack className="items-center justify-center">
+                      <HStack space="xs" className="items-center">
+                        <Icon as={Play} size="sm" className="text-[#333333]" />
+                        <Text retro className="text-[#333333] font-bold">
+                          {mission.submission_status === "completed" ? "Review" : "Continue"}
+                        </Text>
+                      </HStack>
+                    </VStack>
                   </Button>
                 ) : (
                   <Button
@@ -361,10 +365,12 @@ const MissionDetailsPage = () => {
                     disabled={actionLoading === "start"}
                     className="flex-1 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                   >
-                    <HStack space="xs" className="items-center justify-center">
-                      <Icon as={Target} size="sm" className="text-[#333333]" />
-                      <Text retro className="text-[#333333] font-bold">Start Mission</Text>
-                    </HStack>
+                    <VStack className="items-center justify-center">
+                      <HStack space="xs" className="items-center">
+                        <Icon as={Target} size="sm" className="text-[#333333]" />
+                        <Text retro className="text-[#333333] font-bold">Start Mission</Text>
+                      </HStack>
+                    </VStack>
                   </Button>
                 )}
               </HStack>

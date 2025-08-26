@@ -191,13 +191,13 @@ const EditProfilePage = () => {
         <ScrollView className="flex-1">
           <Box className="p-6">
             {/* Header */}
-            <VStack space="lg" className="items-center mb-6">
+            <VStack space="lg" className="items-center mb-8">
               <Image
                 source={require("@/assets/icon.png")}
                 style={{ width: 48, height: 48 }}
                 resizeMode="contain"
               />
-              <VStack space="xs" className="items-center">
+              <VStack space="md" className="items-center">
                 <Heading retro
                   size="xl"
                   className="text-[#333333] font-bold tracking-wide"
@@ -211,6 +211,19 @@ const EditProfilePage = () => {
                   Update your personal information
                 </Text>
               </VStack>
+              
+              {/* Back Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={() => router.back()}
+                className="bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+              >
+                <HStack space="xs" className="items-center justify-center">
+                  <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
+                  <Text retro size="sm" className="text-[#333333] font-bold">Go Back</Text>
+                </HStack>
+              </Button>
             </VStack>
 
             <VStack space="lg">
@@ -385,11 +398,11 @@ const EditProfilePage = () => {
                 disabled={saving || uploadingAvatar}
                 onPress={() => router.back()}
               >
-                <HStack className="justify-center">
+                <VStack className="items-center justify-center">
                   <Text retro size="lg" className="text-[#333333] font-bold">
                     Cancel
                   </Text>
-                </HStack>
+                </VStack>
               </Button>
             </VStack>
           </Box>

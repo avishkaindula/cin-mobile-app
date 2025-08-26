@@ -386,7 +386,7 @@ const MissionSubmissionPage = () => {
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-[#FCFCFC]">
       {/* Header */}
-      <VStack space="lg" className="items-center p-6 border-b-2 border-[#333333]">
+      <VStack space="lg" className="items-center p-6">
         <Image
           source={require("@/assets/icon.png")}
           style={{ width: 48, height: 48 }}
@@ -395,6 +395,19 @@ const MissionSubmissionPage = () => {
         <Heading retro size="xl" className="text-[#333333] font-bold tracking-wide text-center">
           Submit Evidence
         </Heading>
+        
+        {/* Back Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onPress={() => router.back()}
+          className="bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+        >
+          <HStack space="xs" className="items-center justify-center">
+            <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
+            <Text retro size="sm" className="text-[#333333] font-bold">Go Back</Text>
+          </HStack>
+        </Button>
       </VStack>
 
       <ScrollView className="flex-1 p-6">
@@ -479,9 +492,9 @@ const MissionSubmissionPage = () => {
             </Card>
 
             {/* Evidence Collection */}
-            <Card className="p-4 border border-gray-200 dark:border-gray-700">
+            <Card className="p-4 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="md">
-                <Text className="font-semibold text-typography-900 dark:text-typography-950">
+                <Text retro size="lg" className="font-bold text-[#333333]">
                   Add Evidence
                 </Text>
 
@@ -489,18 +502,20 @@ const MissionSubmissionPage = () => {
                 <VStack space="md">
                   {currentStep.requiredEvidence.includes("photo") && (
                     <VStack space="xs">
-                      <Text size="sm" className="font-medium">Photo Evidence</Text>
+                      <Text retro size="sm" className="font-bold text-[#333333]">Photo Evidence</Text>
                       <Button
                         variant="outline"
                         size="sm"
                         onPress={handleSelectPhoto}
                         disabled={submitting}
-                        className="w-full"
+                        className="w-full bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                       >
-                        <HStack space="xs" className="items-center">
-                          <Icon as={Upload} size="sm" />
-                          <Text>Select Photo from Gallery</Text>
-                        </HStack>
+                        <VStack className="items-center justify-center">
+                          <HStack space="xs" className="items-center">
+                            <Icon as={Upload} size="sm" className="text-[#333333]" />
+                            <Text retro className="text-[#333333] font-bold">Select Photo from Gallery</Text>
+                          </HStack>
+                        </VStack>
                       </Button>
                     </VStack>
                   )}
