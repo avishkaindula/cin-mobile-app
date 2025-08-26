@@ -12,7 +12,7 @@ import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Icon } from "@/components/ui/icon";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
@@ -251,10 +251,12 @@ export default function SignUp() {
               onPress={() => router.back()}
               className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC] px-4 py-2"
             >
-              <ButtonIcon as={ArrowLeft} size="sm" className="text-[#333333]" />
-              <ButtonText className="text-[#333333] font-bold tracking-wide">
-                Go Back
-              </ButtonText>
+              <HStack space="sm" className="items-center">
+                <Icon as={ArrowLeft} size="sm" className="text-[#333333]" />
+                <Text className="text-[#333333] font-bold tracking-wide">
+                  Go Back
+                </Text>
+              </HStack>
             </Button>
           </HStack>
 
