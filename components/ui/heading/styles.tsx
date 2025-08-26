@@ -29,7 +29,7 @@ export const headingStyle = tva({
       true: 'bg-[#FFD966] border-2 border-[#333333] px-3 py-2 shadow-[3px_3px_0_#333333]',
     },
     retro: {
-      true: 'text-[#333333] border-2 border-[#333333] bg-[#A2D8FF] px-4 py-2 shadow-[3px_3px_0_#333333] uppercase font-extrabold tracking-widest',
+      true: 'text-[#333333] border-2 border-[#333333] bg-[#98FB98] px-4 py-2 shadow-[3px_3px_0_#333333] uppercase font-extrabold tracking-widest',
     },
     size: {
       '5xl': 'text-6xl',

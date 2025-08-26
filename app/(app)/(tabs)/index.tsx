@@ -172,7 +172,7 @@ const HomePage = () => {
             {/* League Status Card */}
             <Card className="p-4 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <HStack space="md" className="items-center">
-                <Box className="p-3 rounded-lg bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
+                <Box className="p-3 rounded-lg bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
                   <Icon
                     as={userStats.leagueIcon}
                     size="md"
@@ -230,7 +230,7 @@ const HomePage = () => {
                 </Text>
               </VStack>
             </Card>
-            <Card className="flex-1 p-4 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+            <Card className="flex-1 p-4 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="xs" className="items-center">
                 <Text className="font-bold text-[#333333] text-2xl tracking-wider" retro>
                   {userStats.activeMissions}
@@ -289,7 +289,7 @@ const HomePage = () => {
                               />
                               <Badge
                                 variant="solid"
-                                className="absolute top-2 right-2 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                                className="absolute top-2 right-2 bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               >
                                 <Text size="xs" className="text-[#333333] font-bold tracking-wide">
                                   {mission.submission_progress || 0}% Complete
