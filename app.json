@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mission 1.5",
     "slug": "mission-1-5",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "com.mission15",
