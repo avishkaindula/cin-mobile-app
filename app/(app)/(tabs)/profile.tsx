@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Divider } from "@/components/ui/divider";
 import { Image } from "@/components/ui/image";
 import { useTheme } from "@/context/theme";
 import { useSession } from "@/context/auth";
@@ -20,25 +19,18 @@ import {
   Award,
   Target,
   BarChart3,
-  Settings,
-  Moon,
-  Sun,
   LogOut,
   Calendar,
   CheckCircle,
   Edit,
   Trash2,
 } from "lucide-react-native";
+import { getPublishedMissions, MissionWithStats } from "@/services/missions";
 import {
-  getPublishedMissions,
-  getUserMissionStats,
-  MissionWithStats,
-} from "@/services/missions";
-import {
-  getCurrentUserProfile,
   getCurrentUserProfileWithAvatar,
   Agent,
 } from "@/services/profile/profile.service";
+import { BASE_URL } from "@/lib/constants";
 
 const ProfilePage = () => {
   const { colorScheme, toggleColorScheme } = useTheme();
@@ -108,10 +100,10 @@ const ProfilePage = () => {
               if (!user?.id) return;
 
               // Call the delete user API route
-              const response = await fetch('/api/auth/delete-user', {
-                method: 'POST',
+              const response = await fetch(`${BASE_URL}/api/auth/delete-user`, {
+                method: "POST",
                 headers: {
-                  'Content-Type': 'application/json',
+                  "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ userId: user.id }),
               });
@@ -119,17 +111,26 @@ const ProfilePage = () => {
               const result = await response.json();
 
               if (!response.ok) {
-                Alert.alert("Error", result.error || "Failed to delete account. Please try again.");
+                Alert.alert(
+                  "Error",
+                  result.error || "Failed to delete account. Please try again."
+                );
                 return;
               }
 
               // Sign out the user after successful deletion
               await signOut();
-              
-              Alert.alert("Account Deleted", "Your account has been successfully deleted.");
+
+              Alert.alert(
+                "Account Deleted",
+                "Your account has been successfully deleted."
+              );
             } catch (error) {
               console.error("Error deleting account:", error);
-              Alert.alert("Error", "Failed to delete account. Please try again.");
+              Alert.alert(
+                "Error",
+                "Failed to delete account. Please try again."
+              );
             }
           },
         },
@@ -276,10 +277,7 @@ const ProfilePage = () => {
   const displayLocation = profile?.address || user?.user_metadata?.location;
 
   return (
-    <SafeAreaView
-      style={{ flex: 1 }}
-      className="bg-[#FCFCFC]"
-    >
+    <SafeAreaView style={{ flex: 1 }} className="bg-[#FCFCFC]">
       <ScrollView
         className="flex-1"
         refreshControl={
@@ -290,15 +288,19 @@ const ProfilePage = () => {
           {/* Header with Logo */}
           <HStack className="items-center justify-between mb-8">
             <VStack space="lg">
-              <Heading retro size="2xl" className="text-[#333333] tracking-wide font-bold">
+              <Heading
+                retro
+                size="2xl"
+                className="text-[#333333] tracking-wide font-bold"
+              >
                 Profile
               </Heading>
               <Text retro className="text-[#333333] text-base">
                 Your climate action journey
               </Text>
             </VStack>
-            <Image 
-              source={require('@/assets/icon.png')}
+            <Image
+              source={require("@/assets/icon.png")}
               style={{ width: 48, height: 48 }}
               resizeMode="contain"
             />
@@ -323,15 +325,12 @@ const ProfilePage = () => {
                   </Avatar>
                 ) : (
                   <Box className="w-16 h-16 bg-[#A2D8FF] border-2 border-[#333333] rounded-full items-center justify-center">
-                    <Icon
-                      as={User}
-                      size="xl"
-                      className="text-[#333333]"
-                    />
+                    <Icon as={User} size="xl" className="text-[#333333]" />
                   </Box>
                 )}
                 <VStack space="md" className="flex-1">
-                  <Heading retro
+                  <Heading
+                    retro
                     size="lg"
                     className="text-[#333333] font-bold tracking-wide"
                   >
@@ -341,22 +340,32 @@ const ProfilePage = () => {
                     {displayEmail}
                   </Text>
                   {displayLocation && (
-                    <Text retro
-                      size="sm"
-                      className="text-[#333333] opacity-80"
-                    >
+                    <Text retro size="sm" className="text-[#333333] opacity-80">
                       {displayLocation}
                     </Text>
                   )}
                   <HStack space="xs" className="items-center mt-2">
                     <Badge className="bg-[#98FB98] border border-[#333333] shadow-[2px_2px_0_#333333]">
-                      <Text retro size="xs" className="text-[#333333] font-bold">Level {currentLevel.level}</Text>
+                      <Text
+                        retro
+                        size="xs"
+                        className="text-[#333333] font-bold"
+                      >
+                        Level {currentLevel.level}
+                      </Text>
                     </Badge>
                     <Badge className="bg-[#FFD700] border border-[#333333] shadow-[2px_2px_0_#333333]">
-                      <Text retro size="xs" className="text-[#333333] font-bold">{userStats.totalPoints} points</Text>
+                      <Text
+                        retro
+                        size="xs"
+                        className="text-[#333333] font-bold"
+                      >
+                        {userStats.totalPoints} points
+                      </Text>
                     </Badge>
                   </HStack>
-                  <Text retro
+                  <Text
+                    retro
                     size="sm"
                     className="text-[#333333] font-bold tracking-wide"
                   >
@@ -370,12 +379,10 @@ const ProfilePage = () => {
                   onPress={() => router.push("/profile/edit")}
                 >
                   <HStack space="sm" className="items-center">
-                    <Icon
-                      as={Edit}
-                      size="sm"
-                      className="text-[#333333]"
-                    />
-                    <Text className="text-[#333333] font-bold tracking-wide">Edit Profile</Text>
+                    <Icon as={Edit} size="sm" className="text-[#333333]" />
+                    <Text className="text-[#333333] font-bold tracking-wide">
+                      Edit Profile
+                    </Text>
                   </HStack>
                 </Button>
                 <Button
@@ -384,11 +391,13 @@ const ProfilePage = () => {
                 >
                   <HStack space="sm" className="items-center">
                     <Icon as={LogOut} size="sm" className="text-[#333333]" />
-                    <Text className="text-[#333333] font-bold tracking-wide">Sign Out</Text>
+                    <Text className="text-[#333333] font-bold tracking-wide">
+                      Sign Out
+                    </Text>
                   </HStack>
                 </Button>
               </HStack>
-              
+
               {/* Delete Account Button */}
               <Button
                 className="bg-[#FFB3B3] border-2 border-[#333333] shadow-[4px_4px_0_#333333] mt-4"
@@ -396,7 +405,9 @@ const ProfilePage = () => {
               >
                 <HStack space="sm" className="items-center justify-center">
                   <Icon as={Trash2} size="sm" className="text-[#333333]" />
-                  <Text className="text-[#333333] font-bold tracking-wide">Delete Account</Text>
+                  <Text className="text-[#333333] font-bold tracking-wide">
+                    Delete Account
+                  </Text>
                 </HStack>
               </Button>
             </VStack>
@@ -405,7 +416,8 @@ const ProfilePage = () => {
           {/* Stats Card */}
           <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
-              <Heading retro
+              <Heading
+                retro
                 size="lg"
                 className="text-[#333333] font-bold tracking-wide"
               >
@@ -429,7 +441,8 @@ const ProfilePage = () => {
           {/* Achievements Card */}
           <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
-              <Heading retro
+              <Heading
+                retro
                 size="lg"
                 className="text-[#333333] font-bold tracking-wide"
               >
@@ -444,9 +457,7 @@ const ProfilePage = () => {
                   >
                     <Box
                       className={`p-2 rounded-lg border-2 border-[#333333] ${
-                        achievement.earned
-                          ? "bg-[#98FB98]"
-                          : "bg-[#E0E0E0]"
+                        achievement.earned ? "bg-[#98FB98]" : "bg-[#E0E0E0]"
                       }`}
                     >
                       <Icon
@@ -456,7 +467,8 @@ const ProfilePage = () => {
                       />
                     </Box>
                     <VStack space="xs" className="flex-1">
-                      <Text retro
+                      <Text
+                        retro
                         className={`font-bold tracking-wide ${
                           achievement.earned
                             ? "text-[#333333]"
@@ -465,7 +477,8 @@ const ProfilePage = () => {
                       >
                         {achievement.title}
                       </Text>
-                      <Text retro
+                      <Text
+                        retro
                         size="sm"
                         className={`${
                           achievement.earned
@@ -478,7 +491,13 @@ const ProfilePage = () => {
                     </VStack>
                     {achievement.earned && (
                       <Badge className="bg-[#FFD700] border border-[#333333] shadow-[2px_2px_0_#333333]">
-                        <Text retro size="xs" className="text-[#333333] font-bold">Earned</Text>
+                        <Text
+                          retro
+                          size="xs"
+                          className="text-[#333333] font-bold"
+                        >
+                          Earned
+                        </Text>
                       </Badge>
                     )}
                   </HStack>
@@ -490,7 +509,8 @@ const ProfilePage = () => {
           {/* Recent Activity Card */}
           <Card className="p-6 mb-6 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
             <VStack space="lg">
-              <Heading retro
+              <Heading
+                retro
                 size="lg"
                 className="text-[#333333] font-bold tracking-wide"
               >
@@ -504,14 +524,13 @@ const ProfilePage = () => {
                 <VStack space="md">
                   {recentActivity.map((activity, index) => (
                     <HStack key={index} space="md" className="items-center">
-                      <Box
-                        className="w-3 h-3 bg-[#98FB98] border border-[#333333] rounded-full"
-                      />
+                      <Box className="w-3 h-3 bg-[#98FB98] border border-[#333333] rounded-full" />
                       <VStack space="xs" className="flex-1">
                         <Text retro className="text-[#333333] font-bold">
                           {activity.title}
                         </Text>
-                        <Text retro
+                        <Text
+                          retro
                           size="sm"
                           className="text-[#333333] opacity-80"
                         >
