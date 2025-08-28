@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import { SafeAreaView, ScrollView, RefreshControl, Alert } from "react-native";
 import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -27,6 +27,7 @@ import {
   Calendar,
   CheckCircle,
   Edit,
+  Trash2,
 } from "lucide-react-native";
 import {
   getPublishedMissions,
@@ -88,6 +89,52 @@ const ProfilePage = () => {
     setRefreshing(true);
     await loadData();
     setRefreshing(false);
+  };
+
+  const deleteAccount = async () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone and you will lose all your progress.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              if (!user?.id) return;
+
+              // Call the delete user API route
+              const response = await fetch('/api/auth/delete-user', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId: user.id }),
+              });
+
+              const result = await response.json();
+
+              if (!response.ok) {
+                Alert.alert("Error", result.error || "Failed to delete account. Please try again.");
+                return;
+              }
+
+              // Sign out the user after successful deletion
+              await signOut();
+              
+              Alert.alert("Account Deleted", "Your account has been successfully deleted.");
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert("Error", "Failed to delete account. Please try again.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   // Calculate real user statistics from missions
@@ -341,6 +388,17 @@ const ProfilePage = () => {
                   </HStack>
                 </Button>
               </HStack>
+              
+              {/* Delete Account Button */}
+              <Button
+                className="bg-[#FFB3B3] border-2 border-[#333333] shadow-[4px_4px_0_#333333] mt-4"
+                onPress={deleteAccount}
+              >
+                <HStack space="sm" className="items-center justify-center">
+                  <Icon as={Trash2} size="sm" className="text-[#333333]" />
+                  <Text className="text-[#333333] font-bold tracking-wide">Delete Account</Text>
+                </HStack>
+              </Button>
             </VStack>
           </Card>
 
