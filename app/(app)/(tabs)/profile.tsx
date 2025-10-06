@@ -33,7 +33,6 @@ import {
 import { BASE_URL } from "@/lib/constants";
 
 const ProfilePage = () => {
-  const { colorScheme, toggleColorScheme } = useTheme();
   const { signOut, user } = useSession();
   const [missions, setMissions] = useState<MissionWithStats[]>([]);
   const [profile, setProfile] = useState<Agent | null>(null);

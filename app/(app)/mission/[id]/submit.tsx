@@ -266,7 +266,7 @@ const MissionSubmissionPage = () => {
         setEvidenceItems([]);
         setTextInput("");
 
-        // Reload progress
+        // Reload progress - this will automatically update currentStepIndex from backend
         await loadMissionAndProgress();
 
         // Show success message
@@ -283,7 +283,7 @@ const MissionSubmissionPage = () => {
           );
         } else {
           Alert.alert("Step Completed!", "Great job! You can now proceed to the next step.");
-          setCurrentStepIndex(prev => prev + 1);
+          // Don't manually increment - loadMissionAndProgress() already updated it from backend
         }
       }
     } catch (error) {
