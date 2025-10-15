@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mission 1.5",
     "slug": "mission-1-5",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "com.mission15",
@@ -45,6 +45,18 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Mission 1.5 to access your microphone to record audio evidence for climate missions."
         }
       ],
       "expo-font",
