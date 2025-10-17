@@ -588,7 +588,7 @@ const HomePage = () => {
                             <VStack space="md">
                               <Button
                                 size="sm"
-                                className="w-full bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                                className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                                 onPress={() => handleContinueMission(mission.id)}
                               >
                                 <HStack space="xs" className="items-center">
@@ -605,7 +605,7 @@ const HomePage = () => {
                               <Button
                                 variant="solid"
                                 size="sm"
-                                className="w-full border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
+                                className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                                 onPress={() => handleViewMission(mission.id)}
                               >
                                 <HStack space="xs" className="items-center">
@@ -758,7 +758,7 @@ const HomePage = () => {
                           <VStack space="md">
                             <Button
                               size="sm"
-                              className="w-full bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               onPress={() => handleStartMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
@@ -775,7 +775,7 @@ const HomePage = () => {
                             <Button
                               variant="solid"
                               size="sm"
-                              className="w-full border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
+                              className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                               onPress={() => handleViewMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
@@ -920,7 +920,7 @@ const HomePage = () => {
                           <VStack space="md">
                             <Button
                               size="sm"
-                              className="w-full bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
                               onPress={() => handleStartMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
@@ -937,7 +937,7 @@ const HomePage = () => {
                             <Button
                               variant="solid"
                               size="sm"
-                              className="w-full border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
+                              className="border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                               onPress={() => handleViewMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
