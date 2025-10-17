@@ -20,7 +20,6 @@ import {
   ArrowLeft,
   Video,
   FileText,
-  MapPin,
   CheckCircle,
   Upload,
   X,
@@ -43,7 +42,6 @@ import {
 } from "@/services/missions/submissions";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
-import * as Location from "expo-location";
 import { Audio } from "expo-av";
 
 const MissionSubmissionPage = () => {
@@ -104,7 +102,6 @@ const MissionSubmissionPage = () => {
 
   const requestPermissions = async () => {
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
 
     if (libraryStatus !== "granted") {
       Alert.alert("Permission Required", "Photo library access is required to submit evidence.");
@@ -271,38 +268,6 @@ const MissionSubmissionPage = () => {
       Alert.alert("Error", "Failed to upload audio. Please try again.");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleGetLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission Required", "Location access is required to submit location evidence.");
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({});
-      const locationData = JSON.stringify({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        accuracy: location.coords.accuracy,
-        timestamp: location.timestamp,
-      });
-
-      setEvidenceItems(prev => [
-        ...prev,
-        {
-          type: "location",
-          data: locationData,
-          metadata: {
-            accuracy: location.coords.accuracy,
-            timestamp: location.timestamp,
-          },
-        },
-      ]);
-    } catch (error) {
-      Alert.alert("Error", "Failed to get location. Please try again.");
     }
   };
 
@@ -506,7 +471,6 @@ const MissionSubmissionPage = () => {
       if (item.type === "text") return "Text Evidence";
       if (isAudio) return "Audio Evidence";
       if (item.type === "video") return "Video Evidence";
-      if (item.type === "location") return "Location Evidence";
       if (isDocument) return "Document Evidence";
       return "Photo Evidence";
     };
@@ -521,7 +485,6 @@ const MissionSubmissionPage = () => {
       if (item.type === "text") return FileText;
       if (isAudio) return Mic;
       if (item.type === "video") return Video;
-      if (item.type === "location") return MapPin;
       if (isDocument) return FileText;
       return Upload;
     };
@@ -831,23 +794,6 @@ const MissionSubmissionPage = () => {
                           <Icon as={FileText} size="sm" />
                         </Button>
                       </HStack>
-                    </VStack>
-                  )}
-
-                  {currentStep.requiredEvidence.includes("location") && (
-                    <VStack space="xs">
-                      <Text size="sm" className="font-medium">Location Evidence</Text>
-                      <Button
-                        size="sm"
-                        onPress={handleGetLocation}
-                        disabled={submitting}
-                        className="bg-[#87CEEB] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
-                      >
-                        <HStack space="xs" className="items-center">
-                          <Icon as={MapPin} size="sm" className="text-[#333333]" />
-                          <Text retro className="text-[#333333] font-bold">Get Current Location</Text>
-                        </HStack>
-                      </Button>
                     </VStack>
                   )}
                 </VStack>

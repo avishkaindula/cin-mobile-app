@@ -9,12 +9,12 @@ export interface GuidanceStep {
   icon: string;
   title: string;
   description: string;
-  requiredEvidence: string[]; // ["photo", "video", "text", "location"]
+  requiredEvidence: string[]; // ["photo", "video", "text", "audio", "document"]
 }
 
 export interface EvidenceItem {
-  type: "photo" | "video" | "text" | "location";
-  data: string; // For photos/videos: storage path, for text: the text content, for location: JSON string
+  type: "photo" | "video" | "text";
+  data: string; // For photos/videos: storage path, for text: the text content
   metadata?: Record<string, any>; // Additional metadata like file size, duration, etc.
   uploadedAt: string;
 }
