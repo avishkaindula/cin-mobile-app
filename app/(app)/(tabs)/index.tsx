@@ -37,6 +37,7 @@ import {
   getUserAvailablePoints,
   Reward,
 } from "@/services/rewards";
+import { getCurrentUserProfile } from "@/services/profile/profile.service";
 
 const HomePage = () => {
   const { t } = useLanguage();
@@ -44,6 +45,8 @@ const HomePage = () => {
   const [missions, setMissions] = useState<MissionWithStats[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [availablePoints, setAvailablePoints] = useState<number>(0);
+  const [userPoints, setUserPoints] = useState<number>(0);
+  const [userEnergy, setUserEnergy] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -52,7 +55,26 @@ const HomePage = () => {
   }, []);
 
   const loadData = async () => {
-    await Promise.all([loadMissions(), loadRewards(), loadUserPoints()]);
+    await Promise.all([
+      loadMissions(),
+      loadRewards(),
+      loadUserPoints(),
+      loadUserBalance(),
+    ]);
+  };
+
+  const loadUserBalance = async () => {
+    try {
+      const { data: profile, error } = await getCurrentUserProfile();
+      if (error) {
+        console.error("Error loading user balance:", error);
+      } else if (profile) {
+        setUserPoints(profile.points || 0);
+        setUserEnergy(profile.energy || 0);
+      }
+    } catch (error) {
+      console.error("Error loading user balance:", error);
+    }
   };
 
   const loadMissions = async () => {
@@ -128,14 +150,10 @@ const HomePage = () => {
     .filter((m) => !m.submission_status && !m.is_bookmarked)
     .slice(0, 3); // Show top 3 available missions
 
-  // User stats (calculated from real data)
+  // User stats (from real agent balance and mission data)
   const userStats = {
-    currentPoints: missions
-      .filter((m) => m.submission_status === "reviewed")
-      .reduce((sum, m) => sum + (m.points_awarded || 0), 0),
-    totalEnergy: missions
-      .filter((m) => m.submission_status === "reviewed")
-      .reduce((sum, m) => sum + (m.energy_awarded || 0), 0),
+    currentPoints: userPoints, // Use actual balance from agents table
+    totalEnergy: userEnergy, // Use actual balance from agents table
     completedMissions: missions.filter(
       (m) => m.submission_status === "reviewed"
     ).length,
