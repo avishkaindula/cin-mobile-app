@@ -15,7 +15,6 @@ import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/components/i18n/language-context";
 import {
   Globe,
-  Trophy,
   Play,
   CheckCircle,
   Bookmark,
@@ -129,15 +128,11 @@ const HomePage = () => {
     .filter((m) => !m.submission_status && !m.is_bookmarked)
     .slice(0, 3); // Show top 3 available missions
 
-  // User league and points data (calculated from real data)
+  // User stats (calculated from real data)
   const userStats = {
     currentPoints: missions
       .filter((m) => m.submission_status === "reviewed")
       .reduce((sum, m) => sum + (m.points_awarded || 0), 0),
-    currentLeague: "silver",
-    nextLeagueThreshold: 1000,
-    leagueColor: "#C0C0C0", // Silver color
-    leagueIcon: Trophy,
     totalEnergy: missions
       .filter((m) => m.submission_status === "reviewed")
       .reduce((sum, m) => sum + (m.energy_awarded || 0), 0),
@@ -146,8 +141,6 @@ const HomePage = () => {
     ).length,
     activeMissions: ongoingMissions.length,
   };
-
-  const pointsToNext = userStats.nextLeagueThreshold - userStats.currentPoints;
 
   const getStatusInfo = (mission: MissionWithStats) => {
     if (mission.submission_status === "reviewed") {
@@ -219,59 +212,56 @@ const HomePage = () => {
               </Text>
             </VStack>
 
-            {/* League Status Card */}
+            {/* Total Points & Energy Card */}
             <Card className="p-4 bg-[#FCFCFC] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
-              <HStack space="md" className="items-center">
-                <Box className="p-3 rounded-lg bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
-                  <Icon
-                    as={userStats.leagueIcon}
-                    size="md"
-                    className="text-[#333333]"
-                  />
-                </Box>
-                <VStack space="xs" className="flex-1">
-                  <HStack space="xs" className="items-center">
-                    <Text
+              <HStack space="lg" className="items-center justify-around">
+                {/* Points Section */}
+                <VStack space="xs" className="items-center flex-1">
+                  <Box className="p-3 rounded-lg bg-[#FFD700] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
+                    <Icon
+                      as={Star}
                       size="lg"
-                      className="font-bold text-[#333333] tracking-wide"
-                      retro
-                    >
-                      Silver League
-                    </Text>
-                    <Badge
-                      variant="solid"
-                      className="bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
-                    >
-                      <Text
-                        size="xs"
-                        className="text-[#333333] font-bold tracking-wide"
-                      >
-                        {userStats.currentPoints} {t("points")}
-                      </Text>
-                    </Badge>
-                  </HStack>
+                      className="text-[#333333]"
+                    />
+                  </Box>
                   <Text
                     size="sm"
                     className="text-[#333333] font-semibold tracking-wide"
                   >
-                    {pointsToNext > 0
-                      ? `${pointsToNext} ${t("pointsToNext")}`
-                      : "Max level reached!"}
+                    Total Points
                   </Text>
-                  <Box className="w-full h-3 bg-[#333333] border-2 border-[#333333] rounded-lg mt-1">
-                    <Box
-                      className="h-full rounded-md border border-[#333333]"
-                      style={{
-                        width: `${Math.min(
-                          (userStats.currentPoints /
-                            userStats.nextLeagueThreshold) *
-                            100,
-                          100
-                        )}%`,
-                        backgroundColor: userStats.leagueColor,
-                      }}
+                  <Text
+                    className="font-extrabold text-[#333333] text-3xl tracking-wider"
+                    retro
+                  >
+                    {userStats.currentPoints}
+                  </Text>
+                </VStack>
+
+                {/* Divider */}
+                <Box className="w-0.5 h-20 bg-[#333333]" />
+
+                {/* Energy Section */}
+                <VStack space="xs" className="items-center flex-1">
+                  <Box className="p-3 rounded-lg bg-[#FFE4B5] border-2 border-[#333333] shadow-[2px_2px_0_#333333]">
+                    <Icon
+                      as={Zap}
+                      size="lg"
+                      className="text-[#333333]"
                     />
                   </Box>
+                  <Text
+                    size="sm"
+                    className="text-[#333333] font-semibold tracking-wide"
+                  >
+                    Total Energy
+                  </Text>
+                  <Text
+                    className="font-extrabold text-[#333333] text-3xl tracking-wider"
+                    retro
+                  >
+                    {userStats.totalEnergy}
+                  </Text>
                 </VStack>
               </HStack>
             </Card>
@@ -311,19 +301,19 @@ const HomePage = () => {
                 </Text>
               </VStack>
             </Card>
-            <Card className="flex-1 p-4 bg-[#FFE4B5] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
+            <Card className="flex-1 p-4 bg-[#DDA0DD] border-2 border-[#333333] shadow-[4px_4px_0_#333333]">
               <VStack space="xs" className="items-center">
                 <Text
                   className="font-bold text-[#333333] text-2xl tracking-wider"
                   retro
                 >
-                  {userStats.totalEnergy}
+                  {savedMissions.length}
                 </Text>
                 <Text
                   size="sm"
                   className="text-[#333333] font-bold tracking-wide"
                 >
-                  Energy
+                  Saved
                 </Text>
               </VStack>
             </Card>
