@@ -611,22 +611,44 @@ const HomePage = () => {
                                 />
                               </Box>
                             </VStack>
-                            <Button
-                              size="sm"
-                              className="mt-2 bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
-                              onPress={() => handleContinueMission(mission.id)}
-                            >
-                              <HStack space="xs" className="items-center">
-                                <Icon
-                                  as={Play}
-                                  size="sm"
-                                  className="text-[#333333]"
-                                />
-                                <Text className="text-[#333333] font-bold tracking-wide">
-                                  Continue
-                                </Text>
-                              </HStack>
-                            </Button>
+                            <VStack space="md">
+                              <Button
+                                size="sm"
+                                className="w-full bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
+                                onPress={() => handleContinueMission(mission.id)}
+                              >
+                                <HStack space="xs" className="items-center">
+                                  <Icon
+                                    as={Play}
+                                    size="sm"
+                                    className="text-[#333333]"
+                                  />
+                                  <Text className="text-[#333333] font-bold tracking-wide">
+                                    Continue
+                                  </Text>
+                                </HStack>
+                              </Button>
+                              <Button
+                                variant="solid"
+                                size="sm"
+                                className="w-full border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
+                                onPress={() => handleViewMission(mission.id)}
+                              >
+                                <HStack space="xs" className="items-center">
+                                  <Icon
+                                    as={Eye}
+                                    size="sm"
+                                    className="text-[#333333]"
+                                  />
+                                  <Text
+                                    size="sm"
+                                    className="text-[#333333] font-bold tracking-wide"
+                                  >
+                                    View
+                                  </Text>
+                                </HStack>
+                              </Button>
+                            </VStack>
                           </VStack>
                         </VStack>
                       </Card>
@@ -759,11 +781,27 @@ const HomePage = () => {
                               {mission.organization_name}
                             </Text>
                           </HStack>
-                          <HStack space="md">
+                          <VStack space="md">
+                            <Button
+                              size="sm"
+                              className="w-full bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              onPress={() => handleStartMission(mission.id)}
+                            >
+                              <HStack space="xs" className="items-center">
+                                <Icon
+                                  as={Target}
+                                  size="sm"
+                                  className="text-[#333333]"
+                                />
+                                <Text className="text-[#333333] font-bold tracking-wide">
+                                  Start
+                                </Text>
+                              </HStack>
+                            </Button>
                             <Button
                               variant="solid"
                               size="sm"
-                              className="flex-1 border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
+                              className="w-full border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
                               onPress={() => handleViewMission(mission.id)}
                             >
                               <HStack space="xs" className="items-center">
@@ -780,23 +818,7 @@ const HomePage = () => {
                                 </Text>
                               </HStack>
                             </Button>
-                            <Button
-                              size="sm"
-                              className="flex-1 bg-[#A2D8FF] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
-                              onPress={() => handleStartMission(mission.id)}
-                            >
-                              <HStack space="xs" className="items-center">
-                                <Icon
-                                  as={Target}
-                                  size="sm"
-                                  className="text-[#333333]"
-                                />
-                                <Text className="text-[#333333] font-bold tracking-wide">
-                                  Start
-                                </Text>
-                              </HStack>
-                            </Button>
-                          </HStack>
+                          </VStack>
                         </VStack>
                       </VStack>
                     </Card>
@@ -908,50 +930,57 @@ const HomePage = () => {
                               {mission.description}
                             </Text>
                           </VStack>
-                          <HStack space="md" className="items-center">
-                            <HStack space="xs" className="items-center">
-                              <Icon
-                                as={Building}
-                                size="sm"
-                                className="text-[#333333]"
-                              />
-                              <Text
-                                size="sm"
-                                className="text-[#333333] font-semibold tracking-wide"
-                              >
-                                {mission.organization_name}
-                              </Text>
-                            </HStack>
-                            <HStack space="xs" className="items-center">
-                              <Icon
-                                as={Users}
-                                size="sm"
-                                className="text-[#333333]"
-                              />
-                              <Text
-                                size="sm"
-                                className="text-[#333333] font-semibold tracking-wide"
-                              >
-                                {mission.participants_count}
-                              </Text>
-                            </HStack>
+                          <HStack space="xs" className="items-center">
+                            <Icon
+                              as={Building}
+                              size="sm"
+                              className="text-[#333333]"
+                            />
+                            <Text
+                              size="sm"
+                              className="text-[#333333] font-semibold tracking-wide"
+                            >
+                              {mission.organization_name}
+                            </Text>
                           </HStack>
-                          <Button
-                            size="sm"
-                            className="mt-2 bg-[#98FB98] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
-                            onPress={() => handleStartMission(mission.id)}
-                          >
-                            <HStack space="xs" className="items-center">
-                              <Icon
-                                as={Target}
-                                size="sm"
-                                className="text-[#333333]"
-                              />
-                              <Text className="text-[#333333] font-bold tracking-wide">
-                                Start Quest
-                              </Text>
-                            </HStack>
-                          </Button>
+                          <VStack space="md">
+                            <Button
+                              size="sm"
+                              className="w-full bg-[#98FB98] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                              onPress={() => handleStartMission(mission.id)}
+                            >
+                              <HStack space="xs" className="items-center">
+                                <Icon
+                                  as={Target}
+                                  size="sm"
+                                  className="text-[#333333]"
+                                />
+                                <Text className="text-[#333333] font-bold tracking-wide">
+                                  Start Quest
+                                </Text>
+                              </HStack>
+                            </Button>
+                            <Button
+                              variant="solid"
+                              size="sm"
+                              className="w-full border-2 border-[#333333] shadow-[2px_2px_0_#333333] bg-[#FCFCFC]"
+                              onPress={() => handleViewMission(mission.id)}
+                            >
+                              <HStack space="xs" className="items-center">
+                                <Icon
+                                  as={Eye}
+                                  size="sm"
+                                  className="text-[#333333]"
+                                />
+                                <Text
+                                  size="sm"
+                                  className="text-[#333333] font-bold tracking-wide"
+                                >
+                                  View
+                                </Text>
+                              </HStack>
+                            </Button>
+                          </VStack>
                         </VStack>
                       </VStack>
                     </Card>
