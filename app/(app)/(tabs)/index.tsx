@@ -585,32 +585,6 @@ const HomePage = () => {
                                 {mission.description}
                               </Text>
                             </VStack>
-                            <VStack space="xs">
-                              <HStack className="justify-between">
-                                <Text
-                                  size="sm"
-                                  className="text-[#333333] font-bold tracking-wide"
-                                >
-                                  Progress
-                                </Text>
-                                <Text
-                                  size="sm"
-                                  className="text-[#333333] font-bold tracking-wide"
-                                >
-                                  {mission.submission_progress || 0}%
-                                </Text>
-                              </HStack>
-                              <Box className="w-full h-3 bg-[#333333] border-2 border-[#333333] rounded-lg">
-                                <Box
-                                  className="h-full rounded-md bg-[#A2D8FF] border border-[#333333]"
-                                  style={{
-                                    width: `${
-                                      mission.submission_progress || 0
-                                    }%`,
-                                  }}
-                                />
-                              </Box>
-                            </VStack>
                             <VStack space="md">
                               <Button
                                 size="sm"

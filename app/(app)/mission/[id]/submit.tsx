@@ -728,20 +728,17 @@ const MissionSubmissionPage = () => {
                 <VStack space="md">
                   {currentStep.requiredEvidence.includes("photo") && (
                     <VStack space="xs">
-                      <Text retro size="sm" className="font-bold text-[#333333]">Photo Evidence</Text>
+                      <Text size="sm" className="font-medium">Photo Evidence</Text>
                       <Button
-                        variant="outline"
                         size="sm"
                         onPress={handleSelectPhoto}
                         disabled={submitting}
-                        className="w-full bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                        className="bg-[#A2D8FF] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                       >
-                        <VStack className="items-center justify-center">
-                          <HStack space="xs" className="items-center">
-                            <Icon as={Upload} size="sm" className="text-[#333333]" />
-                            <Text retro className="text-[#333333] font-bold">Select Photo from Gallery</Text>
-                          </HStack>
-                        </VStack>
+                        <HStack space="xs" className="items-center">
+                          <Icon as={Upload} size="sm" className="text-[#333333]" />
+                          <Text retro className="text-[#333333] font-bold">Select Photo from Gallery</Text>
+                        </HStack>
                       </Button>
                     </VStack>
                   )}
@@ -750,15 +747,14 @@ const MissionSubmissionPage = () => {
                     <VStack space="xs">
                       <Text size="sm" className="font-medium">Video Evidence</Text>
                       <Button
-                        variant="outline"
                         size="sm"
                         onPress={handleSelectVideo}
                         disabled={submitting}
-                        className="w-full"
+                        className="bg-[#DDA0DD] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                       >
                         <HStack space="xs" className="items-center">
-                          <Icon as={Video} size="sm" />
-                          <Text>Select Video from Gallery</Text>
+                          <Icon as={Video} size="sm" className="text-[#333333]" />
+                          <Text retro className="text-[#333333] font-bold">Select Video from Gallery</Text>
                         </HStack>
                       </Button>
                     </VStack>
@@ -767,20 +763,19 @@ const MissionSubmissionPage = () => {
                   {/* Document Picker */}
                   {currentStep.requiredEvidence.includes("document") && (
                     <VStack space="xs">
-                      <Text retro size="sm" className="font-bold text-[#333333]">Document Evidence</Text>
+                      <Text size="sm" className="font-medium">Document Evidence</Text>
                       <Button
-                        variant="outline"
                         size="sm"
                         onPress={handleSelectDocument}
                         disabled={submitting}
-                        className="w-full bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333]"
+                        className="bg-[#FFE4B5] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                       >
                         <VStack className="items-center justify-center">
                           <HStack space="xs" className="items-center">
                             <Icon as={FileText} size="sm" className="text-[#333333]" />
                             <Text retro className="text-[#333333] font-bold">Upload Document/File</Text>
                           </HStack>
-                          <Text retro size="xs" className="text-[#666666]">(PDF, DOC, XLS, etc.)</Text>
+                          <Text size="xs" className="text-[#333333] font-semibold">(PDF, DOC, XLS, etc.)</Text>
                         </VStack>
                       </Button>
                     </VStack>
@@ -789,17 +784,16 @@ const MissionSubmissionPage = () => {
                   {/* Audio Recording */}
                   {currentStep.requiredEvidence.includes("audio") && (
                     <VStack space="xs">
-                      <Text retro size="sm" className="font-bold text-[#333333]">Audio Evidence</Text>
+                      <Text size="sm" className="font-medium">Audio Evidence</Text>
                       <Button
-                        variant="outline"
                         size="sm"
                         onPress={isRecording ? stopAudioRecording : startAudioRecording}
                         disabled={submitting}
-                        className={`w-full bg-[#FCFCFC] border-2 border-[#333333] shadow-[2px_2px_0_#333333] ${isRecording ? 'bg-red-50' : ''}`}
+                        className={`border-2 border-[#333333] shadow-[4px_4px_0_#333333] ${isRecording ? "bg-[#FF6B6B]" : "bg-[#FFA07A]"}`}
                       >
                         <HStack space="xs" className="items-center">
-                          <Icon as={isRecording ? Square : Mic} size="sm" className={isRecording ? "text-red-500" : "text-[#333333]"} />
-                          <Text retro className={isRecording ? "text-red-500 font-bold" : "text-[#333333] font-bold"}>
+                          <Icon as={isRecording ? Square : Mic} size="sm" className="text-[#333333]" />
+                          <Text retro className="text-[#333333] font-bold">
                             {isRecording ? "Stop Recording" : "Start Recording"}
                           </Text>
                         </HStack>
@@ -844,14 +838,14 @@ const MissionSubmissionPage = () => {
                     <VStack space="xs">
                       <Text size="sm" className="font-medium">Location Evidence</Text>
                       <Button
-                        variant="outline"
                         size="sm"
                         onPress={handleGetLocation}
                         disabled={submitting}
+                        className="bg-[#87CEEB] border-2 border-[#333333] shadow-[4px_4px_0_#333333]"
                       >
                         <HStack space="xs" className="items-center">
-                          <Icon as={MapPin} size="sm" />
-                          <Text>Get Current Location</Text>
+                          <Icon as={MapPin} size="sm" className="text-[#333333]" />
+                          <Text retro className="text-[#333333] font-bold">Get Current Location</Text>
                         </HStack>
                       </Button>
                     </VStack>

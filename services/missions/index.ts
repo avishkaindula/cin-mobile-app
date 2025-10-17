@@ -90,7 +90,7 @@ export async function getPublishedMissions(
         completed_submissions_count: completedSubmissions.length,
         is_bookmarked: isBookmarked,
         submission_status: userSubmission?.status || null,
-        submission_progress: userSubmission ? getSubmissionProgress(userSubmission) : 0,
+        submission_progress: userSubmission ? getSubmissionProgressWithSteps(userSubmission, mission.guidance_steps) : 0,
       };
     });
 
@@ -149,7 +149,7 @@ export async function getBookmarkedMissions(): Promise<{ data: MissionWithStats[
         completed_submissions_count: completedSubmissions.length,
         is_bookmarked: true,
         submission_status: userSubmission?.status || null,
-        submission_progress: userSubmission ? getSubmissionProgress(userSubmission) : 0,
+        submission_progress: userSubmission ? getSubmissionProgressWithSteps(userSubmission, mission.guidance_steps) : 0,
       };
     });
 
@@ -208,7 +208,7 @@ export async function getActiveMissions(): Promise<{ data: MissionWithStats[] | 
         completed_submissions_count: completedSubmissions.length,
         is_bookmarked: false, // We'll need to check this separately if needed
         submission_status: submission.status,
-        submission_progress: getSubmissionProgress(submission),
+        submission_progress: getSubmissionProgressWithSteps(submission, mission.guidance_steps),
       };
     });
 
@@ -368,6 +368,29 @@ function getSubmissionProgress(submission: any): number {
   // This is a rough calculation - in reality, you'd want to compare against
   // the total number of guidance steps in the mission
   const totalSteps = Math.max(Object.keys(evidence).length, 1);
+  return Math.round((completedSteps.length / totalSteps) * 100);
+}
+
+/**
+ * Calculate submission progress with actual guidance steps count
+ */
+function getSubmissionProgressWithSteps(submission: any, guidanceSteps: any[]): number {
+  if (!submission.guidance_evidence || typeof submission.guidance_evidence !== "object") {
+    return 0;
+  }
+
+  // If no guidance steps defined, fall back to old calculation
+  if (!Array.isArray(guidanceSteps) || guidanceSteps.length === 0) {
+    return getSubmissionProgress(submission);
+  }
+
+  const evidence = submission.guidance_evidence as Record<string, any>;
+  const completedSteps = Object.keys(evidence).filter(step => {
+    const stepEvidence = evidence[step];
+    return Array.isArray(stepEvidence) && stepEvidence.length > 0;
+  });
+
+  const totalSteps = guidanceSteps.length;
   return Math.round((completedSteps.length / totalSteps) * 100);
 }
 
