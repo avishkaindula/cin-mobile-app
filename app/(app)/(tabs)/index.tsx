@@ -585,6 +585,19 @@ const HomePage = () => {
                                 {mission.description}
                               </Text>
                             </VStack>
+                            <HStack space="xs" className="items-center">
+                              <Icon
+                                as={Building}
+                                size="sm"
+                                className="text-[#333333]"
+                              />
+                              <Text
+                                size="sm"
+                                className="text-[#333333] font-semibold tracking-wide"
+                              >
+                                {mission.organization_name}
+                              </Text>
+                            </HStack>
                             <VStack space="md">
                               <Button
                                 size="sm"
