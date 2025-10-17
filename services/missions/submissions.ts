@@ -245,7 +245,16 @@ export async function submitStepEvidence(
 
     // If submission is completed, trigger point/energy transactions
     if (allStepsCompleted && submission.status !== "completed") {
+      console.log("🚀 All steps completed! Triggering completion rewards...");
+      console.log("Previous status:", submission.status, "New status:", newStatus);
       await triggerCompletionRewards(submission.id);
+    } else {
+      console.log("📝 Steps progress:", {
+        completedSteps: Object.keys(updatedEvidence).length,
+        totalSteps: guidanceSteps.length,
+        allCompleted: allStepsCompleted,
+        currentStatus: submission.status
+      });
     }
 
     return { success: true, error: null };
@@ -259,7 +268,7 @@ export async function submitStepEvidence(
  * Upload a file to mission submissions storage
  */
 export async function uploadEvidenceFile(
-  file: File | Blob,
+  file: File | Blob | Uint8Array | ArrayBuffer,
   fileName: string,
   missionId: string,
   stepId: string
@@ -277,11 +286,15 @@ export async function uploadEvidenceFile(
     const uniqueFileName = `${timestamp}_${stepId}.${fileExtension}`;
     const filePath = `${user.id}/${missionId}/${uniqueFileName}`;
 
+    // Determine content type from file extension
+    const contentType = getContentType(fileExtension || '');
+
     const { data, error } = await supabase.storage
       .from("mission-submissions")
       .upload(filePath, file, {
         cacheControl: "3600",
         upsert: false,
+        contentType,
       });
 
     if (error) {
@@ -293,6 +306,38 @@ export async function uploadEvidenceFile(
     console.error("Error uploading evidence file:", error);
     return { data: null, error: "Failed to upload file" };
   }
+}
+
+/**
+ * Helper function to determine content type from file extension
+ */
+function getContentType(extension: string): string {
+  const ext = extension.toLowerCase();
+  const types: Record<string, string> = {
+    // Images
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+    // Videos
+    'mp4': 'video/mp4',
+    'mov': 'video/quicktime',
+    'avi': 'video/x-msvideo',
+    'webm': 'video/webm',
+    // Audio
+    'm4a': 'audio/m4a',
+    'mp3': 'audio/mpeg',
+    'wav': 'audio/wav',
+    // Documents
+    'pdf': 'application/pdf',
+    'doc': 'application/msword',
+    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'xls': 'application/vnd.ms-excel',
+    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'txt': 'text/plain',
+  };
+  return types[ext] || 'application/octet-stream';
 }
 
 /**
@@ -368,18 +413,28 @@ export async function deleteStepEvidence(
  */
 async function triggerCompletionRewards(submissionId: string): Promise<void> {
   try {
+    console.log("🎯 Triggering completion rewards for submission:", submissionId);
+    
     // Use the new auto-completion function that awards points immediately
     const { data, error } = await supabase.rpc("auto_complete_mission_submission", {
       p_submission_id: submissionId,
     });
 
     if (error) {
-      console.error("Error triggering completion rewards:", error.message);
+      console.error("❌ Error triggering completion rewards:", error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
     } else if (data) {
-      console.log("Mission completion result:", data);
+      console.log("✅ Mission completion result:", JSON.stringify(data, null, 2));
+      if (data.success && data.completed) {
+        console.log(`🎉 Awarded ${data.points_awarded} points and ${data.energy_awarded} energy!`);
+      } else {
+        console.log("ℹ️ Mission not completed or already processed:", data.message);
+      }
+    } else {
+      console.log("⚠️ No data returned from completion function");
     }
   } catch (error) {
-    console.error("Error in triggerCompletionRewards:", error);
+    console.error("❌ Exception in triggerCompletionRewards:", error);
   }
 }
 

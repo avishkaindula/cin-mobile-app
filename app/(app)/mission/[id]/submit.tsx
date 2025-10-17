@@ -42,6 +42,7 @@ import {
 } from "@/services/missions/submissions";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import { Audio } from "expo-av";
 
 const MissionSubmissionPage = () => {
@@ -275,16 +276,26 @@ const MissionSubmissionPage = () => {
     try {
       setSubmitting(true);
 
-      // Convert to blob for upload
-      const response = await fetch(asset.uri);
-      const blob = await response.blob();
-
       const currentStep = guidanceSteps[currentStepIndex];
       if (!currentStep) return;
 
+      // Read file as base64
+      const base64Data = await FileSystem.readAsStringAsync(asset.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Convert base64 to binary for upload
+      const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+
+      // Determine content type
+      const fileExt = asset.uri.split('.').pop()?.toLowerCase() || (type === "video" ? "mp4" : "jpg");
+      const contentType = type === "video" 
+        ? `video/${fileExt}` 
+        : `image/${fileExt}`;
+
       const { data, error } = await uploadEvidenceFile(
-        blob,
-        asset.fileName || `${type}_${Date.now()}`,
+        binaryData,
+        asset.fileName || `${type}_${Date.now()}.${fileExt}`,
         missionId,
         currentStep.id
       );
@@ -311,6 +322,7 @@ const MissionSubmissionPage = () => {
         ]);
       }
     } catch (error) {
+      console.error("Upload error:", error);
       Alert.alert("Error", "Failed to upload file. Please try again.");
     } finally {
       setSubmitting(false);
@@ -321,15 +333,19 @@ const MissionSubmissionPage = () => {
     try {
       setSubmitting(true);
 
-      // Convert to blob for upload
-      const response = await fetch(document.uri);
-      const blob = await response.blob();
-
       const currentStep = guidanceSteps[currentStepIndex];
       if (!currentStep) return;
 
+      // Read file as base64
+      const base64Data = await FileSystem.readAsStringAsync(document.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Convert base64 to binary for upload
+      const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+
       const { data, error } = await uploadEvidenceFile(
-        blob,
+        binaryData,
         document.name,
         missionId,
         currentStep.id
@@ -355,6 +371,7 @@ const MissionSubmissionPage = () => {
         ]);
       }
     } catch (error) {
+      console.error("Upload error:", error);
       Alert.alert("Error", "Failed to upload document. Please try again.");
     } finally {
       setSubmitting(false);
@@ -414,9 +431,11 @@ const MissionSubmissionPage = () => {
 
         // Show success message
         if (currentStepIndex + 1 >= guidanceSteps.length) {
+          const pointsAwarded = mission?.points_awarded || 0;
+          const energyAwarded = mission?.energy_awarded || 0;
           Alert.alert(
             "Mission Completed! 🎉",
-            "Congratulations! You've completed all steps. Your submission is being reviewed and points will be awarded once approved.",
+            `Congratulations! You've completed all steps and earned ${pointsAwarded} points and ${energyAwarded} energy!`,
             [
               {
                 text: "OK",
