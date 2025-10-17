@@ -230,17 +230,21 @@ const MissionSubmissionPage = () => {
     try {
       setSubmitting(true);
 
-      // Convert to blob for upload
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
       const currentStep = guidanceSteps[currentStepIndex];
       if (!currentStep) return;
+
+      // Read file as base64
+      const base64Data = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Convert base64 to binary for upload
+      const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
 
       const fileName = `audio_${Date.now()}.m4a`;
 
       const { data, error } = await uploadEvidenceFile(
-        blob,
+        binaryData,
         fileName,
         missionId,
         currentStep.id
